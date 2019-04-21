@@ -37,11 +37,39 @@
 #include "Netlist.h"
 
 Netlist::Netlist() {
-	// TODO Auto-generated constructor stub
-
+	_netPointer.push_back(0);
 }
 
-Netlist::~Netlist() {
-	// TODO Auto-generated destructor stub
+void Netlist::addIONet(const IOPin& ioPin, const std::vector<InstancePin>& instPins) {
+	_ioPins.push_back(ioPin);
+	_instPins.insert(_instPins.end(), instPins.begin(), instPins.end());
+	_netPointer.push_back(_instPins.size());
 }
 
+void Netlist::forEachIOPin(std::function<void(unsigned idx, IOPin&)> func) {
+	for (unsigned idx = 0; idx < _ioPins.size(); ++idx) {
+		func(idx, _ioPins[idx]);
+	}
+}
+
+void Netlist::forEachIOPin(std::function<void(unsigned idx, const IOPin&)> func) const {
+	for (unsigned idx = 0; idx < _ioPins.size(); ++idx) {
+		func(idx, _ioPins[idx]);
+	}
+}
+
+void Netlist::forEachSinkOfIO(unsigned idx, std::function<void(InstancePin&)> func) {
+	unsigned netStart = _netPointer[idx];
+	unsigned netEnd = _netPointer[idx + 1];
+	for (unsigned idx = netStart; idx < netEnd; ++idx) {
+		func(_instPins[idx]);
+	}
+}
+
+void Netlist::forEachSinkOfIO(unsigned idx, std::function<void(const InstancePin&)> func) const {
+	unsigned netStart = _netPointer[idx];
+	unsigned netEnd = _netPointer[idx + 1];
+	for (unsigned idx = netStart; idx < netEnd; ++idx) {
+		func(_instPins[idx]);
+	}
+}

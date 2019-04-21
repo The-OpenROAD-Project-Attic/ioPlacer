@@ -38,10 +38,16 @@
 
 #include <iostream>
 #include "Parameters.h"
+#include "Netlist.h"
+#include "Core.h"
 
 class IOPlacementKernel {
 private:
 	Parameters* _parms;
+	Netlist _netlist;
+	Core _core;
+
+	void initNetlistAndCore();
 
 public:
 	IOPlacementKernel(Parameters& parms);

@@ -39,8 +39,21 @@
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms){
 }
 
-void IOPlacementKernel::run() {
-	Parser parser(*_parms);
+void IOPlacementKernel::initNetlistAndCore() {
+	Parser parser(*_parms, _netlist, _core);
+	parser.run();
 }
+
+void IOPlacementKernel::run() {
+	initNetlistAndCore();
+
+	_netlist.forEachIOPin([&](unsigned idx, const IOPin& ioPin) {
+		std::cout << "IO Pin: " << ioPin.getName() << "\n";
+		_netlist.forEachSinkOfIO(idx, [&](const InstancePin& instPin) {
+			std::cout << "\tinstPin " << instPin.getName() << "\n";
+		});
+	});
+}
+
 
 

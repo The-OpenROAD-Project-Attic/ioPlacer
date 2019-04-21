@@ -38,7 +38,15 @@
 #include <fstream>
 #include "Parser.h"
 
-Parser::Parser(Parameters &parms) : _parms(&parms) {
+Parser::Parser(Parameters &parms, Netlist& netlist, Core& core) :
+	_parms(&parms), _netlist(&netlist), _core(&core) {
+}
+
+void Parser::run() {
+	readDieArea();
+	readConnections();
+	initNetlist();
+	initCore();
 }
 
 void Parser::readDieArea() {
@@ -46,7 +54,7 @@ void Parser::readDieArea() {
 	infile.open(_parms->getFloorplanFile());
 	
 	if(!infile.is_open())
-		std::cout << "File" << _parms->getFloorplanFile() << "not found!!!\n";
+		std::cout << "File " << _parms->getFloorplanFile() << " not found!!!\n";
 	
 	std::string line;
 
@@ -64,14 +72,12 @@ void Parser::readDieArea() {
 	infile.close();
 } // end method
 
-// -----------------------------------------------------------------------------
-
 void Parser::readConnections() {
 	std::ifstream infile;
 	infile.open(_parms->getNetlistFile());
 	
 	if(!infile.is_open())
-		std::cout << "File" << _parms->getNetlistFile() << "not found!!!\n";
+		std::cout << "File " << _parms->getNetlistFile() << " not found!!!\n";
 	
 	std::string line;
 
@@ -87,7 +93,6 @@ void Parser::readConnections() {
 		} // end if
 		
 		std::istringstream iss(line);
-		
 		if (iss >> pinName >> lowerX >> lowerY >> upperX >> upperY >> direction) {
 			ioPin pin;
 			pin.name = pinName;
@@ -109,8 +114,28 @@ void Parser::readConnections() {
 	infile.close();
 } // end method
 
-// -----------------------------------------------------------------------------
+void Parser::initNetlist() {
+	for (unsigned i = 0; i < _ioPins.size(); ++i) {
+		ioPin& io = _ioPins[i];
+		Direction dir = IN;
+		if(io.direction == "OUT") {
+			dir = OUT;
+		} else if (io.direction == "INOUT") {
+			dir = INOUT;
+		}
 
-std::vector<Parser::ioPin>& Parser::getIOPins() {
-	return _ioPins;
-} // end method
+		IOPin ioPin(io.name, dir);
+		std::vector<InstancePin> instPins;
+		for (unsigned j = 0; j < io.connections.size(); ++j) {
+			cellPin& cellPin = io.connections[j];
+			instPins.push_back(InstancePin(cellPin.name, Coordinate(cellPin.position.x(), cellPin.position.y())));
+		}
+		_netlist->addIONet(ioPin, instPins);
+	}
+}
+
+void Parser::initCore() {
+	Coordinate lowerBound(_dieArea.min_corner().x(), _dieArea.min_corner().y());
+	Coordinate upperBound(_dieArea.max_corner().x(), _dieArea.max_corner().y());
+	*_core = Core(lowerBound, upperBound);
+}

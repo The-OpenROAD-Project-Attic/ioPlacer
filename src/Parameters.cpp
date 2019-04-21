@@ -60,6 +60,7 @@ Parameters::Parameters(int argc, char** argv) {
 		if (vm.count("help") || !vm.count("fpn") || !vm.count("net")
 				|| !vm.count("def")) {
 			std::cout << "\n" << dscp;
+			std::exit(1);
 		}
 
 		_floorplanFile = vm["fpn"].as<std::string>();

@@ -47,9 +47,11 @@
 #include <boost/geometry/geometries/polygon.hpp>
 
 #include "Parameters.h"
+#include "Netlist.h"
+#include "Core.h"
 
 class Parser {
-typedef boost::geometry::model::d2::point_xy<double> point;
+typedef boost::geometry::model::d2::point_xy<DBU> point;
 typedef boost::geometry::model::box<point> box;
 
 private:
@@ -66,16 +68,19 @@ private:
     };
 
     Parameters* _parms;
+    Netlist* _netlist;
+    Core* _core;
     box _dieArea;
     std::vector<ioPin> _ioPins;
     
     void readDieArea();
     void readConnections();
+    void initNetlist();
+    void initCore();
     
 public:
-    Parser(Parameters& parms);
+    Parser(Parameters& parms, Netlist& netlist, Core& core);
     void run();
-    std::vector<ioPin>& getIOPins();
 };
 
 #endif /* SRC_PARSER_H_ */
