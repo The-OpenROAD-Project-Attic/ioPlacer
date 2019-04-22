@@ -40,7 +40,10 @@
 #include <string>
 #include <vector>
 #include <functional>
+#include <limits>
+#include <iostream>
 #include "Coordinate.h"
+#include "Core.h"
 
 enum Orientation {NORTH, SOUTH, EAST, WEST};
 enum Direction {IN, OUT, INOUT};
@@ -89,8 +92,10 @@ public:
 	void forEachIOPin(std::function<void(unsigned idx, const IOPin&)> func) const;
 	void forEachSinkOfIO(unsigned idx, std::function<void(InstancePin&)> func);
 	void forEachSinkOfIO(unsigned idx, std::function<void(const InstancePin&)> func) const;
+        unsigned numSinkofIO(unsigned idx);
+        int numIOPins();
 
-	DBU computeIONetBoundingBox(const IOPin& ioPin);
+	DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);
 };
 
 #endif /* SRC_NETLIST_H_ */

@@ -49,6 +49,9 @@ public:
 
 	Coordinate getLowerBound() const { return _lowerBound; }
 	Coordinate getUpperBound() const { return _upperBound; }
+        
+        DBU getPerimeter();
+        DBU getHPWL();
 };
 
 #endif /* SRC_CORE_H_ */

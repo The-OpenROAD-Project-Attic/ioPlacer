@@ -35,6 +35,7 @@
 
 
 #include "Netlist.h"
+#include "Core.h"
 
 Netlist::Netlist() {
 	_netPointer.push_back(0);
@@ -72,4 +73,39 @@ void Netlist::forEachSinkOfIO(unsigned idx, std::function<void(const InstancePin
 	for (unsigned idx = netStart; idx < netEnd; ++idx) {
 		func(_instPins[idx]);
 	}
+}
+
+unsigned Netlist::numSinkofIO(unsigned idx){
+	unsigned netStart = _netPointer[idx];
+	unsigned netEnd = _netPointer[idx + 1];
+	return netEnd - netStart;
+}
+
+int Netlist::numIOPins(){
+    return _ioPins.size();
+}
+
+DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos){
+    unsigned netStart = _netPointer[idx];
+    unsigned netEnd = _netPointer[idx + 1];
+    Coordinate upperBounds = Coordinate(slotPos.getX(), slotPos.getY());
+    Coordinate lowerBounds = Coordinate(slotPos.getX(), slotPos.getY());
+
+    for (unsigned idx = netStart; idx < netEnd; ++idx) {
+	Coordinate pos = _instPins[idx].getPos();
+           
+        if (pos.getX() < lowerBounds.getX())
+            lowerBounds.setX(pos.getX());
+        if (pos.getX() > upperBounds.getX())
+            upperBounds.setX(pos.getX());
+        if (pos.getY() < lowerBounds.getY())
+            lowerBounds.setY(pos.getY());
+        if (pos.getY() > upperBounds.getY())
+            upperBounds.setY(pos.getY());
+    }
+    
+    Core netBBox(lowerBounds, upperBounds);
+
+    return netBBox.getHPWL();
+    
 }

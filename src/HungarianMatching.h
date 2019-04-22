@@ -36,10 +36,34 @@
 #ifndef SRC_HUNGARIANMATCHING_H_
 #define SRC_HUNGARIANMATCHING_H_
 
+#include "Coordinate.h"
+#include "Core.h"
+#include "Netlist.h"
+#include "munkres/munkres.h"
+#include <iostream>
+#include <math.h>
+
 class HungarianMatching {
 public:
-	HungarianMatching();
-	virtual ~HungarianMatching();
+	HungarianMatching(Netlist& netlist, Core& core);
+	virtual ~HungarianMatching() = default;
+        void run();
+        
+private:
+	DBU slotSize;
+	int numSlots;
+        Netlist _netlist;
+        Core _core;
+        Netlist netlistIOPins;
+        Munkres<DBU> ostlindo;
+        Matrix<DBU> hungarianMatrix;
+        void defineSlotSize();
+        void createMatrix();
+        int getKValue();
+        void setIOListWithSinks();
+        int getNumIOPins();
+        
+	
 };
 
 #endif /* SRC_HUNGARIANMATCHING_H_ */
