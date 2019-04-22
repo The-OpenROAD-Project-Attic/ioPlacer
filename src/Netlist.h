@@ -39,6 +39,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 #include "Coordinate.h"
 
 enum Orientation {NORTH, SOUTH, EAST, WEST};
