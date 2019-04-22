@@ -36,83 +36,78 @@
 #include "HungarianMatching.h"
 
 HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
-    _netlist = netlist;
-    _core = core;
+        _netlist = netlist;
+        _core = core;
 }
 
-void HungarianMatching::run(){
-    setIOListWithSinks();
-    defineSlotSize();
-    createMatrix();
+void HungarianMatching::run() {
+        setIOListWithSinks();
+        defineSlotSize();
+        createMatrix();
 
-    ostlindo.solve(hungarianMatrix);
-    std::cout << hungarianMatrix;
+        ostlindo.solve(hungarianMatrix);
+        std::cout << hungarianMatrix;
 }
 
-void HungarianMatching::defineSlotSize(){
-    int nPins = getNumIOPins();
-    int k = getKValue();
-    DBU corePerimeter = _core.getPerimeter();
-    numSlots = nPins * k;
-    
-    slotSize = std::floor(corePerimeter/numSlots);
+void HungarianMatching::defineSlotSize() {
+        int nPins = getNumIOPins();
+        int k = getKValue();
+        DBU corePerimeter = _core.getPerimeter();
+        numSlots = nPins * k;
+
+        slotSize = std::floor(corePerimeter / numSlots);
 }
 
-int HungarianMatching::getKValue(){
-    return 1;
-}
+int HungarianMatching::getKValue() { return 1; }
 
-void HungarianMatching::setIOListWithSinks(){
-    _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-        std::vector<InstancePin> instPinsVector;
-        if (_netlist.numSinkofIO(idx) != 0){
-            _netlist.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
-               instPinsVector.push_back(instPin);
-            });
-            netlistIOPins.addIONet(ioPin, instPinsVector);
-        }
-    });
-}
-
-int HungarianMatching::getNumIOPins(){
-   return netlistIOPins.numIOPins(); 
-}
-
-void HungarianMatching::createMatrix(){
-    
-    hungarianMatrix = Matrix<DBU>(getNumIOPins(), numSlots);
-            
-    for (int i=0; i < numSlots; i++){
-        int pinIndex = 0;
-        int y = 0;
-        DBU slotBeginning = slotSize * i;
-        DBU halfSlot = slotBeginning + std::floor(slotSize/2);
-        Coordinate coreLowerBounds = _core.getLowerBound();
-        Coordinate coreUpperBounds = _core.getUpperBound();
-        int x = halfSlot;
-        if (x > coreUpperBounds.getX()){
-            y = x - coreUpperBounds.getX();
-            x = coreUpperBounds.getX();
-            if (y > coreUpperBounds.getY()){
-                x = x - (y - coreUpperBounds.getY());
-                y = coreUpperBounds.getY();
-                if (x < coreLowerBounds.getX()){
-                    y = y - std::abs(coreLowerBounds.getX() - x);
-                    x = coreLowerBounds.getX();
-                    
+void HungarianMatching::setIOListWithSinks() {
+        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                std::vector<InstancePin> instPinsVector;
+                if (_netlist.numSinkofIO(idx) != 0) {
+                        _netlist.forEachSinkOfIO(
+                            idx, [&](InstancePin& instPin) {
+                                    instPinsVector.push_back(instPin);
+                            });
+                        netlistIOPins.addIONet(ioPin, instPinsVector);
                 }
-            }
-        }
-        
-        Coordinate newPos = Coordinate(x,y);
-        
-        netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-            DBU hpwl = netlistIOPins.computeIONetHPWL(idx, newPos);
-            hungarianMatrix(pinIndex,i) = hpwl;
-            pinIndex++;
         });
-       
-    }
-    
-    std::cout << hungarianMatrix << "\n";
+}
+
+int HungarianMatching::getNumIOPins() { return netlistIOPins.numIOPins(); }
+
+void HungarianMatching::createMatrix() {
+        hungarianMatrix = Matrix<DBU>(getNumIOPins(), numSlots);
+
+        for (int i = 0; i < numSlots; i++) {
+                int pinIndex = 0;
+                int y = 0;
+                DBU slotBeginning = slotSize * i;
+                DBU halfSlot = slotBeginning + std::floor(slotSize / 2);
+                Coordinate coreLowerBounds = _core.getLowerBound();
+                Coordinate coreUpperBounds = _core.getUpperBound();
+                int x = halfSlot;
+                if (x > coreUpperBounds.getX()) {
+                        y = x - coreUpperBounds.getX();
+                        x = coreUpperBounds.getX();
+                        if (y > coreUpperBounds.getY()) {
+                                x = x - (y - coreUpperBounds.getY());
+                                y = coreUpperBounds.getY();
+                                if (x < coreLowerBounds.getX()) {
+                                        y = y - std::abs(
+                                                    coreLowerBounds.getX() - x);
+                                        x = coreLowerBounds.getX();
+                                }
+                        }
+                }
+
+                Coordinate newPos = Coordinate(x, y);
+
+                netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                        DBU hpwl = netlistIOPins.computeIONetHPWL(idx, newPos);
+                        hungarianMatrix(pinIndex, i) = hpwl;
+                        pinIndex++;
+                });
+        }
+
+        std::cout << hungarianMatrix << "\n";
 }

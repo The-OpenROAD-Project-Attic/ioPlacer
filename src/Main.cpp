@@ -41,29 +41,27 @@
 #include "IOPlacementKernel.h"
 
 int main(int argc, char** argv) {
-	std::cout << " ######################################\n";
-	std::cout << " #      OpenROAD IO placement tool    #\n";
-	std::cout << " #                                    #\n";
-	std::cout << " # Authors:                           #\n";
-	std::cout << " #    Vitor Bandeira (UFRGS)          #\n";
-	std::cout << " #    Mateus Fogaça (UFRGS)           #\n";
-	std::cout << " #    Eder Matheus Monteiro (UFRGS)   #\n";
-	std::cout << " #    Isadora Oliveira (UFRGS)        #\n";
-	std::cout << " #                                    #\n";
-	std::cout << " #  Advisor:                          #\n";
-	std::cout << " #    Ricardo Reis (UFRGS)            #\n";
-	std::cout << " ######################################\n";
-	std::cout << "\n";
+        std::cout << " ######################################\n";
+        std::cout << " #      OpenROAD IO placement tool    #\n";
+        std::cout << " #                                    #\n";
+        std::cout << " # Authors:                           #\n";
+        std::cout << " #    Vitor Bandeira (UFRGS)          #\n";
+        std::cout << " #    Mateus Fogaça (UFRGS)           #\n";
+        std::cout << " #    Eder Matheus Monteiro (UFRGS)   #\n";
+        std::cout << " #    Isadora Oliveira (UFRGS)        #\n";
+        std::cout << " #                                    #\n";
+        std::cout << " #  Advisor:                          #\n";
+        std::cout << " #    Ricardo Reis (UFRGS)            #\n";
+        std::cout << " ######################################\n";
+        std::cout << "\n";
 
-	std::time_t date = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::cout << "Current time: " << std::ctime(&date);
+        std::time_t date = std::chrono::system_clock::to_time_t(
+            std::chrono::system_clock::now());
+        std::cout << "Current time: " << std::ctime(&date);
 
-	Parameters parms(argc, argv);
-	IOPlacementKernel kernel(parms);
-	kernel.run();
+        Parameters parms(argc, argv);
+        IOPlacementKernel kernel(parms);
+        kernel.run();
 
-	return 0;
+        return 0;
 }
-
-
-

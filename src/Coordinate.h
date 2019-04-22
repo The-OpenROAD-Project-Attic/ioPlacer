@@ -39,14 +39,18 @@
 typedef long long int DBU;
 
 class Coordinate {
-	DBU _x, _y;
-public:
-	Coordinate(const DBU x, const DBU y) : _x(x), _y(y) {}
-	void init(const DBU x, const DBU y) { _x = x; _y = y; }
-	void setX(const DBU x) { _x = x; }
-	void setY(const DBU y) { _y = y; }
-	DBU getX() const { return _x; }
-	DBU getY() const { return _y; }
+        DBU _x, _y;
+
+       public:
+        Coordinate(const DBU x, const DBU y) : _x(x), _y(y) {}
+        void init(const DBU x, const DBU y) {
+                _x = x;
+                _y = y;
+        }
+        void setX(const DBU x) { _x = x; }
+        void setY(const DBU y) { _y = y; }
+        DBU getX() const { return _x; }
+        DBU getY() const { return _y; }
 };
 
 #endif /* SRC_COORDINATE_H_ */

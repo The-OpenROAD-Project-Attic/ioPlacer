@@ -33,7 +33,6 @@
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////////
 
-
 #ifndef SRC_NETLIST_H_
 #define SRC_NETLIST_H_
 
@@ -45,57 +44,66 @@
 #include "Coordinate.h"
 #include "Core.h"
 
-enum Orientation {NORTH, SOUTH, EAST, WEST};
-enum Direction {IN, OUT, INOUT};
+enum Orientation { NORTH, SOUTH, EAST, WEST };
+enum Direction { IN, OUT, INOUT };
 
 class InstancePin {
-protected:
-	std::string _name;
-	Coordinate 	_pos;
+       protected:
+        std::string _name;
+        Coordinate _pos;
 
-public:
-	InstancePin(const std::string& name, const Coordinate& pos) : _name(name), _pos(pos) {}
-	std::string getName() const { return _name; }
-	Coordinate getPos() const { return _pos; }
-	DBU getX() const { return _pos.getX(); }
-	DBU getY() const { return _pos.getY(); }
+       public:
+        InstancePin(const std::string& name, const Coordinate& pos)
+            : _name(name), _pos(pos) {}
+        std::string getName() const { return _name; }
+        Coordinate getPos() const { return _pos; }
+        DBU getX() const { return _pos.getX(); }
+        DBU getY() const { return _pos.getY(); }
 };
 
 class IOPin : public InstancePin {
-	Orientation	_orientation;
-	Direction _direction;
+        Orientation _orientation;
+        Direction _direction;
 
-public:
-	IOPin(const std::string& name, Direction dir) :
-		InstancePin(name, Coordinate(0, 0)), _orientation(NORTH), _direction(dir) {}
+       public:
+        IOPin(const std::string& name, Direction dir)
+            : InstancePin(name, Coordinate(0, 0)),
+              _orientation(NORTH),
+              _direction(dir) {}
 
-	void setOrientation(const Orientation orientation) { _orientation = orientation; }
-	Orientation getOrientation() const { return _orientation; }
-	void setX(const DBU x) { _pos.setX(x); }
-	void setY(const DBU y) { _pos.setY(y); }
-	void setPos(const Coordinate pos) { _pos = pos; }
-	void setPos(const DBU x, const DBU y) { _pos.init(x, y); }
-	Direction getDirection() const { return _direction; }
+        void setOrientation(const Orientation orientation) {
+                _orientation = orientation;
+        }
+        Orientation getOrientation() const { return _orientation; }
+        void setX(const DBU x) { _pos.setX(x); }
+        void setY(const DBU y) { _pos.setY(y); }
+        void setPos(const Coordinate pos) { _pos = pos; }
+        void setPos(const DBU x, const DBU y) { _pos.init(x, y); }
+        Direction getDirection() const { return _direction; }
 };
 
 class Netlist {
-	std::vector<InstancePin> _instPins;
-	std::vector<unsigned> _netPointer;
-	std::vector<IOPin> _ioPins;
+        std::vector<InstancePin> _instPins;
+        std::vector<unsigned> _netPointer;
+        std::vector<IOPin> _ioPins;
 
-public:
-	Netlist();
+       public:
+        Netlist();
 
-	void addIONet(const IOPin& ioPin, const std::vector<InstancePin>& instPins);
+        void addIONet(const IOPin& ioPin,
+                      const std::vector<InstancePin>& instPins);
 
-	void forEachIOPin(std::function<void(unsigned idx, IOPin&)> func);
-	void forEachIOPin(std::function<void(unsigned idx, const IOPin&)> func) const;
-	void forEachSinkOfIO(unsigned idx, std::function<void(InstancePin&)> func);
-	void forEachSinkOfIO(unsigned idx, std::function<void(const InstancePin&)> func) const;
+        void forEachIOPin(std::function<void(unsigned idx, IOPin&)> func);
+        void forEachIOPin(
+            std::function<void(unsigned idx, const IOPin&)> func) const;
+        void forEachSinkOfIO(unsigned idx,
+                             std::function<void(InstancePin&)> func);
+        void forEachSinkOfIO(
+            unsigned idx, std::function<void(const InstancePin&)> func) const;
         unsigned numSinkofIO(unsigned idx);
         int numIOPins();
 
-	DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);
+        DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);
 };
 
 #endif /* SRC_NETLIST_H_ */

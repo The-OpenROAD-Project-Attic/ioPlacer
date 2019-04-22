@@ -40,50 +40,50 @@
 #include <boost/program_options.hpp>
 
 Parameters::Parameters(int argc, char** argv) {
-	namespace po = boost::program_options;
-	po::options_description dscp("Usage");
-	dscp.add_options()
-		("fpn,f", po::value<std::string>(), "Floorplan file (mandatory)")
-		("net,n", po::value<std::string>(), "Netlist file (mandatory)")
-		("def,d", po::value<std::string>(), "Output DEF file (mandatory)")
-		;
+        namespace po = boost::program_options;
+        po::options_description dscp("Usage");
+        dscp.add_options()("fpn,f", po::value<std::string>(),
+                           "Floorplan file (mandatory)")(
+            "net,n", po::value<std::string>(), "Netlist file (mandatory)")(
+            "def,d", po::value<std::string>(), "Output DEF file (mandatory)");
 
-	po::variables_map vm;
-	try {
-		po::store(
-				po::command_line_parser(argc, argv).options(dscp).style(
-						po::command_line_style::unix_style
-								| po::command_line_style::allow_long_disguise).run(),
-				vm);
-		po::notify(vm);
+        po::variables_map vm;
+        try {
+                po::store(
+                    po::command_line_parser(argc, argv)
+                        .options(dscp)
+                        .style(po::command_line_style::unix_style |
+                               po::command_line_style::allow_long_disguise)
+                        .run(),
+                    vm);
+                po::notify(vm);
 
-		if (vm.count("help") || !vm.count("fpn") || !vm.count("net")
-				|| !vm.count("def")) {
-			std::cout << "\n" << dscp;
-			std::exit(1);
-		}
+                if (vm.count("help") || !vm.count("fpn") || !vm.count("net") ||
+                    !vm.count("def")) {
+                        std::cout << "\n" << dscp;
+                        std::exit(1);
+                }
 
-		_floorplanFile = vm["fpn"].as<std::string>();
-		_netlistFile = vm["net"].as<std::string>();
-		_outputDefFile = vm["def"].as<std::string>();
+                _floorplanFile = vm["fpn"].as<std::string>();
+                _netlistFile = vm["net"].as<std::string>();
+                _outputDefFile = vm["def"].as<std::string>();
 
-	} catch (const po::error &ex) {
-		std::cerr << ex.what() << '\n';
-	}
+        } catch (const po::error& ex) {
+                std::cerr << ex.what() << '\n';
+        }
 
-	printAll();
+        printAll();
 }
 
 void Parameters::printAll() const {
-	std::cout << "\nOptions: \n";
+        std::cout << "\nOptions: \n";
 
-	std::cout << std::setw(20) << std::left << "Floorplan file: ";
-	std::cout << _floorplanFile << "\n";
-	std::cout << std::setw(20) << std::left << "Netlist file: ";
-	std::cout << _netlistFile << "\n";
-	std::cout << std::setw(20) << std::left << "Output DEF file: ";
-	std::cout << _outputDefFile << "\n";
+        std::cout << std::setw(20) << std::left << "Floorplan file: ";
+        std::cout << _floorplanFile << "\n";
+        std::cout << std::setw(20) << std::left << "Netlist file: ";
+        std::cout << _netlistFile << "\n";
+        std::cout << std::setw(20) << std::left << "Output DEF file: ";
+        std::cout << _outputDefFile << "\n";
 
-	std::cout << "\n";
+        std::cout << "\n";
 }
-

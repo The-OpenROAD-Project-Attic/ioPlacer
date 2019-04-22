@@ -41,17 +41,16 @@
 #include "HungarianMatching.h"
 
 class IOPlacementKernel {
-private:
-	Parameters* _parms;
-	Netlist _netlist;
-	Core _core;
-        
+       private:
+        Parameters* _parms;
+        Netlist _netlist;
+        Core _core;
 
-	void initNetlistAndCore();
+        void initNetlistAndCore();
 
-public:
-	IOPlacementKernel(Parameters& parms);
-	void run();
+       public:
+        IOPlacementKernel(Parameters& parms);
+        void run();
 };
 
 #endif /* SRC_IOPLACEMENTKERNEL_H_ */

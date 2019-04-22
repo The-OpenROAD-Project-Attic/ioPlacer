@@ -39,18 +39,19 @@
 #include <string>
 
 class Parameters {
-private:
-	std::string _floorplanFile;
-	std::string _netlistFile;
-	std::string _outputDefFile;
+       private:
+        std::string _floorplanFile;
+        std::string _netlistFile;
+        std::string _outputDefFile;
 
-	void printAll() const;
-public:
-	Parameters(int argc, char** argv);
+        void printAll() const;
 
-	std::string getFloorplanFile() const { return _floorplanFile; }
-	std::string getNetlistFile() const { return _netlistFile; }
-	std::string getOutputDefFile() const { return _outputDefFile; }
+       public:
+        Parameters(int argc, char** argv);
+
+        std::string getFloorplanFile() const { return _floorplanFile; }
+        std::string getNetlistFile() const { return _netlistFile; }
+        std::string getOutputDefFile() const { return _outputDefFile; }
 };
 
 #endif /* SRC_PARAMETERS_H_ */

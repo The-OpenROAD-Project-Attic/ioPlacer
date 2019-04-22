@@ -44,14 +44,14 @@
 #include <math.h>
 
 class HungarianMatching {
-public:
-	HungarianMatching(Netlist& netlist, Core& core);
-	virtual ~HungarianMatching() = default;
+       public:
+        HungarianMatching(Netlist& netlist, Core& core);
+        virtual ~HungarianMatching() = default;
         void run();
-        
-private:
-	DBU slotSize;
-	int numSlots;
+
+       private:
+        DBU slotSize;
+        int numSlots;
         Netlist _netlist;
         Core _core;
         Netlist netlistIOPins;
@@ -62,8 +62,6 @@ private:
         int getKValue();
         void setIOListWithSinks();
         int getNumIOPins();
-        
-	
 };
 
 #endif /* SRC_HUNGARIANMATCHING_H_ */

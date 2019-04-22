@@ -51,37 +51,36 @@
 #include "Core.h"
 
 class Parser {
-typedef boost::geometry::model::d2::point_xy<DBU> point;
-typedef boost::geometry::model::box<point> box;
+        typedef boost::geometry::model::d2::point_xy<DBU> point;
+        typedef boost::geometry::model::box<point> box;
 
-private:
-    struct cellPin {
-        std::string name;
-        point position;
-    };
-    
-    struct ioPin {
-        std::string name;
-        box bounds;
-        std::string direction;
-        std::vector<cellPin> connections;
-    };
+       private:
+        struct cellPin {
+                std::string name;
+                point position;
+        };
 
-    Parameters* _parms;
-    Netlist* _netlist;
-    Core* _core;
-    box _dieArea;
-    std::vector<ioPin> _ioPins;
-    
-    void readDieArea();
-    void readConnections();
-    void initNetlist();
-    void initCore();
-    
-public:
-    Parser(Parameters& parms, Netlist& netlist, Core& core);
-    void run();
+        struct ioPin {
+                std::string name;
+                box bounds;
+                std::string direction;
+                std::vector<cellPin> connections;
+        };
+
+        Parameters* _parms;
+        Netlist* _netlist;
+        Core* _core;
+        box _dieArea;
+        std::vector<ioPin> _ioPins;
+
+        void readDieArea();
+        void readConnections();
+        void initNetlist();
+        void initCore();
+
+       public:
+        Parser(Parameters& parms, Netlist& netlist, Core& core);
+        void run();
 };
 
 #endif /* SRC_PARSER_H_ */
-

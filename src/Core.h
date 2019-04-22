@@ -39,17 +39,17 @@
 #include "Coordinate.h"
 
 class Core {
-	Coordinate _lowerBound;
-	Coordinate _upperBound;
+        Coordinate _lowerBound;
+        Coordinate _upperBound;
 
-public:
-	Core() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
-	Core(const Coordinate& lowerBound, const Coordinate& upperBound)
-		: _lowerBound(lowerBound), _upperBound(upperBound) {}
+       public:
+        Core() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
+        Core(const Coordinate& lowerBound, const Coordinate& upperBound)
+            : _lowerBound(lowerBound), _upperBound(upperBound) {}
 
-	Coordinate getLowerBound() const { return _lowerBound; }
-	Coordinate getUpperBound() const { return _upperBound; }
-        
+        Coordinate getLowerBound() const { return _lowerBound; }
+        Coordinate getUpperBound() const { return _upperBound; }
+
         DBU getPerimeter();
         DBU getHPWL();
 };

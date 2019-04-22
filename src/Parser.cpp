@@ -38,104 +38,112 @@
 #include <fstream>
 #include "Parser.h"
 
-Parser::Parser(Parameters &parms, Netlist& netlist, Core& core) :
-	_parms(&parms), _netlist(&netlist), _core(&core) {
-}
+Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
+    : _parms(&parms), _netlist(&netlist), _core(&core) {}
 
 void Parser::run() {
-	readDieArea();
-	readConnections();
-	initNetlist();
-	initCore();
+        readDieArea();
+        readConnections();
+        initNetlist();
+        initCore();
 }
 
 void Parser::readDieArea() {
-	std::ifstream infile;
-	infile.open(_parms->getFloorplanFile());
-	
-	if(!infile.is_open())
-		std::cout << "File " << _parms->getFloorplanFile() << " not found!!!\n";
-	
-	std::string line;
+        std::ifstream infile;
+        infile.open(_parms->getFloorplanFile());
 
-	std::string trash_buffer;
-	int lowerX, lowerY, upperX, upperY;
+        if (!infile.is_open())
+                std::cout << "File " << _parms->getFloorplanFile()
+                          << " not found!!!\n";
 
-	while (std::getline(infile, line)) {
-		std::istringstream iss(line);
-		if (iss >> trash_buffer >> lowerX >> lowerY >> upperX >> upperY) {
-			point lowerBound = point(lowerX, lowerY);
-			point upperBound = point(upperX, upperY);
-			_dieArea = box(lowerBound, upperBound);
-		} // end if
-	} // end while
-	infile.close();
-} // end method
+        std::string line;
+
+        std::string trash_buffer;
+        int lowerX, lowerY, upperX, upperY;
+
+        while (std::getline(infile, line)) {
+                std::istringstream iss(line);
+                if (iss >> trash_buffer >> lowerX >> lowerY >> upperX >>
+                    upperY) {
+                        point lowerBound = point(lowerX, lowerY);
+                        point upperBound = point(upperX, upperY);
+                        _dieArea = box(lowerBound, upperBound);
+                }  // end if
+        }          // end while
+        infile.close();
+}  // end method
 
 void Parser::readConnections() {
-	std::ifstream infile;
-	infile.open(_parms->getNetlistFile());
-	
-	if(!infile.is_open())
-		std::cout << "File " << _parms->getNetlistFile() << " not found!!!\n";
-	
-	std::string line;
+        std::ifstream infile;
+        infile.open(_parms->getNetlistFile());
 
-	int ioCounter = -1;
-	std::string pinName;
-	std::string direction;
-	int lowerX, lowerY, upperX, upperY;
-	double x, y;
+        if (!infile.is_open())
+                std::cout << "File " << _parms->getNetlistFile()
+                          << " not found!!!\n";
 
-	while (std::getline(infile, line)) {
-		if (line[0] == '\t') {
-			line.erase(0, 1);
-		} // end if
-		
-		std::istringstream iss(line);
-		if (iss >> pinName >> lowerX >> lowerY >> upperX >> upperY >> direction) {
-			ioPin pin;
-			pin.name = pinName;
-			pin.bounds = box(point(lowerX, lowerY), point(upperX, upperY));
-			pin.direction = direction;
-			_ioPins.push_back(pin);
-			ioCounter++;
-			continue;
-		} // end if
-		
-		std::istringstream iss2(line);
-		if (iss2 >> pinName >> x >> y) {
-			cellPin cPin;
-			cPin.name = pinName;
-			cPin.position = point(x, y);
-			_ioPins[ioCounter].connections.push_back(cPin);
-		} // end if
-	} // end while
-	infile.close();
-} // end method
+        std::string line;
+
+        int ioCounter = -1;
+        std::string pinName;
+        std::string direction;
+        int lowerX, lowerY, upperX, upperY;
+        double x, y;
+
+        while (std::getline(infile, line)) {
+                if (line[0] == '\t') {
+                        line.erase(0, 1);
+                }  // end if
+
+                std::istringstream iss(line);
+                if (iss >> pinName >> lowerX >> lowerY >> upperX >> upperY >>
+                    direction) {
+                        ioPin pin;
+                        pin.name = pinName;
+                        pin.bounds =
+                            box(point(lowerX, lowerY), point(upperX, upperY));
+                        pin.direction = direction;
+                        _ioPins.push_back(pin);
+                        ioCounter++;
+                        continue;
+                }  // end if
+
+                std::istringstream iss2(line);
+                if (iss2 >> pinName >> x >> y) {
+                        cellPin cPin;
+                        cPin.name = pinName;
+                        cPin.position = point(x, y);
+                        _ioPins[ioCounter].connections.push_back(cPin);
+                }  // end if
+        }          // end while
+        infile.close();
+}  // end method
 
 void Parser::initNetlist() {
-	for (unsigned i = 0; i < _ioPins.size(); ++i) {
-		ioPin& io = _ioPins[i];
-		Direction dir = IN;
-		if(io.direction == "OUT") {
-			dir = OUT;
-		} else if (io.direction == "INOUT") {
-			dir = INOUT;
-		}
+        for (unsigned i = 0; i < _ioPins.size(); ++i) {
+                ioPin& io = _ioPins[i];
+                Direction dir = IN;
+                if (io.direction == "OUT") {
+                        dir = OUT;
+                } else if (io.direction == "INOUT") {
+                        dir = INOUT;
+                }
 
-		IOPin ioPin(io.name, dir);
-		std::vector<InstancePin> instPins;
-		for (unsigned j = 0; j < io.connections.size(); ++j) {
-			cellPin& cellPin = io.connections[j];
-			instPins.push_back(InstancePin(cellPin.name, Coordinate(cellPin.position.x(), cellPin.position.y())));
-		}
-		_netlist->addIONet(ioPin, instPins);
-	}
+                IOPin ioPin(io.name, dir);
+                std::vector<InstancePin> instPins;
+                for (unsigned j = 0; j < io.connections.size(); ++j) {
+                        cellPin& cellPin = io.connections[j];
+                        instPins.push_back(InstancePin(
+                            cellPin.name, Coordinate(cellPin.position.x(),
+                                                     cellPin.position.y())));
+                }
+                _netlist->addIONet(ioPin, instPins);
+        }
 }
 
 void Parser::initCore() {
-	Coordinate lowerBound(_dieArea.min_corner().x(), _dieArea.min_corner().y());
-	Coordinate upperBound(_dieArea.max_corner().x(), _dieArea.max_corner().y());
-	*_core = Core(lowerBound, upperBound);
+        Coordinate lowerBound(_dieArea.min_corner().x(),
+                              _dieArea.min_corner().y());
+        Coordinate upperBound(_dieArea.max_corner().x(),
+                              _dieArea.max_corner().y());
+        *_core = Core(lowerBound, upperBound);
 }
