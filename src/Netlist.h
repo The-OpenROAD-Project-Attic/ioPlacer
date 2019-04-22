@@ -69,7 +69,7 @@ public:
 	void setOrientation(const Orientation orientation) { _orientation = orientation; }
 	Orientation getOrientation() const { return _orientation; }
 	void setX(const DBU x) { _pos.setX(x); }
-	void getY(const DBU y) { _pos.setY(y); }
+	void setY(const DBU y) { _pos.setY(y); }
 	void setPos(const Coordinate pos) { _pos = pos; }
 	void setPos(const DBU x, const DBU y) { _pos.init(x, y); }
 	Direction getDirection() const { return _direction; }
