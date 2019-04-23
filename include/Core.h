@@ -53,7 +53,7 @@ class Core {
               _upperBound(Coordinate(0, 0)),
               _minDstPins(20){};
         Core(const Coordinate& lowerBound, const Coordinate& upperBound,
-             const int& minDstPins)
+             const DBU& minDstPins)
             : _lowerBound(lowerBound),
               _upperBound(upperBound),
               _minDstPins(minDstPins) {}

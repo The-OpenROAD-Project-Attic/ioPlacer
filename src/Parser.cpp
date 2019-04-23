@@ -147,7 +147,5 @@ void Parser::initCore() {
                               _dieArea.min_corner().y());
         Coordinate upperBound(_dieArea.max_corner().x(),
                               _dieArea.max_corner().y());
-        /* TODO:  <23-04-19, passing 20 as the min distance between pins while
-         * this is not fully implemented > */
-        *_core = Core(lowerBound, upperBound, 20);
+        *_core = Core(lowerBound, upperBound, _parms->getMinimumSpacing());
 }

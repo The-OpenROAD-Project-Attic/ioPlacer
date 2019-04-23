@@ -47,6 +47,7 @@ Parameters::Parameters(int argc, char** argv) {
         dscp.add_options()("fpn,f", po::value<std::string>(),
                            "Floorplan file (mandatory)")(
             "net,n", po::value<std::string>(), "Netlist file (mandatory)")(
+			"spc,s", po::value<DBU>(), "Minimum spacing value (mandatory)")(
             "def,d", po::value<std::string>(), "Output DEF file (mandatory)");
 
         po::variables_map vm;
@@ -61,13 +62,14 @@ Parameters::Parameters(int argc, char** argv) {
                 po::notify(vm);
 
                 if (vm.count("help") || !vm.count("fpn") || !vm.count("net") ||
-                    !vm.count("def")) {
+                    !vm.count("spc") || !vm.count("def")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
 
                 _floorplanFile = vm["fpn"].as<std::string>();
                 _netlistFile = vm["net"].as<std::string>();
+				_minimumSpacing = vm["spc"].as<DBU>();
                 _outputDefFile = vm["def"].as<std::string>();
 
         } catch (const po::error& ex) {
@@ -84,6 +86,8 @@ void Parameters::printAll() const {
         std::cout << _floorplanFile << "\n";
         std::cout << std::setw(20) << std::left << "Netlist file: ";
         std::cout << _netlistFile << "\n";
+        std::cout << std::setw(20) << std::left << "Minimum spacing: ";
+        std::cout << _minimumSpacing << "\n";
         std::cout << std::setw(20) << std::left << "Output DEF file: ";
         std::cout << _outputDefFile << "\n";
 

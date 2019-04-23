@@ -40,10 +40,13 @@
 
 #include <string>
 
+#include "Coordinate.h"
+
 class Parameters {
        private:
         std::string _floorplanFile;
         std::string _netlistFile;
+        DBU _minimumSpacing;
         std::string _outputDefFile;
 
         void printAll() const;
@@ -54,6 +57,7 @@ class Parameters {
         std::string getFloorplanFile() const { return _floorplanFile; }
         std::string getNetlistFile() const { return _netlistFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
+        DBU getMinimumSpacing() const { return _minimumSpacing; }
 };
 
 #endif /* __PARAMETERS_H_ */
