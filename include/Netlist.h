@@ -102,7 +102,7 @@ class Netlist {
                              std::function<void(InstancePin&)> func);
         void forEachSinkOfIO(
             unsigned idx, std::function<void(const InstancePin&)> func) const;
-        unsigned numSinkofIO(unsigned idx);
+        unsigned numSinksOfIO(unsigned idx);
         int numIOPins();
 
         DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);

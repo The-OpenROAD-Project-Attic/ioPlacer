@@ -50,7 +50,7 @@ void IOPlacementKernel::run() {
 
         _netlist.forEachIOPin([&](unsigned idx, const IOPin& ioPin) {
                 std::cout << "IO Pin: " << ioPin.getName() << "\n";
-                std::cout << "N Pins: " << _netlist.numSinkofIO(idx) << "\n";
+                std::cout << "N Pins: " << _netlist.numSinksOfIO(idx) << "\n";
                 _netlist.forEachSinkOfIO(idx, [&](const InstancePin& instPin) {
                         std::cout << "\tinstPin " << instPin.getName() << "\n";
                 });

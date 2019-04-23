@@ -55,15 +55,15 @@ class HungarianMatching {
        private:
         DBU slotSize;
         int numSlots;
-        Netlist _netlist;
-        Core _core;
+        Netlist* _netlist;
+        Core* _core;
         Netlist netlistIOPins;
-        Munkres<DBU> ostlindo;
+        Munkres<DBU> hungarianSolver;
         Matrix<DBU> hungarianMatrix;
-        void defineSlotSize();
+        void defineSlots();
         void createMatrix();
         int getKValue();
-        void setIOListWithSinks();
+        void initIOLists();
         int getNumIOPins();
 };
 

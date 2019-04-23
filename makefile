@@ -1,6 +1,8 @@
 BIN_NAME = ioPlacement
 
-BIN_ARGS =
+BIN_ARGS =  -f ispd18_test2.fpn -n ispd18_test2.nets -d out.def
+
+PRE_ARGS = timeout 1s
 
 BUILD_DIR = build
 
@@ -11,9 +13,7 @@ default: normal
 all: clean release
 
 run: normal
-	-@( \
-		./$(BIN_NAME) $(BIN_ARGS) ;\
-		)
+	-$(PRE_ARGS) ./$(BIN_NAME) $(BIN_ARGS)
 
 normal: dirs
 	@( \

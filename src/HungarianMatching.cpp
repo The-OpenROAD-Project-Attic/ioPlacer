@@ -38,35 +38,105 @@
 #include "HungarianMatching.h"
 
 HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
-        _netlist = netlist;
-        _core = core;
+        _netlist = &netlist;
+        _core = &core;
 }
 
 void HungarianMatching::run() {
-        setIOListWithSinks();
-        defineSlotSize();
+        initIOLists();
+        defineSlots();
         createMatrix();
 
-        ostlindo.solve(hungarianMatrix);
-        std::cout << hungarianMatrix;
+        hungarianSolver.solve(hungarianMatrix);
+        /* std::cout << hungarianMatrix; */
 }
 
-void HungarianMatching::defineSlotSize() {
-        int nPins = getNumIOPins();
-        int k = getKValue();
-        DBU corePerimeter = _core.getPerimeter();
-        numSlots = nPins * k;
+void HungarianMatching::defineSlots() {
+        Coordinate lb = _core->getLowerBound();
+        Coordinate ub = _core->getUpperBound();
+        DBU corePerimeter = _core->getPerimeter();
+        unsigned int minDstPins = _core->getMinDstPins();
 
-        slotSize = std::floor(corePerimeter / numSlots);
+        DBU numSlots = corePerimeter / minDstPins;
+        DBU currX = minDstPins;
+        DBU currY = 0;
+
+        int numPins = getNumIOPins();
+        int interval = std::floor(numSlots / double(getKValue() * numPins));
+
+        if (std::floor(numSlots / double(interval)) >= numPins) {
+                interval = std::floor(numSlots / double(numPins));
+        }
+
+        // tuple values are:
+        //      bool: currently considered in iteration
+        //      bool: already visited in past iteration
+        //      Coordinate: slot position in core boundary
+        typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
+        slotVector_t tl;
+
+        bool use = false;
+
+        for (unsigned int i = 0; i < numSlots; i++) {
+                if (i % interval) {
+                        use = false;
+                } else {
+                        use = true;
+                }
+
+                tl.push_back(std::tuple<bool, bool, Coordinate>(
+                    use, false, Coordinate(currX, currY)));
+
+                /****************************************
+                *                 Core                  *
+                *****************************************
+                *                                       *
+                *               3st edge     upperBound *
+                *         *------------------x          *
+                *         |                  |          *
+                *         |                  |          *
+                *    4th  |                  | 2nd      *
+                *    edge |                  | edge     *
+                *         |                  |          *
+                *         |                  |          *
+                *         x------------------*          *
+                * lowerBound    1st edge                *
+                ****************************************/
+
+                // get slots for 1st edge
+                if (currX < ub.getX() && currY == lb.getY()) {
+                        currX += minDstPins;
+                }
+                // get slots for 2nd edge
+                else if (currY < ub.getY() && currX >= ub.getX()) {
+                        currX = ub.getX();
+                        currY += minDstPins;
+                }
+                // get slots for 3rd edge
+                else if (currX > lb.getX()) {
+                        currY = ub.getY();
+                        currX -= minDstPins;
+                }
+                // get slots for 4th  edge
+                else if (currY > lb.getY()) {
+                        currX = lb.getX();
+                        currY -= minDstPins;
+                }
+        }
+
+        /* numSlots = nPins * k; */
+        /* slotSize = std::floor(corePerimeter / numSlots); */
 }
 
 int HungarianMatching::getKValue() { return 1; }
 
-void HungarianMatching::setIOListWithSinks() {
-        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+void HungarianMatching::initIOLists() {
+        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 std::vector<InstancePin> instPinsVector;
-                if (_netlist.numSinkofIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
+                /* TODO:  <23-04-19, do we need this check to remove pins
+                 * without sinks? TBD > */
+                if (_netlist->numSinksOfIO(idx) != 0) {
+                        _netlist->forEachSinkOfIO(
                             idx, [&](InstancePin& instPin) {
                                     instPinsVector.push_back(instPin);
                             });
@@ -84,9 +154,9 @@ void HungarianMatching::createMatrix() {
                 int pinIndex = 0;
                 int y = 0;
                 DBU slotBeginning = slotSize * i;
-                DBU halfSlot = slotBeginning + std::floor(slotSize / 2);
-                Coordinate coreLowerBounds = _core.getLowerBound();
-                Coordinate coreUpperBounds = _core.getUpperBound();
+                DBU halfSlot = slotBeginning + std::floor(slotSize / double(2));
+                Coordinate coreLowerBounds = _core->getLowerBound();
+                Coordinate coreUpperBounds = _core->getUpperBound();
                 int x = halfSlot;
                 if (x > coreUpperBounds.getX()) {
                         y = x - coreUpperBounds.getX();
@@ -111,5 +181,5 @@ void HungarianMatching::createMatrix() {
                 });
         }
 
-        std::cout << hungarianMatrix << "\n";
+        /* std::cout << hungarianMatrix << "\n"; */
 }

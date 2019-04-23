@@ -78,7 +78,7 @@ void Netlist::forEachSinkOfIO(
         }
 }
 
-unsigned Netlist::numSinkofIO(unsigned idx) {
+unsigned Netlist::numSinksOfIO(unsigned idx) {
         unsigned netStart = _netPointer[idx];
         unsigned netEnd = _netPointer[idx + 1];
         return netEnd - netStart;
