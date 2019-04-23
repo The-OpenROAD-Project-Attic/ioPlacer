@@ -44,7 +44,7 @@
 #include <limits>
 #include <iostream>
 #include "Coordinate.h"
-#include "Core.h"
+#include "Box.h"
 
 enum Orientation { NORTH, SOUTH, EAST, WEST };
 enum Direction { IN, OUT, INOUT };

@@ -63,7 +63,6 @@ class Core {
         unsigned int getMinDstPins() const { return _minDstPins; }
 
         DBU getPerimeter();
-        DBU getHPWL();
 };
 
 #endif /* __CORE_H_ */

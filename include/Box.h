@@ -35,18 +35,29 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Core.h"
+#ifndef BOX_H
+#define BOX_H
 
-DBU Core::getPerimeter() {
-        DBU lowerX = _lowerBound.getX();
-        DBU lowerY = _lowerBound.getY();
-        DBU upperX = _upperBound.getX();
-        DBU upperY = _upperBound.getY();
+#include "Coordinate.h"
 
-        DBU x = upperX - lowerX;
-        DBU y = upperY - lowerY;
+class Box {
+        Coordinate _lowerBound;
+        Coordinate _upperBound;
 
-        return (x + y) * 2;
-}
+       public:
+        Box()
+            : _lowerBound(Coordinate(0, 0)),
+              _upperBound(Coordinate(0, 0)){};
+
+        Box(const Coordinate& lowerBound, const Coordinate& upperBound)
+            : _lowerBound(lowerBound),
+              _upperBound(upperBound){}
+
+        Coordinate getLowerBound() const { return _lowerBound; }
+        Coordinate getUpperBound() const { return _upperBound; }
+
+        DBU getHPWL();
+};
 
 
+#endif /* BOX_H */
