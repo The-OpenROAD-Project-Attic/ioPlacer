@@ -105,7 +105,9 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
                         upperBounds.setY(pos.getY());
         }
 
-        Core netBBox(lowerBounds, upperBounds);
+        /* TODO:  <23-04-19, passing 20 as the min distance between pins while
+         * this is not fully implemented > */
+        Core netBBox(lowerBounds, upperBounds, 20);
 
         return netBBox.getHPWL();
 }
