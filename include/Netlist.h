@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_NETLIST_H_
-#define SRC_NETLIST_H_
+#ifndef __NETLIST_H_
+#define __NETLIST_H_
 
 #include <string>
 #include <vector>
@@ -108,4 +108,4 @@ class Netlist {
         DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);
 };
 
-#endif /* SRC_NETLIST_H_ */
+#endif /* __NETLIST_H_ */

@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_PARSER_H_
-#define SRC_PARSER_H_
+#ifndef __PARSER_H_
+#define __PARSER_H_
 
 #include <iostream>
 #include <fstream>
@@ -85,4 +85,4 @@ class Parser {
         void run();
 };
 
-#endif /* SRC_PARSER_H_ */
+#endif /* __PARSER_H_ */

@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_CORE_H_
-#define SRC_CORE_H_
+#ifndef __CORE_H_
+#define __CORE_H_
 
 #include "Coordinate.h"
 
@@ -56,4 +56,4 @@ class Core {
         DBU getHPWL();
 };
 
-#endif /* SRC_CORE_H_ */
+#endif /* __CORE_H_ */

@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_PARAMETERS_H_
-#define SRC_PARAMETERS_H_
+#ifndef __PARAMETERS_H_
+#define __PARAMETERS_H_
 
 #include <string>
 
@@ -56,4 +56,4 @@ class Parameters {
         std::string getOutputDefFile() const { return _outputDefFile; }
 };
 
-#endif /* SRC_PARAMETERS_H_ */
+#endif /* __PARAMETERS_H_ */

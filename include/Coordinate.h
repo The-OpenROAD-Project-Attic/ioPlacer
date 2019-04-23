@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_COORDINATE_H_
-#define SRC_COORDINATE_H_
+#ifndef __COORDINATE_H_
+#define __COORDINATE_H_
 
 typedef long long int DBU;
 
@@ -55,4 +55,4 @@ class Coordinate {
         DBU getY() const { return _y; }
 };
 
-#endif /* SRC_COORDINATE_H_ */
+#endif /* __COORDINATE_H_ */

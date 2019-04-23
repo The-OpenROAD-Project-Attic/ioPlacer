@@ -35,13 +35,14 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_HUNGARIANMATCHING_H_
-#define SRC_HUNGARIANMATCHING_H_
+#ifndef __HUNGARIANMATCHING_H_
+#define __HUNGARIANMATCHING_H_
 
 #include "Coordinate.h"
 #include "Core.h"
 #include "Netlist.h"
 #include "munkres/munkres.h"
+
 #include <iostream>
 #include <math.h>
 
@@ -66,4 +67,4 @@ class HungarianMatching {
         int getNumIOPins();
 };
 
-#endif /* SRC_HUNGARIANMATCHING_H_ */
+#endif /* __HUNGARIANMATCHING_H_ */

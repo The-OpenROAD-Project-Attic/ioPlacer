@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef SRC_IOPLACEMENTKERNEL_H_
-#define SRC_IOPLACEMENTKERNEL_H_
+#ifndef __IOPLACEMENTKERNEL_H_
+#define __IOPLACEMENTKERNEL_H_
 
 #include <iostream>
 #include "Parameters.h"
@@ -55,4 +55,4 @@ class IOPlacementKernel {
         void run();
 };
 
-#endif /* SRC_IOPLACEMENTKERNEL_H_ */
+#endif /* __IOPLACEMENTKERNEL_H_ */
