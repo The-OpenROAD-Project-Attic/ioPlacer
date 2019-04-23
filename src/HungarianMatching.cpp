@@ -48,7 +48,6 @@ void HungarianMatching::run() {
         createMatrix();
 
         hungarianSolver.solve(hungarianMatrix);
-        /* std::cout << hungarianMatrix; */
 }
 
 void HungarianMatching::defineSlots() {
@@ -56,10 +55,11 @@ void HungarianMatching::defineSlots() {
         Coordinate ub = _core->getUpperBound();
         DBU corePerimeter = _core->getPerimeter();
         unsigned int minDstPins = _core->getMinDstPins();
+        slotVector_t* slots = _slots;
 
         DBU numSlots = corePerimeter / minDstPins;
-        DBU currX = minDstPins;
-        DBU currY = 0;
+        DBU currX = lb.getX() + minDstPins;
+        DBU currY = lb.getY();
 
         int numPins = getNumIOPins();
         int interval = std::floor(numSlots / double(getKValue() * numPins));
@@ -67,13 +67,6 @@ void HungarianMatching::defineSlots() {
         if (std::floor(numSlots / double(interval)) >= numPins) {
                 interval = std::floor(numSlots / double(numPins));
         }
-
-        // tuple values are:
-        //      bool: currently considered in iteration
-        //      bool: already visited in past iteration
-        //      Coordinate: slot position in core boundary
-        typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
-        slotVector_t slots;
 
         bool use = false;
 
@@ -94,17 +87,14 @@ void HungarianMatching::defineSlots() {
          *   lowerBound    1st edge                 *
          *                 ---->                    *
          *******************************************/
-
         for (unsigned int i = 0; i < numSlots; i++) {
                 if (i % interval) {
                         use = false;
                 } else {
                         use = true;
                 }
-
-                slots.push_back(std::tuple<bool, bool, Coordinate>(
+                slots->push_back(std::tuple<bool, bool, Coordinate>(
                     use, false, Coordinate(currX, currY)));
-
                 // get slots for 1st edge
                 if (currX < ub.getX() && currY == lb.getY()) {
                         currX += minDstPins;
@@ -124,9 +114,7 @@ void HungarianMatching::defineSlots() {
                         currX = lb.getX();
                         currY -= minDstPins;
                 }
-
         }
-
 }
 
 int HungarianMatching::getKValue() { return 1; }
@@ -181,6 +169,4 @@ void HungarianMatching::createMatrix() {
                         pinIndex++;
                 });
         }
-
-        /* std::cout << hungarianMatrix << "\n"; */
 }

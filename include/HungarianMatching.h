@@ -46,6 +46,12 @@
 #include <iostream>
 #include <math.h>
 
+// tuple values are:
+//      bool: currently considered in iteration
+//      bool: already visited in past iteration
+//      Coordinate: slot position in core boundary
+typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
+
 class HungarianMatching {
        public:
         HungarianMatching(Netlist& netlist, Core& core);
@@ -60,6 +66,7 @@ class HungarianMatching {
         Netlist netlistIOPins;
         Munkres<DBU> hungarianSolver;
         Matrix<DBU> hungarianMatrix;
+        slotVector_t* _slots;
         void defineSlots();
         void createMatrix();
         int getKValue();
