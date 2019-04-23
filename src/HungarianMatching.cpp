@@ -73,7 +73,7 @@ void HungarianMatching::defineSlots() {
         //      bool: already visited in past iteration
         //      Coordinate: slot position in core boundary
         typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
-        slotVector_t tl;
+        slotVector_t slots;
 
         bool use = false;
 
@@ -102,7 +102,7 @@ void HungarianMatching::defineSlots() {
                         use = true;
                 }
 
-                tl.push_back(std::tuple<bool, bool, Coordinate>(
+                slots.push_back(std::tuple<bool, bool, Coordinate>(
                     use, false, Coordinate(currX, currY)));
 
                 // get slots for 1st edge
@@ -124,10 +124,9 @@ void HungarianMatching::defineSlots() {
                         currX = lb.getX();
                         currY -= minDstPins;
                 }
+
         }
 
-        /* numSlots = nPins * k; */
-        /* slotSize = std::floor(corePerimeter / numSlots); */
 }
 
 int HungarianMatching::getKValue() { return 1; }
