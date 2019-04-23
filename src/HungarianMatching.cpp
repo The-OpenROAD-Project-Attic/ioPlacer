@@ -77,6 +77,24 @@ void HungarianMatching::defineSlots() {
 
         bool use = false;
 
+        /*******************************************
+         * How the for bellow follows core boundary *
+         ********************************************
+         *                 <----                    *
+         *                                          *
+         *                 3st edge     upperBound  *
+         *           *------------------x           *
+         *           |                  |           *
+         *   |       |                  |      ^    *
+         *   |  4th  |                  | 2nd  |    *
+         *   |  edge |                  | edge |    *
+         *   V       |                  |      |    *
+         *           |                  |           *
+         *           x------------------*           *
+         *   lowerBound    1st edge                 *
+         *                 ---->                    *
+         *******************************************/
+
         for (unsigned int i = 0; i < numSlots; i++) {
                 if (i % interval) {
                         use = false;
@@ -86,22 +104,6 @@ void HungarianMatching::defineSlots() {
 
                 tl.push_back(std::tuple<bool, bool, Coordinate>(
                     use, false, Coordinate(currX, currY)));
-
-                /****************************************
-                *                 Core                  *
-                *****************************************
-                *                                       *
-                *               3st edge     upperBound *
-                *         *------------------x          *
-                *         |                  |          *
-                *         |                  |          *
-                *    4th  |                  | 2nd      *
-                *    edge |                  | edge     *
-                *         |                  |          *
-                *         |                  |          *
-                *         x------------------*          *
-                * lowerBound    1st edge                *
-                ****************************************/
 
                 // get slots for 1st edge
                 if (currX < ub.getX() && currY == lb.getY()) {
