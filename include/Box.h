@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BOX_H
-#define BOX_H
+#ifndef __BOX_H_
+#define __BOX_H_
 
 #include "Coordinate.h"
 
@@ -60,4 +60,4 @@ class Box {
 };
 
 
-#endif /* BOX_H */
+#endif /* __BOX_H_ */
