@@ -43,14 +43,24 @@
 class Core {
         Coordinate _lowerBound;
         Coordinate _upperBound;
+        // TODO: get this distance considering routing grid, max pin width,...
+        // now returning a random value (20)
+        unsigned int _minDstPins;
 
        public:
-        Core() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
-        Core(const Coordinate& lowerBound, const Coordinate& upperBound)
-            : _lowerBound(lowerBound), _upperBound(upperBound) {}
+        Core()
+            : _lowerBound(Coordinate(0, 0)),
+              _upperBound(Coordinate(0, 0)),
+              _minDstPins(20){};
+        Core(const Coordinate& lowerBound, const Coordinate& upperBound,
+             const int& minDstPins)
+            : _lowerBound(lowerBound),
+              _upperBound(upperBound),
+              _minDstPins(minDstPins) {}
 
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }
+        unsigned int getMinDstPins() const { return _minDstPins; }
 
         DBU getPerimeter();
         DBU getHPWL();
