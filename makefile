@@ -1,6 +1,6 @@
 BIN_NAME = ioPlacement
 
-BIN_ARGS =  -f ispd18_test2.fpn -n ispd18_test2.nets -d out.def
+BIN_ARGS =  -f ispd18_test2.fpn -n ispd18_test2.nets -d out.def -s 200
 
 PRE_ARGS = timeout 1s
 
@@ -12,8 +12,8 @@ default: normal
 
 all: clean release
 
-run: normal
-	-$(PRE_ARGS) ./$(BIN_NAME) $(BIN_ARGS)
+run:
+	/usr/bin/time -v ./$(BIN_NAME) $(BIN_ARGS)
 
 normal: dirs
 	@( \
