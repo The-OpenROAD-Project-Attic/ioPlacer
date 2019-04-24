@@ -87,13 +87,21 @@ void HungarianMatching::initIOLists() {
 void HungarianMatching::defineSlots() {
         Coordinate lb = _core->getLowerBound();
         Coordinate ub = _core->getUpperBound();
-        DBU corePerimeter = _core->getPerimeter();
-        unsigned minDstPins = _core->getMinDstPins();
+//        DBU corePerimeter = _core->getPerimeter();
+        unsigned minDstPinsX = _core->getMinDstPinsX();
+        unsigned minDstPinsY = _core->getMinDstPinsY();
+        unsigned initTracksX = _core->getInitTracksX();
+        unsigned initTracksY = _core->getInitTracksY();
 
         bool use = false;
-        DBU currX = lb.getX() + minDstPins;
+		bool firstRight = true;
+		bool firstUp = true;
+		bool firstLeft = true;
+        DBU currX = lb.getX() + initTracksX;
         DBU currY = lb.getY();
-        DBU totalNumSlots = corePerimeter / minDstPins;
+        DBU totalNumSlots = 0; // = corePerimeter / minDstPinsX;
+		totalNumSlots += (ub.getX() - lb.getX())*2 /minDstPinsX;
+		totalNumSlots += (ub.getY() - lb.getY())*2 /minDstPinsY;
         unsigned numPins = getNumIOPins();
 
         unsigned interval = std::floor(totalNumSlots / getKValue() * numPins);
@@ -129,28 +137,47 @@ void HungarianMatching::defineSlots() {
                     use, false, Coordinate(currX, currY)));
                 // get slots for 1st edge
                 if (currX < ub.getX() && currY == lb.getY()) {
-                        currX += minDstPins;
+                        currX += minDstPinsX;
                 }
                 // get slots for 2nd edge
                 else if (currY < ub.getY() && currX >= ub.getX()) {
-                        currX = ub.getX();
-                        currY += minDstPins;
+						if (firstRight) {
+							currX = ub.getX();
+							currY += initTracksY;
+							firstRight = false;
+						} else {
+							currX = ub.getX();
+							currY += minDstPinsY;
+						}
                 }
                 // get slots for 3rd edge
                 else if (currX > lb.getX()) {
-                        currY = ub.getY();
-                        currX -= minDstPins;
+						if (firstUp) {
+							currY = ub.getY();
+							currX -= initTracksX;
+							firstUp = false;
+						} else {
+							currY = ub.getY();
+							currX -= minDstPinsX;
+						}
                 }
                 // get slots for 4th  edge
                 else if (currY > lb.getY()) {
-                        currX = lb.getX();
-                        currY -= minDstPins;
+						if (firstLeft) {
+							currX = lb.getX();
+							currY -= initTracksY;
+							firstLeft = false;
+						} else {
+							currX = lb.getX();
+							currY -= minDstPinsY;
+						}
                 }
                 // is at the lowerBound again, break loop
                 else if (currX < lb.getX() && currY == lb.getY()) {
                         break;
                 }
         }
+		std::cout << currX << ", " << currY << "\n";
 }
 
 void HungarianMatching::createMatrix() {

@@ -58,6 +58,8 @@ class HungarianMatching {
         HungarianMatching(Netlist& , Core& );
         virtual ~HungarianMatching() = default;
         void run();
+	void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
+	Netlist getNetlist() { return _netlistIOPins; };
 
        private:
         Core* _core;
@@ -77,7 +79,6 @@ class HungarianMatching {
         bool updateNeighborhood(bool);
         void markRemove(std::vector<unsigned>);
         void markExplore(std::vector<unsigned>);
-        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */
