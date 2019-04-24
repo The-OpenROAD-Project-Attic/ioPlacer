@@ -238,3 +238,14 @@ void HungarianMatching::markRemove(std::vector<unsigned> v) {
                 }
         }
 }
+
+void HungarianMatching::getFinalAssignment(
+    std::vector<std::tuple<unsigned, Coordinate>>& v) {
+        unsigned idx = 0;
+        for (auto i : _slots) {
+                if (std::get<0>(i) && not std::get<1>(i)) {
+                        v.push_back(std::tuple<unsigned, Coordinate>(
+                            idx++, std::get<2>(i)));
+                }
+        }
+}

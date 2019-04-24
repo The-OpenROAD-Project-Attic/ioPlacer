@@ -77,6 +77,7 @@ class HungarianMatching {
         bool updateNeighborhood(bool);
         void markRemove(std::vector<unsigned>);
         void markExplore(std::vector<unsigned>);
+        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */
