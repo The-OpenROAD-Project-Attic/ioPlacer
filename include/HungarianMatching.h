@@ -46,6 +46,7 @@
 #include <iostream>
 #include <math.h>
 
+/* TODO:  <23-04-19, change to named tuple or...> */
 // tuple values are:
 //      bool: currently considered in iteration
 //      bool: already visited in past iteration
@@ -59,19 +60,23 @@ class HungarianMatching {
         void run();
 
        private:
-        DBU slotSize;
-        int numSlots;
-        Netlist* _netlist;
         Core* _core;
-        Netlist netlistIOPins;
-        Munkres<DBU> hungarianSolver;
-        Matrix<DBU> hungarianMatrix;
-        slotVector_t* _slots;
+        Matrix<DBU> _hungarianMatrix;
+        Munkres<DBU> _hungarianSolver;
+        Netlist _netlistIOPins;
+        Netlist* _netlist;
+        int _numSlots = 0;
+        slotVector_t _slots;
+
+        int getKValue() { return 1; }
+        int getNumIOPins() { return _netlistIOPins.numIOPins(); }
+
+        void initIOLists();
         void defineSlots();
         void createMatrix();
-        int getKValue();
-        void initIOLists();
-        int getNumIOPins();
+        bool updateNeighborhood();
+        void markRemove(std::vector<unsigned>);
+        void markExplore(std::vector<unsigned>);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

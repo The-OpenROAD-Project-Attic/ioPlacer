@@ -48,6 +48,7 @@ void IOPlacementKernel::initNetlistAndCore() {
 void IOPlacementKernel::run() {
         initNetlistAndCore();
 
+#ifdef DEBUG
         _netlist.forEachIOPin([&](unsigned idx, const IOPin& ioPin) {
                 std::cout << "IO Pin: " << ioPin.getName() << "\n";
                 std::cout << "N Pins: " << _netlist.numSinksOfIO(idx) << "\n";
@@ -55,6 +56,8 @@ void IOPlacementKernel::run() {
                         std::cout << "\tinstPin " << instPin.getName() << "\n";
                 });
         });
+#endif
+
         HungarianMatching hgMatching(_netlist, _core);
         hgMatching.run();
 }
