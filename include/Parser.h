@@ -43,12 +43,12 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
-#include <boost/geometry.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
 #include "Parameters.h"
+#include "Coordinate.h"
 #include "Netlist.h"
 #include "Core.h"
 
@@ -64,6 +64,7 @@ class Parser {
 
         struct ioPin {
                 std::string name;
+                std::string netName;
                 box bounds;
                 std::string direction;
                 std::vector<cellPin> connections;

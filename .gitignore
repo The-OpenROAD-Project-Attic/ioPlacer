@@ -9,6 +9,7 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+nbproject/
 
 CMakeLists.txt.user
 CMakeCache.txt

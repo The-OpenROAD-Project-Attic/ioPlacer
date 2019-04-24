@@ -87,6 +87,7 @@ void Parser::readConnections() {
 
         int ioCounter = -1;
         std::string pinName;
+		std::string netName;
         std::string direction;
         int lowerX, lowerY, upperX, upperY;
         double x, y;
@@ -97,10 +98,11 @@ void Parser::readConnections() {
                 }  // end if
 
                 std::istringstream iss(line);
-                if (iss >> pinName >> lowerX >> lowerY >> upperX >> upperY >>
+                if (iss >> pinName >> netName >> lowerX >> lowerY >> upperX >> upperY >>
                     direction) {
                         ioPin pin;
                         pin.name = pinName;
+						pin.netName = netName;
                         pin.bounds =
                             box(point(lowerX, lowerY), point(upperX, upperY));
                         pin.direction = direction;
@@ -129,8 +131,15 @@ void Parser::initNetlist() {
                 } else if (io.direction == "INOUT") {
                         dir = INOUT;
                 }
-
-                IOPin ioPin(io.name, dir);
+				
+				Coordinate lowerBound(_ioPins[i].bounds.min_corner().x(),
+					_ioPins[i].bounds.min_corner().y());
+				Coordinate upperBound(_ioPins[i].bounds.max_corner().x(),
+					_ioPins[i].bounds.max_corner().y());
+				
+				std::string netName = _ioPins[i].netName;
+				
+                IOPin ioPin(io.name, dir, lowerBound, upperBound, netName);
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];
@@ -147,5 +156,7 @@ void Parser::initCore() {
                               _dieArea.min_corner().y());
         Coordinate upperBound(_dieArea.max_corner().x(),
                               _dieArea.max_corner().y());
-        *_core = Core(lowerBound, upperBound, _parms->getMinimumSpacing());
+        *_core = Core(lowerBound, upperBound, _parms->getMinimumSpacingX(),
+			_parms->getMinimumSpacingY(), _parms->getInitTrackX(),
+			_parms->getInitTrackY());
 }

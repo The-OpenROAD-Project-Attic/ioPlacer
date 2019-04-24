@@ -37,12 +37,38 @@
 
 #include "IOPlacementKernel.h"
 #include "Parser.h"
+#include "WriterIOPins.h"
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {}
 
 void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
         parser.run();
+}
+
+inline Orientation IOPlacementKernel::checkOrientation(const DBU x, const DBU y,
+		Orientation currentOrient) {
+        DBU lowerXBound = _core.getLowerBound().getX();
+        DBU lowerYBound = _core.getLowerBound().getY();
+        DBU upperXBound = _core.getUpperBound().getX();
+        DBU upperYBound = _core.getUpperBound().getY();
+		
+        if (x == lowerXBound){
+            if (y == upperYBound)
+                return Orientation::SOUTH;
+            return Orientation::EAST;
+        }
+        if (x == upperXBound){
+            if (y == lowerYBound)
+                return Orientation::NORTH;
+            return Orientation::WEST;
+        }
+        if (y == lowerYBound)
+            return Orientation::NORTH;
+        if (y == upperYBound)
+            return Orientation::SOUTH;
+        
+		return currentOrient;
 }
 
 void IOPlacementKernel::run() {
@@ -60,4 +86,25 @@ void IOPlacementKernel::run() {
 
         HungarianMatching hgMatching(_netlist, _core);
         hgMatching.run();
+
+		std::vector<std::tuple<unsigned, Coordinate>> assignment;
+		hgMatching.getFinalAssignment(assignment);
+		Netlist netlist = hgMatching.getNetlist();
+		
+		netlist.forEachIOPin([&](unsigned idx, IOPin & ioPin) {
+			DBU _x = 0, _y = 0;
+			for (std::tuple<unsigned, Coordinate> pinAssignment : assignment) {
+				if (idx == std::get<0>(pinAssignment)) {
+					_x = std::get<1>(pinAssignment).getX();
+					_y = std::get<1>(pinAssignment).getY();
+					break;
+				}
+			}
+			Orientation orient = checkOrientation(_x, _y, ioPin.getOrientation());
+			ioPin.setOrientation(orient);
+		});
+		
+		WriterIOPins writer(netlist, assignment, _parms->getOutputDefFile());
+
+		writer.run();
 }

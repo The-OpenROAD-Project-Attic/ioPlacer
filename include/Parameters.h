@@ -46,7 +46,10 @@ class Parameters {
        private:
         std::string _floorplanFile;
         std::string _netlistFile;
-        DBU _minimumSpacing;
+        DBU _minimumSpacingX;
+        DBU _minimumSpacingY;
+	DBU _initTracksX;
+	DBU _initTracksY;
         std::string _outputDefFile;
 
         void printAll() const;
@@ -57,7 +60,10 @@ class Parameters {
         std::string getFloorplanFile() const { return _floorplanFile; }
         std::string getNetlistFile() const { return _netlistFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
-        DBU getMinimumSpacing() const { return _minimumSpacing; }
+        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
+        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
+	DBU getInitTrackX() const { return _initTracksX; };
+	DBU getInitTrackY() const { return _initTracksY; };
 };
 
 #endif /* __PARAMETERS_H_ */

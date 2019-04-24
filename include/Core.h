@@ -45,22 +45,33 @@ class Core {
         Coordinate _upperBound;
         // TODO: get this distance considering routing grid, max pin width,...
         // now returning a random value (20)
-        unsigned int _minDstPins;
+        unsigned int _minDstPinsX;
+        unsigned int _minDstPinsY;
+        unsigned int _initTracksX;
+        unsigned int _initTracksY;
 
        public:
         Core()
             : _lowerBound(Coordinate(0, 0)),
               _upperBound(Coordinate(0, 0)),
-              _minDstPins(20){};
+              _minDstPinsX(20),
+              _minDstPinsY(20){};
         Core(const Coordinate& lowerBound, const Coordinate& upperBound,
-             const DBU& minDstPins)
+             const DBU& minDstPinsX, const DBU& minDstPinsY,
+	     const DBU& initTracksX, const DBU& initTracksY)
             : _lowerBound(lowerBound),
               _upperBound(upperBound),
-              _minDstPins(minDstPins) {}
+              _minDstPinsX(minDstPinsX),
+              _minDstPinsY(minDstPinsY),
+              _initTracksX(initTracksX),
+              _initTracksY(initTracksY){}
 
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }
-        unsigned int getMinDstPins() const { return _minDstPins; }
+        unsigned int getMinDstPinsX() const { return _minDstPinsX; }
+        unsigned int getMinDstPinsY() const { return _minDstPinsY; }
+        unsigned int getInitTracksX() const { return _initTracksX; }
+        unsigned int getInitTracksY() const { return _initTracksY; }
 
         DBU getPerimeter();
 };
