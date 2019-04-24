@@ -52,6 +52,21 @@ void HungarianMatching::run() {
                 createMatrix();
         }
         updateNeighborhood(true);
+#ifdef DEBUG
+        /* print final assignment, i.e., pin index and position */
+        std::vector<std::tuple<unsigned, Coordinate>> v;
+        unsigned name;
+        Coordinate coor(0, 0);
+        getFinalAssignment(v);
+        for (auto i : v) {
+                name = std::get<0>(i);
+                coor = std::get<1>(i);
+                std::cout << name << ": (" << coor.getX() << ", " << coor.getY()
+                          << ")" << std::endl;
+        }
+        std::cout << _hungarianMatrix.rows() << ','
+                  << _hungarianMatrix.columns() << std::endl;
+#endif
 }
 
 void HungarianMatching::initIOLists() {
