@@ -55,7 +55,7 @@ typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
 
 class HungarianMatching {
        public:
-        HungarianMatching(Netlist& netlist, Core& core);
+        HungarianMatching(Netlist& , Core& );
         virtual ~HungarianMatching() = default;
         void run();
 
