@@ -48,9 +48,10 @@ void HungarianMatching::run() {
         createMatrix();
         for (int i = 0; i < 3; ++i) {
                 _hungarianSolver.solve(_hungarianMatrix);
-                updateNeighborhood();
+                updateNeighborhood(false);
                 createMatrix();
         }
+        updateNeighborhood(true);
 }
 
 void HungarianMatching::initIOLists() {
@@ -169,7 +170,7 @@ void HungarianMatching::createMatrix() {
         }
 }
 
-bool HungarianMatching::updateNeighborhood() {
+bool HungarianMatching::updateNeighborhood(bool last_pass) {
         Coordinate pos(0, 0);
         bool will_remove;
         std::vector<unsigned> to_remove;
@@ -189,9 +190,10 @@ bool HungarianMatching::updateNeighborhood() {
                         to_explore.push_back(col);
                 }
         }
-
         markRemove(to_remove);
-        markExplore(to_explore);
+        if (last_pass) {
+                markExplore(to_explore);
+        }
         return false;
 }
 
@@ -200,14 +202,16 @@ void HungarianMatching::markExplore(std::vector<unsigned> v) {
         for (unsigned i = 0; i < _slots.size(); ++i) {
                 if (std::get<0>(_slots.at(i))) {
                         if (v.size() > 0 && v.at(0) == curr) {
-                                if (i > 1 && not std::get<1>(_slots.at(i - 1))) {
+                                if (i > 1 &&
+                                    not std::get<1>(_slots.at(i - 1))) {
                                         if (not std::get<0>(_slots.at(i - 1))) {
                                                 std::get<0>(_slots.at(i - 1)) =
                                                     true;
                                                 _numSlots++;
                                         }
                                 }
-                                if (i < _slots.size() && not std::get<1>(_slots.at(i + 1))) {
+                                if (i < _slots.size() &&
+                                    not std::get<1>(_slots.at(i + 1))) {
                                         if (not std::get<0>(_slots.at(i + 1))) {
                                                 std::get<0>(_slots.at(i + 1)) =
                                                     true;

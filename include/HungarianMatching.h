@@ -74,7 +74,7 @@ class HungarianMatching {
         void initIOLists();
         void defineSlots();
         void createMatrix();
-        bool updateNeighborhood();
+        bool updateNeighborhood(bool);
         void markRemove(std::vector<unsigned>);
         void markExplore(std::vector<unsigned>);
 };
