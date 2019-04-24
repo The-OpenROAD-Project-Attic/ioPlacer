@@ -66,3 +66,7 @@ dirs:
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+clean_all:
+	rm -rf $(BUILD_DIR)
+	rm -rf $(BIN_NAME)
