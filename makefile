@@ -1,6 +1,6 @@
 BIN_NAME = ioPlacement
 
-BIN_ARGS =  -f ispd18_test2.fpn -n ispd18_test2.nets -d out.def -s 200
+BIN_ARGS =  -f ispd18_test2.fpn -n ispd18_test2.nets -x 200 -y 190 -t 20 -r 30 -d out.def
 
 PRE_ARGS = timeout 1s
 
