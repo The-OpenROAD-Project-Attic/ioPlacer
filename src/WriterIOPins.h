@@ -46,7 +46,7 @@
 class WriterIOPins {
        private:
         Netlist* _netlist;
-        std::vector<IOPin> *_assignment;
+        std::vector<IOPin>* _assignment;
         std::string _outFileName;
 
         bool writeFile();

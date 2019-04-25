@@ -161,23 +161,24 @@ inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
         }
 }
 
-void HungarianMatching::getFinalAssignment(std::vector<IOPin>& v, std::vector<IOPin>& zeroSinkIOs) {
+void HungarianMatching::getFinalAssignment(std::vector<IOPin>& v,
+                                           std::vector<IOPin>& zeroSinkIOs) {
         unsigned id = 0;
         for (auto i : *_slots) {
-			    bool pinPlaced = false;
+                bool pinPlaced = false;
                 if (i.current && not i.visited) {
-					_netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-							if (idx == id && !pinPlaced) {
-								ioPin.setPos(i.pos);
-								v.push_back(ioPin);
-								pinPlaced = true;
-								id++;
-							}
-					});					
+                        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                if (idx == id && !pinPlaced) {
+                                        ioPin.setPos(i.pos);
+                                        v.push_back(ioPin);
+                                        pinPlaced = true;
+                                        id++;
+                                }
+                        });
                 } else if (zeroSinkIOs.size() > 0) {
-					zeroSinkIOs[0].setPos(i.pos);
-					v.push_back(zeroSinkIOs[0]);
-					zeroSinkIOs.erase(zeroSinkIOs.begin());
-				}
+                        zeroSinkIOs[0].setPos(i.pos);
+                        v.push_back(zeroSinkIOs[0]);
+                        zeroSinkIOs.erase(zeroSinkIOs.begin());
+                }
         }
 }

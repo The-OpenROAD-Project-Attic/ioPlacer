@@ -62,8 +62,12 @@ class Parameters {
         std::string getOutputDefFile() const { return _outputDefFile; }
         DBU getMinimumSpacingX() const { return _minimumSpacingX; }
         DBU getMinimumSpacingY() const { return _minimumSpacingY; }
-        DBU getInitTrackX() const { return _initTracksX; };
-        DBU getInitTrackY() const { return _initTracksY; };
+        DBU getInitTrackX() const {
+                return _initTracksX;
+        };
+        DBU getInitTrackY() const {
+                return _initTracksY;
+        };
 };
 
 #endif /* __PARAMETERS_H_ */

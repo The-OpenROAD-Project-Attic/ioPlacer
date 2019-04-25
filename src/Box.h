@@ -46,7 +46,7 @@ class Box {
         Coordinate _upperBound;
 
        public:
-        Box() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
+        Box() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)) {};
 
         Box(const Coordinate& lowerBound, const Coordinate& upperBound)
             : _lowerBound(lowerBound), _upperBound(upperBound) {}

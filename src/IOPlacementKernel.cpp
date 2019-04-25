@@ -52,14 +52,14 @@ void IOPlacementKernel::initIOLists() {
                 /* TODO:  <23-04-19, do we need this check to remove pins
                  * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
+                        _netlist.forEachSinkOfIO(idx,
+                                                 [&](InstancePin& instPin) {
+                                instPinsVector.push_back(instPin);
+                        });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
-				}
+                }
         });
 }
 
@@ -245,11 +245,10 @@ void IOPlacementKernel::run() {
         std::vector<IOPin> assignment;
         hgMatching.getFinalAssignment(assignment, _zeroSinkIOs);
 
-        for (IOPin& ioPin : assignment) {	
-                Orientation orient =
-                    checkOrientation(ioPin.getX(), ioPin.getY(),
-					ioPin.getOrientation());
-				ioPin.setOrientation(orient);
+        for (IOPin& ioPin : assignment) {
+                Orientation orient = checkOrientation(
+                    ioPin.getX(), ioPin.getY(), ioPin.getOrientation());
+                ioPin.setOrientation(orient);
         }
 
         WriterIOPins writer(_netlistIOPins, assignment,
