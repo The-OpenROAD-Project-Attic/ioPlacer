@@ -60,17 +60,19 @@ void HungarianMatching::run() {
 void HungarianMatching::setNumSlots() {
         _numSlots = 0;
         for (auto i : *_slots) {
-                if (i.current && i.visited) {
-                        i.current = false;
-                } else if (i.current) {
-                        _numSlots++;
+                if (i.current) {
+                        if (i.visited) {
+                                i.current = false;
+                        } else {
+                                _numSlots++;
+                        }
                 }
         }
 }
 
 void HungarianMatching::createMatrix() {
         setNumSlots();
-        _hungarianMatrix = Matrix<DBU>(_numIOPins, _numSlots);
+        _hungarianMatrix = Matrix<DBU>(_numSlots, _numIOPins);
 
         unsigned slotIndex = 0;
         for (auto i : *_slots) {
@@ -83,7 +85,7 @@ void HungarianMatching::createMatrix() {
                 Coordinate newPos = i.pos;
                 _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                         DBU hpwl = _netlist->computeIONetHPWL(idx, newPos);
-                        _hungarianMatrix(pinIndex, slotIndex) = hpwl;
+                        _hungarianMatrix(slotIndex, pinIndex) = hpwl;
                         pinIndex++;
                 });
                 slotIndex++;
@@ -97,18 +99,18 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
         std::vector<unsigned> to_remove;
         std::vector<unsigned> to_explore;
         /* TODO:  <23-04-19, transpose io pins and slots in matrix> */
-        for (size_t col = 0; col < _hungarianMatrix.columns(); col++) {
+        for (size_t row = 0; row < _hungarianMatrix.rows(); row++) {
                 will_remove = true;
-                for (size_t row = 0; row < _hungarianMatrix.rows(); row++) {
+                for (size_t col = 0; col < _hungarianMatrix.columns(); col++) {
                         if (_hungarianMatrix(row, col) == 0) {
                                 will_remove = false;
                                 break;
                         }
                 }
                 if (will_remove) {
-                        to_remove.push_back(col);
+                        to_remove.push_back(row);
                 } else {
-                        to_explore.push_back(col);
+                        to_explore.push_back(row);
                 }
         }
         /* if (to_remove.size()) { */
@@ -117,7 +119,7 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
         /*         stable = true; */
         /* } */
         markRemove(to_remove);
-        if (last_pass) {
+        if (not last_pass) {
                 markExplore(to_explore);
         }
         return false;
