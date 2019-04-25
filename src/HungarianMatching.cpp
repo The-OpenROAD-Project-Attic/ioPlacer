@@ -62,10 +62,10 @@ void HungarianMatching::run() {
                 name = std::get<0>(i);
                 coor = std::get<1>(i);
                 std::cout << name << ": (" << coor.getX() << ", " << coor.getY()
-                          << ")" << std::endl;
+                          << ")\n";
         }
         std::cout << _hungarianMatrix.rows() << ','
-                  << _hungarianMatrix.columns() << std::endl;
+                  << _hungarianMatrix.columns() << "\n";
 #endif
 }
 
@@ -186,7 +186,7 @@ void HungarianMatching::createMatrix() {
         for (auto i : _slots) {
                 if (std::get<0>(i) && std::get<1>(i)) {
                         std::get<0>(i) = false;
-                        std::cout << "here" << std::endl;
+                        std::cout << "here\n";
                 } else if (std::get<0>(i)) {
                         _numSlots++;
                 }

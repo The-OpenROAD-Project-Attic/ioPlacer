@@ -50,7 +50,7 @@ void WriterIOPins::run() {
         if (writeFile())
                 std::cout << "File " << _outFileName << " created\n";
         else
-                std::cout << "Error in writeFile!" << std::endl;
+                std::cout << "Error in writeFile!\n";
 }
 
 bool WriterIOPins::writeFile() {
@@ -58,7 +58,7 @@ bool WriterIOPins::writeFile() {
         pinsFile.open(_outFileName);
 
         if (!pinsFile.is_open()) {
-                std::cout << "Could not open file pinsFile." << std::endl;
+                std::cout << "Could not open file pinsFile.\n";
                 pinsFile.close();
                 return false;
         }
