@@ -50,7 +50,8 @@ HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
 void HungarianMatching::run() {
         bool stable = false;
         unsigned iterr = 4;
-        while (not stable && iterr > 0) {
+
+        while (!stable && iterr > 0) {
                 iterr--;
                 createMatrix();
                 _hungarianSolver.solve(_hungarianMatrix);
@@ -61,7 +62,7 @@ void HungarianMatching::run() {
 
 void HungarianMatching::setNumSlots() {
         _numSlots = 0;
-        for (auto i : *_slots) {
+        for (slot_t& i : *_slots) {
                 if (i.current) {
                         if (i.visited) {
                                 i.current = false;
@@ -75,13 +76,12 @@ void HungarianMatching::setNumSlots() {
 void HungarianMatching::createMatrix() {
         setNumSlots();
         _hungarianMatrix = Matrix<DBU>(_numSlots, _numIOPins);
-
         unsigned slotIndex = 0;
-        for (auto i : *_slots) {
+        for (slot_t& i : *_slots) {
                 unsigned pinIndex = 0;
                 if (i.current && i.visited) {
                         i.current = false;
-                } else if (not i.current) {
+                } else if (!i.current) {
                         continue;
                 }
                 Coordinate newPos = i.pos;
@@ -115,7 +115,7 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
                         to_explore.push_back(row);
                 }
         }
-        if (to_remove.size()) {
+        if (to_remove.size() != 0) {
                 stable = false;
         } else {
                 stable = true;
@@ -127,37 +127,46 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
         return stable;
 }
 
-inline void HungarianMatching::addSlot(slot_t& s) {
-        if (not s.visited && not s.current) {
+inline bool HungarianMatching::addSlot(slot_t& s) {
+        if (!s.visited && !s.current) {
                 s.current = true;
                 _numSlots++;
+                return true;
         }
+        return false;
 }
 
 inline void HungarianMatching::markExplore(std::vector<unsigned> v) {
+
         unsigned curr = 0;
-        slotVector_t slots = *_slots;
+        slotVector_t& slots = *_slots;
+        bool added;
         for (unsigned i = 0; i < slots.size(); ++i) {
-                if (slots.at(i).current && v.size() > 0 && v.at(0) == curr) {
-                        if (i > 0) {
-                                addSlot(slots.at(i - 1));
+                if (slots.at(i).current) {
+                        if (v.size() > 0 && v.at(0) == curr) {
+                                if (i > 0) {
+                                        added = addSlot(slots.at(i - 1));
+                                }
+                                added = addSlot(slots.at(i + 1));
+                                v.erase(v.begin());
+                                if (added) i++;
                         }
-                        addSlot(slots.at(i + 1));
-                        v.erase(v.begin());
+                        curr++;
                 }
-                curr++;
         }
 }
 
 inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
         unsigned curr = 0;
-        for (auto i : *_slots) {
-                if (i.current && v.size() > 0 && v.at(0) == curr) {
-                        i.visited = true;
-                        v.erase(v.begin());
-                        _numSlots--;
+        for (slot_t& i : *_slots) {
+                if (i.current) {
+                        if (v.size() > 0 && v.at(0) == curr) {
+                                i.visited = true;
+                                v.erase(v.begin());
+                                _numSlots--;
+                        }
+                        curr++;
                 }
-                curr++;
         }
 }
 

@@ -105,19 +105,17 @@ void IOPlacementKernel::defineSlots() {
          *   lowerBound    1st edge                 *
          *                 ---->                    *
          *******************************************/
-        std::cout << "Selecting slots\n";
+
         std::vector<Coordinate> slotsEdge1;
         DBU currX = lb.getX() + initTracksX;
         DBU currY = lb.getY();
 
-        std::cout << "Slots edge 1\n";
         while (currX < ub.getX()) {
                 Coordinate pos(currX, currY);
                 slotsEdge1.push_back(pos);
                 currX += minDstPinsX;
         }
 
-        std::cout << "Slots edge 2\n";
         std::vector<Coordinate> slotsEdge2;
         currY = lb.getY() + initTracksY;
         currX = ub.getX();
@@ -127,7 +125,6 @@ void IOPlacementKernel::defineSlots() {
                 currY += minDstPinsY;
         }
 
-        std::cout << "Slots edge 3\n";
         std::vector<Coordinate> slotsEdge3;
         currX = lb.getX() + initTracksX;
         currY = ub.getY();
@@ -138,7 +135,6 @@ void IOPlacementKernel::defineSlots() {
         }
         std::reverse(slotsEdge3.begin(), slotsEdge3.end());
 
-        std::cout << "Slots edge 4\n";
         std::vector<Coordinate> slotsEdge4;
         currY = lb.getY() + initTracksY;
         currX = lb.getX();
@@ -148,8 +144,6 @@ void IOPlacementKernel::defineSlots() {
                 currY += minDstPinsY;
         }
         std::reverse(slotsEdge4.begin(), slotsEdge4.end());
-
-        std::cout << "Setting slots to solver\n";
 
         int i = 0;
         for (Coordinate pos : slotsEdge1) {
