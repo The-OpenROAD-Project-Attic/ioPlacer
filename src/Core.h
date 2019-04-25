@@ -54,7 +54,7 @@ class Core {
             : _lowerBound(Coordinate(0, 0)),
               _upperBound(Coordinate(0, 0)),
               _minDstPinsX(20),
-              _minDstPinsY(20) {};
+              _minDstPinsY(20){};
         Core(const Coordinate& lowerBound, const Coordinate& upperBound,
              const DBU& minDstPinsX, const DBU& minDstPinsY,
              const DBU& initTracksX, const DBU& initTracksY)

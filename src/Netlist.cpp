@@ -52,8 +52,8 @@ void Netlist::forEachIOPin(std::function<void(unsigned idx, IOPin&)> func) {
         }
 }
 
-void Netlist::forEachIOPin(std::function<void(unsigned idx, const IOPin&)> func)
-    const {
+void Netlist::forEachIOPin(
+    std::function<void(unsigned idx, const IOPin&)> func) const {
         for (unsigned idx = 0; idx < _ioPins.size(); ++idx) {
                 func(idx, _ioPins[idx]);
         }

@@ -79,8 +79,7 @@ Parameters::Parameters(int argc, char** argv) {
                 _initTracksX = vm["beX"].as<DBU>();
                 _initTracksY = vm["beY"].as<DBU>();
                 _outputDefFile = vm["def"].as<std::string>();
-        }
-        catch (const po::error& ex) {
+        } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
 

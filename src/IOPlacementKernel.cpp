@@ -41,6 +41,21 @@
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {}
 
+void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
+        static const int kMaxValue = _slots.size() - 1;
+        std::vector<int> v(kMaxValue + 1);
+        for (size_t i = 0; i < v.size(); ++i) v[i] = i;
+        std::random_device rd;
+        std::mt19937 prng(rd());
+        std::shuffle(v.begin(), v.end(), prng);
+        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                unsigned b = v[0];
+                ioPin.setPos(_slots.at(b).pos);
+                assignment.push_back(ioPin);
+                v.erase(v.begin());
+        });
+}
+
 void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
         parser.run();
@@ -52,10 +67,10 @@ void IOPlacementKernel::initIOLists() {
                 /* TODO:  <23-04-19, do we need this check to remove pins
                  * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(idx,
-                                                 [&](InstancePin& instPin) {
-                                instPinsVector.push_back(instPin);
-                        });
+                        _netlist.forEachSinkOfIO(
+                            idx, [&](InstancePin& instPin) {
+                                    instPinsVector.push_back(instPin);
+                            });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
@@ -219,25 +234,22 @@ inline Orientation IOPlacementKernel::checkOrientation(
 }
 
 void IOPlacementKernel::run() {
+        std::vector<IOPin> assignment;
+
         initNetlistAndCore();
-
-#ifdef DEBUG
-        _netlist.forEachIOPin([&](unsigned idx, const IOPin& ioPin) {
-                std::cout << "IO Pin: " << ioPin.getName() << "\n";
-                std::cout << "N Pins: " << _netlist.numSinksOfIO(idx) << "\n";
-                _netlist.forEachSinkOfIO(idx, [&](const InstancePin& instPin) {
-                        std::cout << "\tinstPin " << instPin.getName() << "\n";
-                });
-        });
-#endif
-
         initIOLists();
         defineSlots();
-        HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
-        hgMatching.run();
 
-        std::vector<IOPin> assignment;
-        hgMatching.getFinalAssignment(assignment, _zeroSinkIOs);
+        bool random = true;
+        if (random) {
+                randomPlacement(assignment);
+                /* TODO:  <25-04-19, remove hard coded> */
+                std::cout << "!!!WARNING!!! hard coded run of random" << std::endl;
+        } else {
+                HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
+                hgMatching.run();
+                hgMatching.getFinalAssignment(assignment, _zeroSinkIOs);
+        }
 
         for (IOPin& ioPin : assignment) {
                 Orientation orient = checkOrientation(

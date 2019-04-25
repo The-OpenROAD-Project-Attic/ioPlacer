@@ -79,7 +79,6 @@ bool WriterIOPins::writeFile() {
                 std::string dir =
                     (direction == Direction::IN) ? "INPUT" : "OUTPUT";
                 std::string orient;
-                std::cout << "Orient in writer: " << orientation << "\n";
                 switch (orientation) {
                         case Orientation::EAST:
                                 orient = "E";

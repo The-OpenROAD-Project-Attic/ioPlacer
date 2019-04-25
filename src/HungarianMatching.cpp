@@ -137,7 +137,6 @@ inline bool HungarianMatching::addSlot(slot_t& s) {
 }
 
 inline void HungarianMatching::markExplore(std::vector<unsigned> v) {
-
         unsigned curr = 0;
         slotVector_t& slots = *_slots;
         bool added;
