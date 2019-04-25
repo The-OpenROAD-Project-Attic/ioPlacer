@@ -55,7 +55,7 @@ class Parameters {
         void printAll() const;
 
        public:
-        Parameters(int argc, char** argv);
+        Parameters(int , char** );
 
         std::string getFloorplanFile() const { return _floorplanFile; }
         std::string getNetlistFile() const { return _netlistFile; }

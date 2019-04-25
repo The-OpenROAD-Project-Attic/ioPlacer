@@ -81,9 +81,7 @@ class IOPin : public InstancePin {
               _upperBound(upperBound),
               _netName(netName) {}
 
-        void setOrientation(const Orientation orientation) {
-                _orientation = orientation;
-        }
+        void setOrientation(const Orientation o) { _orientation = o; }
         Orientation getOrientation() const { return _orientation; }
         void setX(const DBU x) { _pos.setX(x); }
         void setY(const DBU y) { _pos.setY(y); }
@@ -104,20 +102,17 @@ class Netlist {
        public:
         Netlist();
 
-        void addIONet(const IOPin& ioPin,
-                      const std::vector<InstancePin>& instPins);
+        void addIONet(const IOPin&, const std::vector<InstancePin>&);
 
-        void forEachIOPin(std::function<void(unsigned idx, IOPin&)> func);
-        void forEachIOPin(
-            std::function<void(unsigned idx, const IOPin&)> func) const;
-        void forEachSinkOfIO(unsigned idx,
-                             std::function<void(InstancePin&)> func);
-        void forEachSinkOfIO(
-            unsigned idx, std::function<void(const InstancePin&)> func) const;
-        unsigned numSinksOfIO(unsigned idx);
+        void forEachIOPin(std::function<void(unsigned, IOPin&)>);
+        void forEachIOPin(std::function<void(unsigned, const IOPin&)>) const;
+        void forEachSinkOfIO(unsigned, std::function<void(InstancePin&)>);
+        void forEachSinkOfIO(unsigned,
+                             std::function<void(const InstancePin&)>) const;
+        unsigned numSinksOfIO(unsigned);
         int numIOPins();
 
-        DBU computeIONetHPWL(unsigned idx, Coordinate slotPos);
+        DBU computeIONetHPWL(unsigned, Coordinate);
 };
 
 #endif /* __NETLIST_H_ */

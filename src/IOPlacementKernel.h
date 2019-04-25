@@ -53,7 +53,7 @@ class IOPlacementKernel {
                                             Orientation currentOrient);
 
        public:
-        IOPlacementKernel(Parameters& parms);
+        IOPlacementKernel(Parameters&);
         void run();
 };
 
