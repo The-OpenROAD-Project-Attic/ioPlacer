@@ -64,8 +64,9 @@ class HungarianMatching {
 
         void createMatrix();
         bool updateNeighborhood(bool);
-        void markRemove(std::vector<unsigned>);
-        void markExplore(std::vector<unsigned>);
+        inline void markRemove(std::vector<unsigned>);
+        inline void markExplore(std::vector<unsigned>);
+        inline void addSlot(slot_t&);
 
        public:
         HungarianMatching(Netlist&, Core&, slotVector_t&);

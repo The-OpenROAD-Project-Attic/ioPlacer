@@ -124,43 +124,37 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
         /* return stable; */
 }
 
-void HungarianMatching::markExplore(std::vector<unsigned> v) {
-        unsigned curr = 0;
-        slotVector_t slots = *_slots;
-        for (unsigned i = 0; i < slots.size(); ++i) {
-                if (slots.at(i).current) {
-                        if (v.size() > 0 && v.at(0) == curr) {
-                                if (i > 1 && not slots.at(i - 1).visited) {
-                                        if (not slots.at(i - 1).current) {
-                                                slots.at(i - 1).current = true;
-                                                _numSlots++;
-                                        }
-                                }
-                                if (i < slots.size() &&
-                                    not slots.at(i + 1).visited) {
-                                        if (not slots.at(i + 1).current) {
-                                                slots.at(i + 1).current = true;
-                                                _numSlots++;
-                                        }
-                                }
-                                v.erase(v.begin());
-                        }
-                        curr++;
-                }
+inline void HungarianMatching::addSlot(slot_t& s) {
+        if (not s.visited && not s.current) {
+                s.current = true;
+                _numSlots++;
         }
 }
 
-void HungarianMatching::markRemove(std::vector<unsigned> v) {
+inline void HungarianMatching::markExplore(std::vector<unsigned> v) {
+        unsigned curr = 0;
+        slotVector_t slots = *_slots;
+        for (unsigned i = 0; i < slots.size(); ++i) {
+                if (slots.at(i).current && v.size() > 0 && v.at(0) == curr) {
+                        if (i > 0) {
+                                addSlot(slots.at(i - 1));
+                        }
+                        addSlot(slots.at(i + 1));
+                        v.erase(v.begin());
+                }
+                curr++;
+        }
+}
+
+inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
         unsigned curr = 0;
         for (auto i : *_slots) {
-                if (i.current) {
-                        if (v.size() > 0 && v.at(0) == curr) {
-                                i.visited = true;
-                                v.erase(v.begin());
-                                _numSlots--;
-                        }
-                        curr++;
+                if (i.current && v.size() > 0 && v.at(0) == curr) {
+                        i.visited = true;
+                        v.erase(v.begin());
+                        _numSlots--;
                 }
+                curr++;
         }
 }
 
