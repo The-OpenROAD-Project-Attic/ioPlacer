@@ -57,6 +57,8 @@ bool WriterIOPins::writeFile() {
         std::ofstream pinsFile;
         pinsFile.open(_outFileName);
 
+        assignmentVec_t assignment = *_assignment;
+
         if (!pinsFile.is_open()) {
                 std::cout << "Could not open file pinsFile.\n";
                 pinsFile.close();
@@ -70,8 +72,7 @@ bool WriterIOPins::writeFile() {
                 Direction direction = ioPin.getDirection();
                 std::string layer = "Metal4";  // Temporary
 
-                for (std::tuple<unsigned, Coordinate> pinAssignment :
-                     _assignment) {
+                for (auto pinAssignment : assignment) {
                         if (std::get<0>(pinAssignment) == idx) {
                                 x = std::get<1>(pinAssignment).getX();
                                 y = std::get<1>(pinAssignment).getY();

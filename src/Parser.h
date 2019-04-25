@@ -81,7 +81,7 @@ class Parser {
         void initCore();
 
        public:
-        Parser(Parameters& , Netlist& , Core& );
+        Parser(Parameters&, Netlist&, Core&);
         void run();
 };
 

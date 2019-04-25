@@ -61,6 +61,98 @@ void IOPlacementKernel::initIOLists() {
         });
 }
 
+void IOPlacementKernel::defineSlots() {
+        Coordinate lb = _core.getLowerBound();
+        Coordinate ub = _core.getUpperBound();
+        unsigned minDstPinsX = _core.getMinDstPinsX();
+        unsigned minDstPinsY = _core.getMinDstPinsY();
+        unsigned initTracksX = _core.getInitTracksX();
+        unsigned initTracksY = _core.getInitTracksY();
+
+        bool use = false;
+        bool firstRight = true;
+        bool firstUp = true;
+        bool firstLeft = true;
+        DBU currX = lb.getX() + initTracksX;
+        DBU currY = lb.getY();
+        DBU totalNumSlots = 0;
+        totalNumSlots += (ub.getX() - lb.getX()) * 2 / minDstPinsX;
+        totalNumSlots += (ub.getY() - lb.getY()) * 2 / minDstPinsY;
+        unsigned numPins = _netlist.numIOPins();
+
+        unsigned interval = std::floor(totalNumSlots / getKValue() * numPins);
+        if (std::floor(totalNumSlots / interval) <= numPins) {
+                interval = std::floor(totalNumSlots / numPins);
+        }
+
+        /*******************************************
+         * How the for bellow follows core boundary *
+         ********************************************
+         *                 <----                    *
+         *                                          *
+         *                 3st edge     upperBound  *
+         *           *------------------x           *
+         *           |                  |           *
+         *   |       |                  |      ^    *
+         *   |  4th  |                  | 2nd  |    *
+         *   |  edge |                  | edge |    *
+         *   V       |                  |      |    *
+         *           |                  |           *
+         *           x------------------*           *
+         *   lowerBound    1st edge                 *
+         *                 ---->                    *
+         *******************************************/
+        for (unsigned i = 0; i < totalNumSlots; i++) {
+                if (i % interval) {
+                        use = false;
+                } else {
+                        use = true;
+                }
+                _slots.push_back({use, false, Coordinate(currX, currY)});
+                // get slots for 1st edge
+                if (currX < ub.getX() && currY == lb.getY()) {
+                        currX += minDstPinsX;
+                }
+                // get slots for 2nd edge
+                else if (currY < ub.getY() && currX >= ub.getX()) {
+                        if (firstRight) {
+                                currX = ub.getX();
+                                currY += initTracksY;
+                                firstRight = false;
+                        } else {
+                                currX = ub.getX();
+                                currY += minDstPinsY;
+                        }
+                }
+                // get slots for 3rd edge
+                else if (currX > lb.getX()) {
+                        if (firstUp) {
+                                currY = ub.getY();
+                                currX -= initTracksX;
+                                firstUp = false;
+                        } else {
+                                currY = ub.getY();
+                                currX -= minDstPinsX;
+                        }
+                }
+                // get slots for 4th  edge
+                else if (currY > lb.getY()) {
+                        if (firstLeft) {
+                                currX = lb.getX();
+                                currY -= initTracksY;
+                                firstLeft = false;
+                        } else {
+                                currX = lb.getX();
+                                currY -= minDstPinsY;
+                        }
+                }
+                // is at the lowerBound again, break loop
+                else if (currX < lb.getX() && currY == lb.getY()) {
+                        break;
+                }
+        }
+}
+
 inline Orientation IOPlacementKernel::checkOrientation(
     const DBU x, const DBU y, Orientation currentOrient) {
         DBU lowerXBound = _core.getLowerBound().getX();
@@ -96,7 +188,8 @@ void IOPlacementKernel::run() {
 #endif
 
         initIOLists();
-        HungarianMatching hgMatching(_netlistIOPins, _core);
+        defineSlots();
+        HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
         hgMatching.run();
 
         std::vector<std::tuple<unsigned, Coordinate>> assignment;
@@ -117,7 +210,8 @@ void IOPlacementKernel::run() {
                 ioPin.setOrientation(orient);
         });
 
-        WriterIOPins writer(_netlistIOPins, assignment, _parms->getOutputDefFile());
+        WriterIOPins writer(_netlistIOPins, assignment,
+                            _parms->getOutputDefFile());
 
         writer.run();
 }

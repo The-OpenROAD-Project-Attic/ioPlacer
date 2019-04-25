@@ -46,8 +46,8 @@
 class WriterIOPins {
        private:
         Netlist* _netlist;
-        std::string _outFileName;
         assignmentVec_t* _assignment;
+        std::string _outFileName;
 
         bool writeFile();
 

@@ -42,18 +42,13 @@
 #include "Core.h"
 #include "Netlist.h"
 #include "IOPlacementKernel.h"
+#include "Slots.h"
 #include "munkres/munkres.h"
 
 #include <iostream>
 #include <math.h>
 
-struct slot {
-        bool current;
-        bool visited;
-        Coordinate pos;
-} typedef slot_t;
-
-typedef std::vector<slot_t> slotVector_t;
+typedef std::vector<std::tuple<unsigned, Coordinate>> assignmentVec_t;
 
 class HungarianMatching {
        private:
@@ -61,23 +56,22 @@ class HungarianMatching {
         Matrix<DBU> _hungarianMatrix;
         Munkres<DBU> _hungarianSolver;
         Netlist* _netlist;
-        int _numSlots = 0;
-        slotVector_t _slots;
+        slotVector_t* _slots;
+        unsigned _numSlots;
+        unsigned _numIOPins;
 
-        int getKValue() { return 1; }
-        int getNumIOPins() { return _netlist->numIOPins(); }
+        void setNumSlots();
 
-        void defineSlots();
         void createMatrix();
         bool updateNeighborhood(bool);
         void markRemove(std::vector<unsigned>);
         void markExplore(std::vector<unsigned>);
 
        public:
-        HungarianMatching(Netlist&, Core&);
+        HungarianMatching(Netlist&, Core&, slotVector_t&);
         virtual ~HungarianMatching() = default;
         void run();
-        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
+        void getFinalAssignment(assignmentVec_t&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

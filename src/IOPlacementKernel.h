@@ -41,8 +41,7 @@
 #include "Parameters.h"
 #include "HungarianMatching.h"
 #include "Netlist.h"
-
-typedef std::vector<std::tuple<unsigned, Coordinate>> assignmentVec_t;
+#include "Slots.h"
 
 class IOPlacementKernel {
        private:
@@ -50,9 +49,12 @@ class IOPlacementKernel {
         Netlist _netlist;
         Netlist _netlistIOPins;
         Core _core;
+        slotVector_t _slots;
 
         void initNetlistAndCore();
         void initIOLists();
+        void defineSlots();
+        int getKValue() { return 1; }
         inline Orientation checkOrientation(const DBU x, const DBU y,
                                             Orientation currentOrient);
 

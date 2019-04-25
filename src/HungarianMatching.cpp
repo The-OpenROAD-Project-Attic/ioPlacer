@@ -37,13 +37,15 @@
 
 #include "HungarianMatching.h"
 
-HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
+HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
+                                     slotVector_t& v) {
         _netlist = &netlist;
         _core = &core;
+        _slots = &v;
+        _numIOPins = _netlist->numIOPins();
 }
 
 void HungarianMatching::run() {
-        defineSlots();
         createMatrix();
         for (int i = 0; i < 3; ++i) {
                 _hungarianSolver.solve(_hungarianMatrix);
@@ -53,114 +55,23 @@ void HungarianMatching::run() {
         updateNeighborhood(true);
 }
 
-void HungarianMatching::defineSlots() {
-        Coordinate lb = _core->getLowerBound();
-        Coordinate ub = _core->getUpperBound();
-        unsigned minDstPinsX = _core->getMinDstPinsX();
-        unsigned minDstPinsY = _core->getMinDstPinsY();
-        unsigned initTracksX = _core->getInitTracksX();
-        unsigned initTracksY = _core->getInitTracksY();
-
-        bool use = false;
-        bool firstRight = true;
-        bool firstUp = true;
-        bool firstLeft = true;
-        DBU currX = lb.getX() + initTracksX;
-        DBU currY = lb.getY();
-        DBU totalNumSlots = 0;
-        totalNumSlots += (ub.getX() - lb.getX()) * 2 / minDstPinsX;
-        totalNumSlots += (ub.getY() - lb.getY()) * 2 / minDstPinsY;
-        unsigned numPins = getNumIOPins();
-
-        unsigned interval = std::floor(totalNumSlots / getKValue() * numPins);
-        if (std::floor(totalNumSlots / interval) <= numPins) {
-                interval = std::floor(totalNumSlots / numPins);
-        }
-
-        /*******************************************
-         * How the for bellow follows core boundary *
-         ********************************************
-         *                 <----                    *
-         *                                          *
-         *                 3st edge     upperBound  *
-         *           *------------------x           *
-         *           |                  |           *
-         *   |       |                  |      ^    *
-         *   |  4th  |                  | 2nd  |    *
-         *   |  edge |                  | edge |    *
-         *   V       |                  |      |    *
-         *           |                  |           *
-         *           x------------------*           *
-         *   lowerBound    1st edge                 *
-         *                 ---->                    *
-         *******************************************/
-        for (unsigned i = 0; i < totalNumSlots; i++) {
-                if (i % interval) {
-                        use = false;
-                } else {
-                        use = true;
-                        _numSlots++;
-                }
-                _slots.push_back({use, false, Coordinate(currX, currY)});
-                // get slots for 1st edge
-                if (currX < ub.getX() && currY == lb.getY()) {
-                        currX += minDstPinsX;
-                }
-                // get slots for 2nd edge
-                else if (currY < ub.getY() && currX >= ub.getX()) {
-                        if (firstRight) {
-                                currX = ub.getX();
-                                currY += initTracksY;
-                                firstRight = false;
-                        } else {
-                                currX = ub.getX();
-                                currY += minDstPinsY;
-                        }
-                }
-                // get slots for 3rd edge
-                else if (currX > lb.getX()) {
-                        if (firstUp) {
-                                currY = ub.getY();
-                                currX -= initTracksX;
-                                firstUp = false;
-                        } else {
-                                currY = ub.getY();
-                                currX -= minDstPinsX;
-                        }
-                }
-                // get slots for 4th  edge
-                else if (currY > lb.getY()) {
-                        if (firstLeft) {
-                                currX = lb.getX();
-                                currY -= initTracksY;
-                                firstLeft = false;
-                        } else {
-                                currX = lb.getX();
-                                currY -= minDstPinsY;
-                        }
-                }
-                // is at the lowerBound again, break loop
-                else if (currX < lb.getX() && currY == lb.getY()) {
-                        break;
-                }
-        }
-}
-
-void HungarianMatching::createMatrix() {
+void HungarianMatching::setNumSlots() {
         _numSlots = 0;
-
-        for (auto i : _slots) {
+        for (auto i : *_slots) {
                 if (i.current && i.visited) {
                         i.current = false;
                 } else if (i.current) {
                         _numSlots++;
                 }
         }
+}
 
-        _hungarianMatrix = Matrix<DBU>(getNumIOPins(), _numSlots);
+void HungarianMatching::createMatrix() {
+        setNumSlots();
+        _hungarianMatrix = Matrix<DBU>(_numIOPins, _numSlots);
 
         unsigned slotIndex = 0;
-        for (auto i : _slots) {
+        for (auto i : *_slots) {
                 unsigned pinIndex = 0;
                 if (i.current && i.visited) {
                         i.current = false;
@@ -206,19 +117,20 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
 
 void HungarianMatching::markExplore(std::vector<unsigned> v) {
         unsigned curr = 0;
-        for (unsigned i = 0; i < _slots.size(); ++i) {
-                if (_slots.at(i).current) {
+        slotVector_t slots = *_slots;
+        for (unsigned i = 0; i < slots.size(); ++i) {
+                if (slots.at(i).current) {
                         if (v.size() > 0 && v.at(0) == curr) {
-                                if (i > 1 && not _slots.at(i - 1).visited) {
-                                        if (not _slots.at(i - 1).current) {
-                                                _slots.at(i - 1).current = true;
+                                if (i > 1 && not slots.at(i - 1).visited) {
+                                        if (not slots.at(i - 1).current) {
+                                                slots.at(i - 1).current = true;
                                                 _numSlots++;
                                         }
                                 }
-                                if (i < _slots.size() &&
-                                    not _slots.at(i + 1).visited) {
-                                        if (not _slots.at(i + 1).current) {
-                                                _slots.at(i + 1).current = true;
+                                if (i < slots.size() &&
+                                    not slots.at(i + 1).visited) {
+                                        if (not slots.at(i + 1).current) {
+                                                slots.at(i + 1).current = true;
                                                 _numSlots++;
                                         }
                                 }
@@ -231,7 +143,7 @@ void HungarianMatching::markExplore(std::vector<unsigned> v) {
 
 void HungarianMatching::markRemove(std::vector<unsigned> v) {
         unsigned curr = 0;
-        for (auto i : _slots) {
+        for (auto i : *_slots) {
                 if (i.current) {
                         if (v.size() > 0 && v.at(0) == curr) {
                                 i.visited = true;
@@ -245,7 +157,7 @@ void HungarianMatching::markRemove(std::vector<unsigned> v) {
 
 void HungarianMatching::getFinalAssignment(assignmentVec_t& v) {
         unsigned idx = 0;
-        for (auto i : _slots) {
+        for (auto i : *_slots) {
                 if (i.current && not i.visited) {
                         v.push_back(
                             std::tuple<unsigned, Coordinate>(idx++, i.pos));
