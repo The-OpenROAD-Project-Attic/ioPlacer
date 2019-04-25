@@ -39,10 +39,10 @@
 #include <iostream>
 #include <fstream>
 
-WriterIOPins::WriterIOPins(Netlist& netlist, assignmentVec_t assignment,
-                               std::string outFileName) {
+WriterIOPins::WriterIOPins(Netlist& netlist, assignmentVec_t& av,
+                           std::string outFileName) {
         _netlist = &netlist;
-        _assignment = assignment;
+        _assignment = &av;
         _outFileName = outFileName;
 }
 
