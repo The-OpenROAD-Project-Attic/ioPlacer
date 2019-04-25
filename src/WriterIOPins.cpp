@@ -39,7 +39,7 @@
 #include <iostream>
 #include <fstream>
 
-WriterIOPins::WriterIOPins(Netlist& netlist, assignmentVec_t& av,
+WriterIOPins::WriterIOPins(Netlist& netlist, std::vector<IOPin>& av,
                            std::string outFileName) {
         _netlist = &netlist;
         _assignment = &av;
@@ -57,7 +57,7 @@ bool WriterIOPins::writeFile() {
         std::ofstream pinsFile;
         pinsFile.open(_outFileName);
 
-        assignmentVec_t assignment = *_assignment;
+        std::vector<IOPin> assignment = *_assignment;
 
         if (!pinsFile.is_open()) {
                 std::cout << "Could not open file pinsFile.\n";
@@ -65,21 +65,13 @@ bool WriterIOPins::writeFile() {
                 return false;
         }
 
-        DBU x, y;
-        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+        for (IOPin ioPin : assignment) {
                 std::string name = ioPin.getName();
                 std::string netName = ioPin.getNetName();
                 Direction direction = ioPin.getDirection();
                 std::string layer = "Metal4";  // Temporary
 
-                for (auto pinAssignment : assignment) {
-                        if (std::get<0>(pinAssignment) == idx) {
-                                x = std::get<1>(pinAssignment).getX();
-                                y = std::get<1>(pinAssignment).getY();
-                                break;
-                        }
-                }
-                Coordinate position(x, y);
+                Coordinate position(ioPin.getX(), ioPin.getY());
                 Orientation orientation = ioPin.getOrientation();
                 Coordinate lowerBound = ioPin.getLowerBound();
                 Coordinate upperBound = ioPin.getUpperBound();
@@ -87,6 +79,7 @@ bool WriterIOPins::writeFile() {
                 std::string dir =
                     (direction == Direction::IN) ? "INPUT" : "OUTPUT";
                 std::string orient;
+				std::cout << "Orient in writer: " << orientation << "\n";
                 switch (orientation) {
                         case Orientation::EAST:
                                 orient = "E";
@@ -110,7 +103,7 @@ bool WriterIOPins::writeFile() {
                          << " )\n";
                 pinsFile << "  + PLACED ( " << position.getX() << " "
                          << position.getY() << " ) " << orient << " ;\n";
-        });
+        }
 
         pinsFile.close();
 

@@ -48,8 +48,6 @@
 #include <iostream>
 #include <math.h>
 
-typedef std::vector<std::tuple<unsigned, Coordinate>> assignmentVec_t;
-
 class HungarianMatching {
        private:
         Core* _core;
@@ -72,7 +70,7 @@ class HungarianMatching {
         HungarianMatching(Netlist&, Core&, slotVector_t&);
         virtual ~HungarianMatching() = default;
         void run();
-        void getFinalAssignment(assignmentVec_t&);
+        void getFinalAssignment(std::vector<IOPin>&, std::vector<IOPin>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

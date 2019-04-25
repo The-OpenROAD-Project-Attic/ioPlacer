@@ -50,6 +50,7 @@ class IOPlacementKernel {
         Netlist _netlistIOPins;
         Core _core;
         slotVector_t _slots;
+        std::vector<IOPin> _zeroSinkIOs;
 
         void initNetlistAndCore();
         void initIOLists();

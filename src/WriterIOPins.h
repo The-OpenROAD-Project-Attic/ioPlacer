@@ -46,13 +46,13 @@
 class WriterIOPins {
        private:
         Netlist* _netlist;
-        assignmentVec_t* _assignment;
+        std::vector<IOPin> *_assignment;
         std::string _outFileName;
 
         bool writeFile();
 
        public:
-        WriterIOPins(Netlist&, assignmentVec_t&, std::string);
+        WriterIOPins(Netlist&, std::vector<IOPin>&, std::string);
         virtual ~WriterIOPins() = default;
         void run();
 };

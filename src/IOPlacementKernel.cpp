@@ -57,7 +57,9 @@ void IOPlacementKernel::initIOLists() {
                                     instPinsVector.push_back(instPin);
                             });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
-                }
+                } else {
+                        _zeroSinkIOs.push_back(ioPin);
+				}
         });
 }
 
@@ -240,23 +242,15 @@ void IOPlacementKernel::run() {
         HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
         hgMatching.run();
 
-        std::vector<std::tuple<unsigned, Coordinate>> assignment;
-        hgMatching.getFinalAssignment(assignment);
+        std::vector<IOPin> assignment;
+        hgMatching.getFinalAssignment(assignment, _zeroSinkIOs);
 
-        _netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                DBU _x = 0, _y = 0;
-                for (std::tuple<unsigned, Coordinate> pinAssignment :
-                     assignment) {
-                        if (idx == std::get<0>(pinAssignment)) {
-                                _x = std::get<1>(pinAssignment).getX();
-                                _y = std::get<1>(pinAssignment).getY();
-                                break;
-                        }
-                }
+        for (IOPin& ioPin : assignment) {	
                 Orientation orient =
-                    checkOrientation(_x, _y, ioPin.getOrientation());
-                ioPin.setOrientation(orient);
-        });
+                    checkOrientation(ioPin.getX(), ioPin.getY(),
+					ioPin.getOrientation());
+				ioPin.setOrientation(orient);
+        }
 
         WriterIOPins writer(_netlistIOPins, assignment,
                             _parms->getOutputDefFile());
