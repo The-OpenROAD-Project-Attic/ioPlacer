@@ -47,7 +47,10 @@ WriterIOPins::WriterIOPins(Netlist& netlist, assignmentVec_t assignment,
 }
 
 void WriterIOPins::run() {
-        if (writeFile()) std::cout << "File " << _outFileName << " created\n";
+        if (writeFile())
+                std::cout << "File " << _outFileName << " created\n";
+        else
+                std::cout << "Error in writeFile!" << std::endl;
 }
 
 bool WriterIOPins::writeFile() {
@@ -55,7 +58,7 @@ bool WriterIOPins::writeFile() {
         pinsFile.open(_outFileName);
 
         if (!pinsFile.is_open()) {
-                std::cout << "Error in writeFile!" << std::endl;
+                std::cout << "Could not open file pinsFile." << std::endl;
                 pinsFile.close();
                 return false;
         }

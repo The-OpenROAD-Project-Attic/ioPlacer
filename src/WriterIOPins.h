@@ -35,8 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef WRITERIOPINS_H
-#define WRITERIOPINS_H
+#ifndef __WRITERIOPINS_H_
+#define __WRITERIOPINS_H_
 
 #include "IOPlacementKernel.h"
 #include "Parameters.h"
@@ -57,4 +57,4 @@ class WriterIOPins {
         void run();
 };
 
-#endif /* WRITERIOPINS_H */
+#endif /* __WRITERIOPINS_H_ */
