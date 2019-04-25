@@ -38,9 +38,9 @@
 #ifndef __IOPLACEMENTKERNEL_H_
 #define __IOPLACEMENTKERNEL_H_
 
-#include <iostream>
 #include "Parameters.h"
 #include "HungarianMatching.h"
+#include "Netlist.h"
 
 typedef std::vector<std::tuple<unsigned, Coordinate>> assignmentVec_t;
 

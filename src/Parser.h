@@ -47,10 +47,9 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
-#include "Parameters.h"
-#include "Coordinate.h"
-#include "Netlist.h"
 #include "Core.h"
+#include "Netlist.h"
+#include "Parameters.h"
 
 class Parser {
         typedef boost::geometry::model::d2::point_xy<DBU> point;

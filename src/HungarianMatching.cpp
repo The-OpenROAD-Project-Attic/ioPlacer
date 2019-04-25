@@ -71,7 +71,6 @@ void HungarianMatching::run() {
 void HungarianMatching::defineSlots() {
         Coordinate lb = _core->getLowerBound();
         Coordinate ub = _core->getUpperBound();
-        //        DBU corePerimeter = _core->getPerimeter();
         unsigned minDstPinsX = _core->getMinDstPinsX();
         unsigned minDstPinsY = _core->getMinDstPinsY();
         unsigned initTracksX = _core->getInitTracksX();
@@ -83,7 +82,7 @@ void HungarianMatching::defineSlots() {
         bool firstLeft = true;
         DBU currX = lb.getX() + initTracksX;
         DBU currY = lb.getY();
-        DBU totalNumSlots = 0;  // = corePerimeter / minDstPinsX;
+        DBU totalNumSlots = 0;
         totalNumSlots += (ub.getX() - lb.getX()) * 2 / minDstPinsX;
         totalNumSlots += (ub.getY() - lb.getY()) * 2 / minDstPinsY;
         unsigned numPins = getNumIOPins();
@@ -117,8 +116,7 @@ void HungarianMatching::defineSlots() {
                         use = true;
                         _numSlots++;
                 }
-                _slots.push_back(std::tuple<bool, bool, Coordinate>(
-                    use, false, Coordinate(currX, currY)));
+                _slots.push_back({use, false, Coordinate(currX, currY)});
                 // get slots for 1st edge
                 if (currX < ub.getX() && currY == lb.getY()) {
                         currX += minDstPinsX;
@@ -167,10 +165,10 @@ void HungarianMatching::createMatrix() {
         _numSlots = 0;
 
         for (auto i : _slots) {
-                if (std::get<0>(i) && std::get<1>(i)) {
-                        std::get<0>(i) = false;
+                if (i.current && i.visited) {
+                        i.current = false;
                         std::cout << "here\n";
-                } else if (std::get<0>(i)) {
+                } else if (i.current) {
                         _numSlots++;
                 }
         }
@@ -180,14 +178,14 @@ void HungarianMatching::createMatrix() {
         unsigned slotIndex = 0;
         for (auto i : _slots) {
                 unsigned pinIndex = 0;
-                if (std::get<0>(i) && std::get<1>(i)) {
-                        std::get<0>(i) = false;
-                } else if (not std::get<0>(i)) {
+                if (i.current && i.visited) {
+                        i.current = false;
+                } else if (not i.current) {
                         continue;
                 }
-                Coordinate newPos = std::get<2>(i);
-                _netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                        DBU hpwl = _netlistIOPins.computeIONetHPWL(idx, newPos);
+                Coordinate newPos = i.pos;
+                _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                        DBU hpwl = _netlist->computeIONetHPWL(idx, newPos);
                         _hungarianMatrix(pinIndex, slotIndex) = hpwl;
                         pinIndex++;
                 });
@@ -225,21 +223,18 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
 void HungarianMatching::markExplore(std::vector<unsigned> v) {
         unsigned curr = 0;
         for (unsigned i = 0; i < _slots.size(); ++i) {
-                if (std::get<0>(_slots.at(i))) {
+                if (_slots.at(i).current) {
                         if (v.size() > 0 && v.at(0) == curr) {
-                                if (i > 1 &&
-                                    not std::get<1>(_slots.at(i - 1))) {
-                                        if (not std::get<0>(_slots.at(i - 1))) {
-                                                std::get<0>(_slots.at(i - 1)) =
-                                                    true;
+                                if (i > 1 && not _slots.at(i - 1).visited) {
+                                        if (not _slots.at(i - 1).current) {
+                                                _slots.at(i - 1).current = true;
                                                 _numSlots++;
                                         }
                                 }
                                 if (i < _slots.size() &&
-                                    not std::get<1>(_slots.at(i + 1))) {
-                                        if (not std::get<0>(_slots.at(i + 1))) {
-                                                std::get<0>(_slots.at(i + 1)) =
-                                                    true;
+                                    not _slots.at(i + 1).visited) {
+                                        if (not _slots.at(i + 1).current) {
+                                                _slots.at(i + 1).current = true;
                                                 _numSlots++;
                                         }
                                 }
@@ -253,9 +248,9 @@ void HungarianMatching::markExplore(std::vector<unsigned> v) {
 void HungarianMatching::markRemove(std::vector<unsigned> v) {
         unsigned curr = 0;
         for (auto i : _slots) {
-                if (std::get<0>(i)) {
+                if (i.current) {
                         if (v.size() > 0 && v.at(0) == curr) {
-                                std::get<1>(i) = true;
+                                i.visited = true;
                                 v.erase(v.begin());
                                 _numSlots--;
                         }
@@ -264,13 +259,12 @@ void HungarianMatching::markRemove(std::vector<unsigned> v) {
         }
 }
 
-void HungarianMatching::getFinalAssignment(
-    assignmentVec_t& v) {
+void HungarianMatching::getFinalAssignment(assignmentVec_t& v) {
         unsigned idx = 0;
         for (auto i : _slots) {
-                if (std::get<0>(i) && not std::get<1>(i)) {
-                        v.push_back(std::tuple<unsigned, Coordinate>(
-                            idx++, std::get<2>(i)));
+                if (i.current && not i.visited) {
+                        v.push_back(
+                            std::tuple<unsigned, Coordinate>(idx++, i.pos));
                 }
         }
 }

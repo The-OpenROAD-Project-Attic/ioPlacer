@@ -41,26 +41,21 @@
 #include "Coordinate.h"
 #include "Core.h"
 #include "Netlist.h"
+#include "IOPlacementKernel.h"
 #include "munkres/munkres.h"
 
 #include <iostream>
 #include <math.h>
 
-/* TODO:  <23-04-19, change to named tuple or...> */
-// tuple values are:
-//      bool: currently considered in iteration
-//      bool: already visited in past iteration
-//      Coordinate: slot position in core boundary
-typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
+struct slot {
+        bool current;
+        bool visited;
+        Coordinate pos;
+} typedef slot_t;
+
+typedef std::vector<slot_t> slotVector_t;
 
 class HungarianMatching {
-       public:
-        HungarianMatching(Netlist&, Core&);
-        virtual ~HungarianMatching() = default;
-        void run();
-        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
-        Netlist getNetlist() { return _netlistIOPins; };
-
        private:
         Core* _core;
         Matrix<DBU> _hungarianMatrix;
