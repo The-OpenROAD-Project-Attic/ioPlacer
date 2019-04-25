@@ -46,6 +46,21 @@ void IOPlacementKernel::initNetlistAndCore() {
         parser.run();
 }
 
+void IOPlacementKernel::initIOLists() {
+        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                std::vector<InstancePin> instPinsVector;
+                /* TODO:  <23-04-19, do we need this check to remove pins
+                 * without sinks? TBD > */
+                if (_netlist.numSinksOfIO(idx) != 0) {
+                        _netlist.forEachSinkOfIO(
+                            idx, [&](InstancePin& instPin) {
+                                    instPinsVector.push_back(instPin);
+                            });
+                        _netlistIOPins.addIONet(ioPin, instPinsVector);
+                }
+        });
+}
+
 inline Orientation IOPlacementKernel::checkOrientation(
     const DBU x, const DBU y, Orientation currentOrient) {
         DBU lowerXBound = _core.getLowerBound().getX();
@@ -80,14 +95,14 @@ void IOPlacementKernel::run() {
         });
 #endif
 
-        HungarianMatching hgMatching(_netlist, _core);
+        initIOLists();
+        HungarianMatching hgMatching(_netlistIOPins, _core);
         hgMatching.run();
 
         std::vector<std::tuple<unsigned, Coordinate>> assignment;
         hgMatching.getFinalAssignment(assignment);
-        Netlist netlist = hgMatching.getNetlist();
 
-        netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+        _netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 DBU _x = 0, _y = 0;
                 for (std::tuple<unsigned, Coordinate> pinAssignment :
                      assignment) {
@@ -102,7 +117,7 @@ void IOPlacementKernel::run() {
                 ioPin.setOrientation(orient);
         });
 
-        WriterIOPins writer(netlist, assignment, _parms->getOutputDefFile());
+        WriterIOPins writer(_netlistIOPins, assignment, _parms->getOutputDefFile());
 
         writer.run();
 }

@@ -43,7 +43,6 @@ HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
 }
 
 void HungarianMatching::run() {
-        initIOLists();
         defineSlots();
         createMatrix();
         for (int i = 0; i < 3; ++i) {
@@ -67,21 +66,6 @@ void HungarianMatching::run() {
         std::cout << _hungarianMatrix.rows() << ','
                   << _hungarianMatrix.columns() << "\n";
 #endif
-}
-
-void HungarianMatching::initIOLists() {
-        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                std::vector<InstancePin> instPinsVector;
-                /* TODO:  <23-04-19, do we need this check to remove pins
-                 * without sinks? TBD > */
-                if (_netlist->numSinksOfIO(idx) != 0) {
-                        _netlist->forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
-                        _netlistIOPins.addIONet(ioPin, instPinsVector);
-                }
-        });
 }
 
 void HungarianMatching::defineSlots() {
@@ -177,7 +161,6 @@ void HungarianMatching::defineSlots() {
                         break;
                 }
         }
-        std::cout << currX << ", " << currY << "\n";
 }
 
 void HungarianMatching::createMatrix() {

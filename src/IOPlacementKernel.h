@@ -48,9 +48,11 @@ class IOPlacementKernel {
        private:
         Parameters* _parms;
         Netlist _netlist;
+        Netlist _netlistIOPins;
         Core _core;
 
         void initNetlistAndCore();
+        void initIOLists();
         inline Orientation checkOrientation(const DBU x, const DBU y,
                                             Orientation currentOrient);
 

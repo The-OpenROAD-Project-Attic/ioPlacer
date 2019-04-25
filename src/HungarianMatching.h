@@ -65,15 +65,13 @@ class HungarianMatching {
         Core* _core;
         Matrix<DBU> _hungarianMatrix;
         Munkres<DBU> _hungarianSolver;
-        Netlist _netlistIOPins;
         Netlist* _netlist;
         int _numSlots = 0;
         slotVector_t _slots;
 
         int getKValue() { return 1; }
-        int getNumIOPins() { return _netlistIOPins.numIOPins(); }
+        int getNumIOPins() { return _netlist->numIOPins(); }
 
-        void initIOLists();
         void defineSlots();
         void createMatrix();
         bool updateNeighborhood(bool);
@@ -85,7 +83,6 @@ class HungarianMatching {
         virtual ~HungarianMatching() = default;
         void run();
         void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
-        Netlist getNetlist() { return _netlistIOPins; };
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */
