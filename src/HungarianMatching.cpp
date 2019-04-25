@@ -36,6 +36,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "HungarianMatching.h"
+#include <istream>
+#include <fstream>
 
 HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
         _netlist = &netlist;
@@ -94,14 +96,13 @@ void HungarianMatching::defineSlots() {
         unsigned initTracksY = _core->getInitTracksY();
 
         bool use = false;
-		bool firstRight = true;
-		bool firstUp = true;
-		bool firstLeft = true;
-        DBU currX = lb.getX() + initTracksX;
-        DBU currY = lb.getY();
+//		bool firstRight = true;
+//		bool firstUp = true;
+//		bool firstLeft = true;
         DBU totalNumSlots = 0; // = corePerimeter / minDstPinsX;
-		totalNumSlots += (ub.getX() - lb.getX())*2 /minDstPinsX;
-		totalNumSlots += (ub.getY() - lb.getY())*2 /minDstPinsY;
+		totalNumSlots += std::floor((ub.getX() - lb.getX())*2 /minDstPinsX);
+		totalNumSlots += std::floor((ub.getY() - lb.getY())*2 /minDstPinsY);
+		
         unsigned numPins = getNumIOPins();
 
         unsigned interval = std::floor(totalNumSlots / getKValue() * numPins);
@@ -126,58 +127,163 @@ void HungarianMatching::defineSlots() {
          *   lowerBound    1st edge                 *
          *                 ---->                    *
          *******************************************/
-        for (unsigned i = 0; i < totalNumSlots; i++) {
-                if (i % interval) {
-                        use = false;
-                } else {
-                        use = true;
-                        _numSlots++;
-                }
-                _slots.push_back(std::tuple<bool, bool, Coordinate>(
+		std::cout << "Selecting slots\n";
+		std::vector<Coordinate> slotsEdge1;
+		DBU currX = lb.getX() + initTracksX;
+        DBU currY = lb.getY();
+		
+		std::cout << "Slots edge 1\n";
+		while (currX < ub.getX()) {
+			Coordinate pos(currX, currY);
+			slotsEdge1.push_back(pos);
+			currX += minDstPinsX;
+		}
+		
+		std::cout << "Slots edge 2\n";
+		std::vector<Coordinate> slotsEdge2;
+		currY = lb.getY() + initTracksY;
+		currX = ub.getX();
+		while (currY < ub.getY()) {
+			Coordinate pos(currX, currY);
+			slotsEdge2.push_back(pos);
+			currY += minDstPinsY;
+		}
+		
+		std::cout << "Slots edge 3\n";
+		std::vector<Coordinate> slotsEdge3;
+		currX = lb.getX() + initTracksX;
+		currY = ub.getY();
+		while (currX < ub.getX()) {
+			Coordinate pos(currX, currY);
+			slotsEdge3.push_back(pos);
+			currX += minDstPinsX;
+		}
+		std::reverse(slotsEdge3.begin(), slotsEdge3.end());
+		
+		std::cout << "Slots edge 4\n";
+		std::vector<Coordinate> slotsEdge4;
+		currY = lb.getY() + initTracksY;
+		currX = lb.getX();
+		while (currY < ub.getY()) {
+			Coordinate pos(currX, currY);
+			slotsEdge4.push_back(pos);
+			currY += minDstPinsY;
+		}
+		std::reverse(slotsEdge4.begin(), slotsEdge4.end());
+		
+		std::cout << "Setting slots to solver\n";
+		
+		int i = 0;
+		for (Coordinate pos : slotsEdge1) {
+			if (i % interval) {
+                    use = false;
+            } else {
+                    use = true;
+                    _numSlots++;
+            }
+			currX = pos.getX();
+			currY = pos.getY();
+			_slots.push_back(std::tuple<bool, bool, Coordinate>(
+                    use, false, Coordinate(currX, currY)));	
+			i++;
+		}
+		
+		for (Coordinate pos : slotsEdge2) {
+			if (i % interval) {
+                    use = false;
+            } else {
+                    use = true;
+                    _numSlots++;
+            }
+			
+			currX = pos.getX();
+			currY = pos.getY();
+			_slots.push_back(std::tuple<bool, bool, Coordinate>(
                     use, false, Coordinate(currX, currY)));
-                // get slots for 1st edge
-                if (currX < ub.getX() && currY == lb.getY()) {
-                        currX += minDstPinsX;
-                }
-                // get slots for 2nd edge
-                else if (currY < ub.getY() && currX >= ub.getX()) {
-						if (firstRight) {
-							currX = ub.getX();
-							currY += initTracksY;
-							firstRight = false;
-						} else {
-							currX = ub.getX();
-							currY += minDstPinsY;
-						}
-                }
-                // get slots for 3rd edge
-                else if (currX > lb.getX()) {
-						if (firstUp) {
-							currY = ub.getY();
-							currX -= initTracksX;
-							firstUp = false;
-						} else {
-							currY = ub.getY();
-							currX -= minDstPinsX;
-						}
-                }
-                // get slots for 4th  edge
-                else if (currY > lb.getY()) {
-						if (firstLeft) {
-							currX = lb.getX();
-							currY -= initTracksY;
-							firstLeft = false;
-						} else {
-							currX = lb.getX();
-							currY -= minDstPinsY;
-						}
-                }
-                // is at the lowerBound again, break loop
-                else if (currX < lb.getX() && currY == lb.getY()) {
-                        break;
-                }
-        }
-		std::cout << currX << ", " << currY << "\n";
+			i++;
+		}
+		
+		for (Coordinate pos : slotsEdge3) {
+			if (i % interval) {
+                    use = false;
+            } else {
+                    use = true;
+                    _numSlots++;
+            }
+			
+			currX = pos.getX();
+			currY = pos.getY();
+			_slots.push_back(std::tuple<bool, bool, Coordinate>(
+                    use, false, Coordinate(currX, currY)));
+			i++;
+		}
+		
+		for (Coordinate pos : slotsEdge4) {
+			if (i % interval) {
+                    use = false;
+            } else {
+                    use = true;
+                    _numSlots++;
+            }
+			
+			currX = pos.getX();
+			currY = pos.getY();
+			_slots.push_back(std::tuple<bool, bool, Coordinate>(
+                    use, false, Coordinate(currX, currY)));
+			i++;
+		}
+		
+//        for (unsigned i = 0; i < totalNumSlots; i++) {
+//                if (i % interval) {
+//                        use = false;
+//                } else {
+//                        use = true;
+//                        _numSlots++;
+//                }
+//                _slots.push_back(std::tuple<bool, bool, Coordinate>(
+//                    use, false, Coordinate(currX, currY)));
+//                // get slots for 1st edge
+//                if (currX < ub.getX() && currY == lb.getY()) {
+//                        currX += minDstPinsX;
+//                }
+//                // get slots for 2nd edge
+//                else if (currY < ub.getY() && currX >= ub.getX()) {
+//						if (firstRight) {
+//							currX = ub.getX();
+//							currY += initTracksY;
+//							firstRight = false;
+//						} else {
+//							currX = ub.getX();
+//							currY += minDstPinsY;
+//						}
+//                }
+//                // get slots for 3rd edge
+//                else if (currX > lb.getX()) {
+//						if (firstUp) {
+//							currY = ub.getY();
+//							currX = lastX;
+//							firstUp = false;
+//						} else {
+//							currY = ub.getY();
+//							currX -= minDstPinsX;
+//						}
+//                }
+//                // get slots for 4th  edge
+//                else if (currY > lb.getY()) {
+//						if (firstLeft) {
+//							currX = lb.getX();
+//							currY = lastY;
+//							firstLeft = false;
+//						} else {
+//							currX = lb.getX();
+//							currY -= minDstPinsY;
+//						}
+//                }
+//                // is at the lowerBound again, break loop
+//                else if (currX < lb.getX() && currY == lb.getY()) {
+//                        break;
+//                }
+//        }
 }
 
 void HungarianMatching::createMatrix() {
