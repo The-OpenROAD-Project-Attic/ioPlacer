@@ -43,10 +43,10 @@
 class Core {
         Coordinate _lowerBound;
         Coordinate _upperBound;
-        unsigned int _minDstPinsX;
-        unsigned int _minDstPinsY;
-        unsigned int _initTracksX;
-        unsigned int _initTracksY;
+        unsigned _minDstPinsX;
+        unsigned _minDstPinsY;
+        unsigned _initTracksX;
+        unsigned _initTracksY;
 
        public:
         Core()
@@ -66,10 +66,10 @@ class Core {
 
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }
-        unsigned int getMinDstPinsX() const { return _minDstPinsX; }
-        unsigned int getMinDstPinsY() const { return _minDstPinsY; }
-        unsigned int getInitTracksX() const { return _initTracksX; }
-        unsigned int getInitTracksY() const { return _initTracksY; }
+        unsigned getMinDstPinsX() const { return _minDstPinsX; }
+        unsigned getMinDstPinsY() const { return _minDstPinsY; }
+        unsigned getInitTracksX() const { return _initTracksX; }
+        unsigned getInitTracksY() const { return _initTracksY; }
 
         DBU getPerimeter();
 };
