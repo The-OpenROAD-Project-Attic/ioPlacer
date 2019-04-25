@@ -43,17 +43,19 @@
 #include "Netlist.h"
 
 class WriterIOPins {
-public:
-	WriterIOPins(Netlist& netlist, std::vector<std::tuple<unsigned, Coordinate>> assignment, std::string outFileName);
-	virtual ~WriterIOPins() = default;
-	void run();
-private:
-	Netlist* _netlist;
-	std::string _outFileName;
-	std::vector<std::tuple<unsigned, Coordinate>> _assignment;
-	
-	bool writeFile();
+       public:
+        WriterIOPins(Netlist& netlist,
+                     std::vector<std::tuple<unsigned, Coordinate>> assignment,
+                     std::string outFileName);
+        virtual ~WriterIOPins() = default;
+        void run();
+
+       private:
+        Netlist* _netlist;
+        std::string _outFileName;
+        std::vector<std::tuple<unsigned, Coordinate>> _assignment;
+
+        bool writeFile();
 };
 
 #endif /* WRITERIOPINS_H */
-

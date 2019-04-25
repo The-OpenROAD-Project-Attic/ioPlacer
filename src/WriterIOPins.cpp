@@ -39,73 +39,77 @@
 #include <iostream>
 #include <fstream>
 
-WriterIOPins::WriterIOPins(Netlist& netlist, std::vector<std::tuple<unsigned, Coordinate>> assignment, std::string outFileName) {
-	_netlist = &netlist;
-	_assignment = assignment;
-	_outFileName = outFileName;
+WriterIOPins::WriterIOPins(
+    Netlist& netlist, std::vector<std::tuple<unsigned, Coordinate>> assignment,
+    std::string outFileName) {
+        _netlist = &netlist;
+        _assignment = assignment;
+        _outFileName = outFileName;
 }
 
 void WriterIOPins::run() {
-	if (writeFile())
-		std::cout << "File " << _outFileName << " created\n";
+        if (writeFile()) std::cout << "File " << _outFileName << " created\n";
 }
 
 bool WriterIOPins::writeFile() {
-	std::ofstream pinsFile;
-	pinsFile.open(_outFileName);
-	
-	if(!pinsFile.is_open()) {
-		std::cout << "Error in writeFile!" << std::endl;
-		pinsFile.close();
-		return false;
-	}
+        std::ofstream pinsFile;
+        pinsFile.open(_outFileName);
 
-	DBU x, y;
-	_netlist->forEachIOPin([&](unsigned idx, IOPin & ioPin) {
-		std::string name = ioPin.getName();
-		std::string netName = ioPin.getNetName();
-		Direction direction = ioPin.getDirection();
-		std::string layer = "Metal4"; // Temporary
-		
-		for (std::tuple<unsigned, Coordinate> pinAssignment : _assignment) {
-			if (std::get<0>(pinAssignment) == idx) {
-				x = std::get<1>(pinAssignment).getX();
-				y = std::get<1>(pinAssignment).getY();
-				break;
-			}
-		}
-		Coordinate position(x, y);
-		Orientation orientation = ioPin.getOrientation();
-		Coordinate lowerBound = ioPin.getLowerBound();
-		Coordinate upperBound = ioPin.getUpperBound();
+        if (!pinsFile.is_open()) {
+                std::cout << "Error in writeFile!" << std::endl;
+                pinsFile.close();
+                return false;
+        }
 
-		std::string dir = (direction == Direction::IN) ? "INPUT" : "OUTPUT";
-		std::string orient;
-		switch (orientation) {
-			case Orientation::EAST:
-				orient = "E";
-				break;
-			case Orientation::WEST:
-				orient = "W";
-				break;
-			case Orientation::NORTH:
-				orient = "N";
-				break;
-			case Orientation::SOUTH:
-				orient = "S";
-				break;
-		}
+        DBU x, y;
+        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                std::string name = ioPin.getName();
+                std::string netName = ioPin.getNetName();
+                Direction direction = ioPin.getDirection();
+                std::string layer = "Metal4";  // Temporary
 
-		pinsFile << "- " << name << " + NET " << netName << " + DIRECTION "
-			<< dir << " + USE SIGNAL\n";
-		pinsFile << "  + LAYER " << layer << " ( " << lowerBound.getX() << " "
-			<< lowerBound.getY() << " ) ( " << upperBound.getX() << " "
-			<< upperBound.getY() << " )\n";
-		pinsFile << "  + PLACED ( " << position.getX() << " " << position.getY()
-			<< " ) " << orient << " ;\n";
-	});
+                for (std::tuple<unsigned, Coordinate> pinAssignment :
+                     _assignment) {
+                        if (std::get<0>(pinAssignment) == idx) {
+                                x = std::get<1>(pinAssignment).getX();
+                                y = std::get<1>(pinAssignment).getY();
+                                break;
+                        }
+                }
+                Coordinate position(x, y);
+                Orientation orientation = ioPin.getOrientation();
+                Coordinate lowerBound = ioPin.getLowerBound();
+                Coordinate upperBound = ioPin.getUpperBound();
 
-	pinsFile.close();
-	
-	return true;
+                std::string dir =
+                    (direction == Direction::IN) ? "INPUT" : "OUTPUT";
+                std::string orient;
+                switch (orientation) {
+                        case Orientation::EAST:
+                                orient = "E";
+                                break;
+                        case Orientation::WEST:
+                                orient = "W";
+                                break;
+                        case Orientation::NORTH:
+                                orient = "N";
+                                break;
+                        case Orientation::SOUTH:
+                                orient = "S";
+                                break;
+                }
+
+                pinsFile << "- " << name << " + NET " << netName
+                         << " + DIRECTION " << dir << " + USE SIGNAL\n";
+                pinsFile << "  + LAYER " << layer << " ( " << lowerBound.getX()
+                         << " " << lowerBound.getY() << " ) ( "
+                         << upperBound.getX() << " " << upperBound.getY()
+                         << " )\n";
+                pinsFile << "  + PLACED ( " << position.getX() << " "
+                         << position.getY() << " ) " << orient << " ;\n";
+        });
+
+        pinsFile.close();
+
+        return true;
 }

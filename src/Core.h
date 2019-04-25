@@ -35,25 +35,43 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __IOPLACEMENTKERNEL_H_
-#define __IOPLACEMENTKERNEL_H_
+#ifndef __CORE_H_
+#define __CORE_H_
 
-#include <iostream>
-#include "Parameters.h"
-#include "HungarianMatching.h"
+#include "Coordinate.h"
 
-class IOPlacementKernel {
-       private:
-        Parameters* _parms;
-        Netlist _netlist;
-        Core _core;
-
-        void initNetlistAndCore();
-	inline Orientation checkOrientation(const DBU x, const DBU y, Orientation currentOrient);
+class Core {
+        Coordinate _lowerBound;
+        Coordinate _upperBound;
+        unsigned int _minDstPinsX;
+        unsigned int _minDstPinsY;
+        unsigned int _initTracksX;
+        unsigned int _initTracksY;
 
        public:
-        IOPlacementKernel(Parameters& parms);
-        void run();
+        Core()
+            : _lowerBound(Coordinate(0, 0)),
+              _upperBound(Coordinate(0, 0)),
+              _minDstPinsX(20),
+              _minDstPinsY(20){};
+        Core(const Coordinate& lowerBound, const Coordinate& upperBound,
+             const DBU& minDstPinsX, const DBU& minDstPinsY,
+             const DBU& initTracksX, const DBU& initTracksY)
+            : _lowerBound(lowerBound),
+              _upperBound(upperBound),
+              _minDstPinsX(minDstPinsX),
+              _minDstPinsY(minDstPinsY),
+              _initTracksX(initTracksX),
+              _initTracksY(initTracksY) {}
+
+        Coordinate getLowerBound() const { return _lowerBound; }
+        Coordinate getUpperBound() const { return _upperBound; }
+        unsigned int getMinDstPinsX() const { return _minDstPinsX; }
+        unsigned int getMinDstPinsY() const { return _minDstPinsY; }
+        unsigned int getInitTracksX() const { return _initTracksX; }
+        unsigned int getInitTracksY() const { return _initTracksY; }
+
+        DBU getPerimeter();
 };
 
-#endif /* __IOPLACEMENTKERNEL_H_ */
+#endif /* __CORE_H_ */

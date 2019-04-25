@@ -95,7 +95,6 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
         DBU maxX = slotPos.getX();
         DBU maxY = slotPos.getY();
 
-
         for (unsigned idx = netStart; idx < netEnd; ++idx) {
                 Coordinate pos = _instPins[idx].getPos();
                 minX = std::min(minX, pos.getX());
@@ -103,7 +102,6 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
                 minY = std::min(minY, pos.getY());
                 maxY = std::max(maxY, pos.getY());
         }
-
 
         Coordinate upperBounds = Coordinate(maxX, maxY);
         Coordinate lowerBounds = Coordinate(minX, minY);

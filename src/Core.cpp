@@ -48,5 +48,3 @@ DBU Core::getPerimeter() {
 
         return (x + y) * 2;
 }
-
-

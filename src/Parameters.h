@@ -35,29 +35,35 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BOX_H_
-#define __BOX_H_
+#ifndef __PARAMETERS_H_
+#define __PARAMETERS_H_
+
+#include <string>
 
 #include "Coordinate.h"
 
-class Box {
-        Coordinate _lowerBound;
-        Coordinate _upperBound;
+class Parameters {
+       private:
+        std::string _floorplanFile;
+        std::string _netlistFile;
+        DBU _minimumSpacingX;
+        DBU _minimumSpacingY;
+        DBU _initTracksX;
+        DBU _initTracksY;
+        std::string _outputDefFile;
+
+        void printAll() const;
 
        public:
-        Box()
-            : _lowerBound(Coordinate(0, 0)),
-              _upperBound(Coordinate(0, 0)){};
+        Parameters(int argc, char** argv);
 
-        Box(const Coordinate& lowerBound, const Coordinate& upperBound)
-            : _lowerBound(lowerBound),
-              _upperBound(upperBound){}
-
-        Coordinate getLowerBound() const { return _lowerBound; }
-        Coordinate getUpperBound() const { return _upperBound; }
-
-        DBU getHPWL();
+        std::string getFloorplanFile() const { return _floorplanFile; }
+        std::string getNetlistFile() const { return _netlistFile; }
+        std::string getOutputDefFile() const { return _outputDefFile; }
+        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
+        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
+        DBU getInitTrackX() const { return _initTracksX; };
+        DBU getInitTrackY() const { return _initTracksY; };
 };
 
-
-#endif /* __BOX_H_ */
+#endif /* __PARAMETERS_H_ */

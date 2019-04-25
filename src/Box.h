@@ -35,50 +35,25 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __HUNGARIANMATCHING_H_
-#define __HUNGARIANMATCHING_H_
+#ifndef __BOX_H_
+#define __BOX_H_
 
 #include "Coordinate.h"
-#include "Core.h"
-#include "Netlist.h"
-#include "munkres/munkres.h"
 
-#include <iostream>
-#include <math.h>
+class Box {
+        Coordinate _lowerBound;
+        Coordinate _upperBound;
 
-/* TODO:  <23-04-19, change to named tuple or...> */
-// tuple values are:
-//      bool: currently considered in iteration
-//      bool: already visited in past iteration
-//      Coordinate: slot position in core boundary
-typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
-
-class HungarianMatching {
        public:
-        HungarianMatching(Netlist& , Core& );
-        virtual ~HungarianMatching() = default;
-        void run();
-	void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
-	Netlist getNetlist() { return _netlistIOPins; };
+        Box() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
 
-       private:
-        Core* _core;
-        Matrix<DBU> _hungarianMatrix;
-        Munkres<DBU> _hungarianSolver;
-        Netlist _netlistIOPins;
-        Netlist* _netlist;
-        int _numSlots = 0;
-        slotVector_t _slots;
+        Box(const Coordinate& lowerBound, const Coordinate& upperBound)
+            : _lowerBound(lowerBound), _upperBound(upperBound) {}
 
-        int getKValue() { return 1; }
-        int getNumIOPins() { return _netlistIOPins.numIOPins(); }
+        Coordinate getLowerBound() const { return _lowerBound; }
+        Coordinate getUpperBound() const { return _upperBound; }
 
-        void initIOLists();
-        void defineSlots();
-        void createMatrix();
-        bool updateNeighborhood(bool);
-        void markRemove(std::vector<unsigned>);
-        void markExplore(std::vector<unsigned>);
+        DBU getHPWL();
 };
 
-#endif /* __HUNGARIANMATCHING_H_ */
+#endif /* __BOX_H_ */

@@ -35,35 +35,50 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __PARAMETERS_H_
-#define __PARAMETERS_H_
-
-#include <string>
+#ifndef __HUNGARIANMATCHING_H_
+#define __HUNGARIANMATCHING_H_
 
 #include "Coordinate.h"
+#include "Core.h"
+#include "Netlist.h"
+#include "munkres/munkres.h"
 
-class Parameters {
-       private:
-        std::string _floorplanFile;
-        std::string _netlistFile;
-        DBU _minimumSpacingX;
-        DBU _minimumSpacingY;
-	DBU _initTracksX;
-	DBU _initTracksY;
-        std::string _outputDefFile;
+#include <iostream>
+#include <math.h>
 
-        void printAll() const;
+/* TODO:  <23-04-19, change to named tuple or...> */
+// tuple values are:
+//      bool: currently considered in iteration
+//      bool: already visited in past iteration
+//      Coordinate: slot position in core boundary
+typedef std::vector<std::tuple<bool, bool, Coordinate>> slotVector_t;
 
+class HungarianMatching {
        public:
-        Parameters(int argc, char** argv);
+        HungarianMatching(Netlist&, Core&);
+        virtual ~HungarianMatching() = default;
+        void run();
+        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
+        Netlist getNetlist() { return _netlistIOPins; };
 
-        std::string getFloorplanFile() const { return _floorplanFile; }
-        std::string getNetlistFile() const { return _netlistFile; }
-        std::string getOutputDefFile() const { return _outputDefFile; }
-        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
-        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
-	DBU getInitTrackX() const { return _initTracksX; };
-	DBU getInitTrackY() const { return _initTracksY; };
+       private:
+        Core* _core;
+        Matrix<DBU> _hungarianMatrix;
+        Munkres<DBU> _hungarianSolver;
+        Netlist _netlistIOPins;
+        Netlist* _netlist;
+        int _numSlots = 0;
+        slotVector_t _slots;
+
+        int getKValue() { return 1; }
+        int getNumIOPins() { return _netlistIOPins.numIOPins(); }
+
+        void initIOLists();
+        void defineSlots();
+        void createMatrix();
+        bool updateNeighborhood(bool);
+        void markRemove(std::vector<unsigned>);
+        void markExplore(std::vector<unsigned>);
 };
 
-#endif /* __PARAMETERS_H_ */
+#endif /* __HUNGARIANMATCHING_H_ */
