@@ -46,13 +46,15 @@ HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
 }
 
 void HungarianMatching::run() {
-        createMatrix();
-        for (int i = 0; i < 3; ++i) {
-                _hungarianSolver.solve(_hungarianMatrix);
-                updateNeighborhood(false);
+        bool stable = false;
+        unsigned iterr = 4;
+        while (not stable && iterr > 0) {
+                iterr--;
                 createMatrix();
+                _hungarianSolver.solve(_hungarianMatrix);
+                stable = updateNeighborhood(stable);
         }
-        updateNeighborhood(true);
+        updateNeighborhood(stable);
 }
 
 void HungarianMatching::setNumSlots() {
@@ -91,6 +93,7 @@ void HungarianMatching::createMatrix() {
 bool HungarianMatching::updateNeighborhood(bool last_pass) {
         Coordinate pos(0, 0);
         bool will_remove;
+        /* bool stable; */
         std::vector<unsigned> to_remove;
         std::vector<unsigned> to_explore;
         /* TODO:  <23-04-19, transpose io pins and slots in matrix> */
@@ -108,11 +111,17 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
                         to_explore.push_back(col);
                 }
         }
+        /* if (to_remove.size()) { */
+        /*         stable = false; */
+        /* } else { */
+        /*         stable = true; */
+        /* } */
         markRemove(to_remove);
         if (last_pass) {
                 markExplore(to_explore);
         }
         return false;
+        /* return stable; */
 }
 
 void HungarianMatching::markExplore(std::vector<unsigned> v) {
