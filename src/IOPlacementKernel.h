@@ -42,6 +42,8 @@
 #include "Parameters.h"
 #include "HungarianMatching.h"
 
+typedef std::vector<std::tuple<unsigned, Coordinate>> assignmentVec_t;
+
 class IOPlacementKernel {
        private:
         Parameters* _parms;

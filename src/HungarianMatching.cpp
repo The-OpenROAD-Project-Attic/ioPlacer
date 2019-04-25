@@ -54,7 +54,7 @@ void HungarianMatching::run() {
         updateNeighborhood(true);
 #ifdef DEBUG
         /* print final assignment, i.e., pin index and position */
-        std::vector<std::tuple<unsigned, Coordinate>> v;
+        assignmentVec_t v;
         unsigned name;
         Coordinate coor(0, 0);
         getFinalAssignment(v);
@@ -282,7 +282,7 @@ void HungarianMatching::markRemove(std::vector<unsigned> v) {
 }
 
 void HungarianMatching::getFinalAssignment(
-    std::vector<std::tuple<unsigned, Coordinate>>& v) {
+    assignmentVec_t& v) {
         unsigned idx = 0;
         for (auto i : _slots) {
                 if (std::get<0>(i) && not std::get<1>(i)) {

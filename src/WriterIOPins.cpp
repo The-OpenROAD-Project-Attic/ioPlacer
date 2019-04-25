@@ -39,9 +39,8 @@
 #include <iostream>
 #include <fstream>
 
-WriterIOPins::WriterIOPins(
-    Netlist& netlist, std::vector<std::tuple<unsigned, Coordinate>> assignment,
-    std::string outFileName) {
+WriterIOPins::WriterIOPins(Netlist& netlist, assignmentVec_t assignment,
+                               std::string outFileName) {
         _netlist = &netlist;
         _assignment = assignment;
         _outFileName = outFileName;

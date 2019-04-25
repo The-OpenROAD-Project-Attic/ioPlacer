@@ -38,6 +38,7 @@
 #ifndef WRITERIOPINS_H
 #define WRITERIOPINS_H
 
+#include "IOPlacementKernel.h"
 #include "Parameters.h"
 #include "Coordinate.h"
 #include "Netlist.h"
@@ -54,7 +55,6 @@ class WriterIOPins {
         WriterIOPins(Netlist&, assignmentVec_t, std::string);
         virtual ~WriterIOPins() = default;
         void run();
-
 };
 
 #endif /* WRITERIOPINS_H */
