@@ -64,6 +64,7 @@ class InstancePin {
 };
 
 class IOPin : public InstancePin {
+       private:
         Orientation _orientation;
         Direction _direction;
         Coordinate _lowerBound;
@@ -95,6 +96,7 @@ class IOPin : public InstancePin {
 };
 
 class Netlist {
+       private:
         std::vector<InstancePin> _instPins;
         std::vector<unsigned> _netPointer;
         std::vector<IOPin> _ioPins;

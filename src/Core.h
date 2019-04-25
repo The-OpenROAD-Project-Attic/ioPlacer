@@ -41,6 +41,7 @@
 #include "Coordinate.h"
 
 class Core {
+       private:
         Coordinate _lowerBound;
         Coordinate _upperBound;
         unsigned _minDstPinsX;

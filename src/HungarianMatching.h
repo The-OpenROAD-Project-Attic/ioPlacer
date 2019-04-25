@@ -79,6 +79,13 @@ class HungarianMatching {
         bool updateNeighborhood(bool);
         void markRemove(std::vector<unsigned>);
         void markExplore(std::vector<unsigned>);
+
+       public:
+        HungarianMatching(Netlist&, Core&);
+        virtual ~HungarianMatching() = default;
+        void run();
+        void getFinalAssignment(std::vector<std::tuple<unsigned, Coordinate>>&);
+        Netlist getNetlist() { return _netlistIOPins; };
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

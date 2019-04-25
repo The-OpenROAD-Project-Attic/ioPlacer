@@ -41,6 +41,7 @@
 #include "Coordinate.h"
 
 class Box {
+       private:
         Coordinate _lowerBound;
         Coordinate _upperBound;
 
