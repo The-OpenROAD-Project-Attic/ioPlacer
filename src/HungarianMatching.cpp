@@ -36,6 +36,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "HungarianMatching.h"
+#include <istream>
+#include <fstream>
 
 HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
                                      slotVector_t& v) {
