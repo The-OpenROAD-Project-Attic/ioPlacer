@@ -108,5 +108,5 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
 
         Box netBBox(lowerBounds, upperBounds);
 
-        return netBBox.getHPWL();
+        return netBBox.getHalfPerimeter();
 }

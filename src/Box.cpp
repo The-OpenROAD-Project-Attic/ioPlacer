@@ -37,7 +37,7 @@
 
 #include "Box.h"
 
-DBU Box::getHPWL() {
+DBU Box::getHalfPerimeter() {
         DBU lowerX = _lowerBound.getX();
         DBU lowerY = _lowerBound.getY();
         DBU upperX = _upperBound.getX();

@@ -53,7 +53,7 @@ class Box {
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }
 
-        DBU getHPWL();
+        DBU getHalfPerimeter();
 };
 
 #endif /* __BOX_H_ */
