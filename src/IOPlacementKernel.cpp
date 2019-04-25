@@ -64,6 +64,10 @@ void IOPlacementKernel::initIOLists() {
 void IOPlacementKernel::defineSlots() {
         Coordinate lb = _core.getLowerBound();
         Coordinate ub = _core.getUpperBound();
+        DBU lbX = lb.getX();
+        DBU lbY = lb.getY();
+        DBU ubX = ub.getX();
+        DBU ubY = ub.getY();
         unsigned minDstPinsX = _core.getMinDstPinsX();
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
@@ -73,14 +77,14 @@ void IOPlacementKernel::defineSlots() {
         bool firstRight = true;
         bool firstUp = true;
         bool firstLeft = true;
-        DBU currX = lb.getX() + initTracksX;
-        DBU currY = lb.getY();
+        DBU currX = lbX + initTracksX;
+        DBU currY = lbY;
         DBU totalNumSlots = 0;
-        totalNumSlots += (ub.getX() - lb.getX()) * 2 / minDstPinsX;
-        totalNumSlots += (ub.getY() - lb.getY()) * 2 / minDstPinsY;
+        totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
+        totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
         unsigned numPins = _netlist.numIOPins();
 
-        unsigned interval = std::floor(totalNumSlots / getKValue() * numPins);
+        unsigned interval = std::floor(totalNumSlots / (getKValue() * numPins));
         if (std::floor(totalNumSlots / interval) <= numPins) {
                 interval = std::floor(totalNumSlots / numPins);
         }
@@ -110,44 +114,44 @@ void IOPlacementKernel::defineSlots() {
                 }
                 _slots.push_back({use, false, Coordinate(currX, currY)});
                 // get slots for 1st edge
-                if (currX < ub.getX() && currY == lb.getY()) {
+                if (currX < ubX && currY == lbY) {
                         currX += minDstPinsX;
                 }
                 // get slots for 2nd edge
-                else if (currY < ub.getY() && currX >= ub.getX()) {
+                else if (currY < ubY && currX >= ubX) {
                         if (firstRight) {
-                                currX = ub.getX();
+                                currX = ubX;
                                 currY += initTracksY;
                                 firstRight = false;
                         } else {
-                                currX = ub.getX();
+                                currX = ubX;
                                 currY += minDstPinsY;
                         }
                 }
                 // get slots for 3rd edge
-                else if (currX > lb.getX()) {
+                else if (currX > lbX) {
                         if (firstUp) {
-                                currY = ub.getY();
+                                currY = ubY;
                                 currX -= initTracksX;
                                 firstUp = false;
                         } else {
-                                currY = ub.getY();
+                                currY = ubY;
                                 currX -= minDstPinsX;
                         }
                 }
                 // get slots for 4th  edge
-                else if (currY > lb.getY()) {
+                else if (currY > lbY) {
                         if (firstLeft) {
-                                currX = lb.getX();
+                                currX = lbX;
                                 currY -= initTracksY;
                                 firstLeft = false;
                         } else {
-                                currX = lb.getX();
+                                currX = lbX;
                                 currY -= minDstPinsY;
                         }
                 }
                 // is at the lowerBound again, break loop
-                else if (currX < lb.getX() && currY == lb.getY()) {
+                else if (currX == lbX && currY < lbY) {
                         break;
                 }
         }
