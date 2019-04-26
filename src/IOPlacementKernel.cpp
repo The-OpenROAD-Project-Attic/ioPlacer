@@ -39,15 +39,15 @@
 #include "Parser.h"
 #include "WriterIOPins.h"
 
+#include <random>
+
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {}
 
 void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
         static const int kMaxValue = _slots.size() - 1;
         std::vector<int> v(kMaxValue + 1);
         for (size_t i = 0; i < v.size(); ++i) v[i] = i;
-        std::random_device rd;
-        std::mt19937 prng(rd());
-        std::shuffle(v.begin(), v.end(), prng);
+        std::shuffle(v.begin(), v.end(), std::default_random_engine(42));
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 unsigned b = v[0];
                 ioPin.setPos(_slots.at(b).pos);
