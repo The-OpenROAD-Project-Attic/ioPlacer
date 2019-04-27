@@ -48,16 +48,8 @@ HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
 }
 
 void HungarianMatching::run() {
-        bool stable = false;
-        unsigned iterr = 4;
-
-        while (!stable && iterr > 0) {
-                iterr--;
-                createMatrix();
-                _hungarianSolver.solve(_hungarianMatrix);
-                stable = updateNeighborhood(stable);
-        }
-        updateNeighborhood(stable);
+        createMatrix();
+        _hungarianSolver.solve(_hungarianMatrix);
 }
 
 void HungarianMatching::setNumSlots() {
@@ -171,22 +163,28 @@ inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
 
 void HungarianMatching::getFinalAssignment(std::vector<IOPin>& v,
                                            std::vector<IOPin>& zeroSinkIOs) {
-        unsigned id = 0;
-        for (auto i : *_slots) {
-                bool pinPlaced = false;
-                if (i.current && not i.visited) {
-                        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                                if (idx == id && !pinPlaced) {
-                                        ioPin.setPos(i.pos);
-                                        v.push_back(ioPin);
-                                        pinPlaced = true;
-                                        id++;
-                                }
-                        });
-                } else if (zeroSinkIOs.size() > 0) {
+        slotVector_t matrixSlots;
+        for (auto& i : *_slots) {
+                if (i.current) {
+                        matrixSlots.push_back(i);
+                }
+                if (!(i.current && not i.visited) && zeroSinkIOs.size() > 0) {
                         zeroSinkIOs[0].setPos(i.pos);
                         v.push_back(zeroSinkIOs[0]);
                         zeroSinkIOs.erase(zeroSinkIOs.begin());
                 }
         }
+
+        size_t rows = _hungarianMatrix.rows();
+        size_t col = 0;
+
+        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                for (size_t row = 0; row < rows; row++) {
+                        if (_hungarianMatrix(row, col) == 0) {
+                                ioPin.setPos(matrixSlots[row].pos);
+                                v.push_back(ioPin);
+                        }
+                }
+                col++;
+        });
 }

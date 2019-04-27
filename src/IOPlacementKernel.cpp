@@ -67,10 +67,10 @@ void IOPlacementKernel::initIOLists() {
                 /* TODO:  <23-04-19, do we need this check to remove pins
                  * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
+                        _netlist.forEachSinkOfIO(idx,
+                                                 [&](InstancePin& instPin) {
+                                instPinsVector.push_back(instPin);
+                        });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
@@ -240,11 +240,12 @@ void IOPlacementKernel::run() {
         initIOLists();
         defineSlots();
 
-        bool random = true;
+        bool random = false;
         if (random) {
                 randomPlacement(assignment);
                 /* TODO:  <25-04-19, remove hard coded> */
-                std::cout << "!!!WARNING!!! hard coded run of random" << std::endl;
+                std::cout << "!!!WARNING!!! hard coded run of random"
+                          << std::endl;
         } else {
                 HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
                 hgMatching.run();
