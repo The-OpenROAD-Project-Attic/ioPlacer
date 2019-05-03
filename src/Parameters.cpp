@@ -52,6 +52,10 @@ Parameters::Parameters(int argc, char** argv) {
             "spY,y", po::value<DBU>(), "Minimum spacing Y value (mandatory)")(
             "beX,t", po::value<DBU>(), "Begin of the tracks X (mandatory)")(
             "beY,r", po::value<DBU>(), "Begin of the tracks Y (mandatory)")(
+            "mlh,h", po::value<std::string>(),
+            "Horizontal metal layer (mandatory)")(
+            "mlv,v", po::value<std::string>(),
+            "Vertical metal layer (mandatory)")(
             "def,d", po::value<std::string>(), "Output DEF file (mandatory)");
 
         po::variables_map vm;
@@ -67,7 +71,8 @@ Parameters::Parameters(int argc, char** argv) {
 
                 if (vm.count("help") || !vm.count("fpn") || !vm.count("net") ||
                     !vm.count("spX") || !vm.count("spY") || !vm.count("beX") ||
-                    !vm.count("beY") || !vm.count("def")) {
+                    !vm.count("beY") || !vm.count("mlh") || !vm.count("mlv") ||
+                    !vm.count("def")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
@@ -78,8 +83,11 @@ Parameters::Parameters(int argc, char** argv) {
                 _minimumSpacingY = vm["spY"].as<DBU>();
                 _initTracksX = vm["beX"].as<DBU>();
                 _initTracksY = vm["beY"].as<DBU>();
+                _horizontalMetalLayer = vm["mlh"].as<std::string>();
+                _verticalMetalLayer = vm["mlv"].as<std::string>();
                 _outputDefFile = vm["def"].as<std::string>();
-        } catch (const po::error& ex) {
+        }
+        catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
 
@@ -98,6 +106,10 @@ void Parameters::printAll() const {
                   << "\n";
         std::cout << std::setw(20) << std::left << "Tracks beginning: ";
         std::cout << "X: " << _initTracksX << ", Y: " << _initTracksY << "\n";
+        std::cout << std::setw(20) << std::left << "Horizontal metal layer: ";
+        std::cout << _horizontalMetalLayer << "\n";
+        std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
+        std::cout << _verticalMetalLayer << "\n";
         std::cout << std::setw(20) << std::left << "Output DEF file: ";
         std::cout << _outputDefFile << "\n";
 

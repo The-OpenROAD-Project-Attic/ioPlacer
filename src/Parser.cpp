@@ -77,7 +77,14 @@ void Parser::readDieArea() {
 
 void Parser::readConnections() {
         std::ifstream infile;
+        std::ofstream previousPos;
+
         infile.open(_parms->getNetlistFile());
+        previousPos.open(_parms->getOutputDefFile() + ".pre");
+
+        if (!previousPos.is_open())
+                std::cout << "File " << _parms->getNetlistFile() + ".pre"
+                          << " not created!!!\n";
 
         if (!infile.is_open())
                 std::cout << "File " << _parms->getNetlistFile()
@@ -90,7 +97,7 @@ void Parser::readConnections() {
         std::string netName;
         std::string direction;
         int lowerX, lowerY, upperX, upperY;
-        double x, y;
+        DBU x, y;
 
         while (std::getline(infile, line)) {
                 if (line[0] == '\t') {
@@ -98,15 +105,17 @@ void Parser::readConnections() {
                 }  // end if
 
                 std::istringstream iss(line);
-                if (iss >> pinName >> netName >> lowerX >> lowerY >> upperX >>
-                    upperY >> direction) {
+                if (iss >> pinName >> netName >> x >> y >> lowerX >> lowerY >>
+                    upperX >> upperY >> direction) {
                         ioPin pin;
                         pin.name = pinName;
+                        pin.position = point(x, y);
                         pin.netName = netName;
                         pin.bounds =
                             box(point(lowerX, lowerY), point(upperX, upperY));
                         pin.direction = direction;
                         _ioPins.push_back(pin);
+                        previousPos << pinName << " " << x << " " << y << "\n";
                         ioCounter++;
                         continue;
                 }  // end if
@@ -120,6 +129,7 @@ void Parser::readConnections() {
                 }  // end if
         }          // end while
         infile.close();
+        previousPos.close();
 }  // end method
 
 void Parser::initNetlist() {
@@ -138,8 +148,10 @@ void Parser::initNetlist() {
                                       _ioPins[i].bounds.max_corner().y());
 
                 std::string netName = _ioPins[i].netName;
+                Coordinate pos(_ioPins[i].position.x(),
+                               _ioPins[i].position.y());
 
-                IOPin ioPin(io.name, dir, lowerBound, upperBound, netName);
+                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName);
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];

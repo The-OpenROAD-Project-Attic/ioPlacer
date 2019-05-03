@@ -47,8 +47,17 @@
 #include "Coordinate.h"
 #include "Box.h"
 
-enum Orientation { NORTH, SOUTH, EAST, WEST };
-enum Direction { IN, OUT, INOUT };
+enum Orientation {
+        NORTH,
+        SOUTH,
+        EAST,
+        WEST
+};
+enum Direction {
+        IN,
+        OUT,
+        INOUT
+};
 
 class InstancePin {
        protected:
@@ -73,9 +82,9 @@ class IOPin : public InstancePin {
         std::string _netName;
 
        public:
-        IOPin(const std::string& name, Direction dir, Coordinate lowerBound,
-              Coordinate upperBound, std::string netName)
-            : InstancePin(name, Coordinate(0, 0)),
+        IOPin(const std::string& name, const Coordinate& pos, Direction dir,
+              Coordinate lowerBound, Coordinate upperBound, std::string netName)
+            : InstancePin(name, pos),
               _orientation(NORTH),
               _direction(dir),
               _lowerBound(lowerBound),
@@ -89,8 +98,12 @@ class IOPin : public InstancePin {
         void setPos(const Coordinate pos) { _pos = pos; }
         void setPos(const DBU x, const DBU y) { _pos.init(x, y); }
         Direction getDirection() const { return _direction; }
-        Coordinate getLowerBound() const { return _lowerBound; };
-        Coordinate getUpperBound() const { return _upperBound; };
+        Coordinate getLowerBound() const {
+                return _lowerBound;
+        };
+        Coordinate getUpperBound() const {
+                return _upperBound;
+        };
         std::string getNetName() const { return _netName; }
 };
 

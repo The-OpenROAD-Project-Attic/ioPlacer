@@ -51,6 +51,8 @@ class IOPlacementKernel {
         Core _core;
         slotVector_t _slots;
         std::vector<IOPin> _zeroSinkIOs;
+        std::string _horizontalMetalLayer;
+        std::string _verticalMetalLayer;
 
         void randomPlacement(std::vector<IOPin>&);
         void initNetlistAndCore();

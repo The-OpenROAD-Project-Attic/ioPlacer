@@ -48,11 +48,14 @@ class WriterIOPins {
         Netlist* _netlist;
         std::vector<IOPin>* _assignment;
         std::string _outFileName;
+        std::string _horizontalMetalLayer;
+        std::string _verticalMetalLayer;
 
         bool writeFile();
 
        public:
-        WriterIOPins(Netlist&, std::vector<IOPin>&, std::string);
+        WriterIOPins(Netlist&, std::vector<IOPin>&, std::string, std::string,
+                     std::string);
         virtual ~WriterIOPins() = default;
         void run();
 };

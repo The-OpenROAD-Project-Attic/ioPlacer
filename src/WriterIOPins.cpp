@@ -40,9 +40,13 @@
 #include <fstream>
 
 WriterIOPins::WriterIOPins(Netlist& netlist, std::vector<IOPin>& av,
+                           std::string horizontalMetalLayer,
+                           std::string verticalMetalLayer,
                            std::string outFileName) {
         _netlist = &netlist;
         _assignment = &av;
+        _horizontalMetalLayer = horizontalMetalLayer;
+        _verticalMetalLayer = verticalMetalLayer;
         _outFileName = outFileName;
 }
 
@@ -55,10 +59,19 @@ void WriterIOPins::run() {
 
 bool WriterIOPins::writeFile() {
         std::ofstream pinsFile;
+        std::ofstream postPos;
+
         pinsFile.open(_outFileName);
+        postPos.open(_outFileName + ".pos");
 
         std::vector<IOPin> assignment = *_assignment;
 
+        if (!postPos.is_open()) {
+                std::cout << "Could not create " << _outFileName + ".pos"
+                          << "\n";
+                pinsFile.close();
+                return false;
+        }
         if (!pinsFile.is_open()) {
                 std::cout << "Could not open file pinsFile.\n";
                 pinsFile.close();
@@ -69,7 +82,7 @@ bool WriterIOPins::writeFile() {
                 std::string name = ioPin.getName();
                 std::string netName = ioPin.getNetName();
                 Direction direction = ioPin.getDirection();
-                std::string layer = "Metal4";  // Temporary
+                std::string layer;
 
                 Coordinate position(ioPin.getX(), ioPin.getY());
                 Orientation orientation = ioPin.getOrientation();
@@ -94,6 +107,13 @@ bool WriterIOPins::writeFile() {
                                 break;
                 }
 
+                if (orientation == Orientation::EAST ||
+                    orientation == Orientation::WEST) {
+                        layer = _horizontalMetalLayer;
+                } else {
+                        layer = _verticalMetalLayer;
+                }
+
                 pinsFile << "- " << name << " + NET " << netName
                          << " + DIRECTION " << dir << " + USE SIGNAL\n";
                 pinsFile << "  + LAYER " << layer << " ( " << lowerBound.getX()
@@ -102,9 +122,13 @@ bool WriterIOPins::writeFile() {
                          << " )\n";
                 pinsFile << "  + PLACED ( " << position.getX() << " "
                          << position.getY() << " ) " << orient << " ;\n";
+
+                postPos << name << " " << position.getX() << " "
+                        << position.getY() << "\n";
         }
 
         pinsFile.close();
+        postPos.close();
 
         return true;
 }

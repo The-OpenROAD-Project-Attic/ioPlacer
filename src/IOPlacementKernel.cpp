@@ -239,6 +239,8 @@ void IOPlacementKernel::run() {
         initNetlistAndCore();
         initIOLists();
         defineSlots();
+        _horizontalMetalLayer = _parms->getHorizontalMetalLayer();
+        _verticalMetalLayer = _parms->getVerticalMetalLayer();
 
         bool random = false;
         if (random) {
@@ -258,8 +260,8 @@ void IOPlacementKernel::run() {
                 ioPin.setOrientation(orient);
         }
 
-        WriterIOPins writer(_netlistIOPins, assignment,
-                            _parms->getOutputDefFile());
+        WriterIOPins writer(_netlistIOPins, assignment, _horizontalMetalLayer,
+                            _verticalMetalLayer, _parms->getOutputDefFile());
 
         writer.run();
 }

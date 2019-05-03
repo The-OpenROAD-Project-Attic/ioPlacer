@@ -63,6 +63,7 @@ class Parser {
 
         struct ioPin {
                 std::string name;
+                point position;
                 std::string netName;
                 box bounds;
                 std::string direction;
