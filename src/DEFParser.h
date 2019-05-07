@@ -48,15 +48,13 @@ using std::vector;
 #include "DEFDescriptor.h"
 #include <cmath>
 
-
 class DEFParser {
-public:
+       public:
         DEFParser();
         void parseDEF(const std::string &filename, DefDscp &defDscp);
         virtual ~DEFParser();
-        
+
         static std::string unescape(const std::string &str);
 };
 
 #endif /* DEFPARSER_H */
-

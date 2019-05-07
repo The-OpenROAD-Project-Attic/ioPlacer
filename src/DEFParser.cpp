@@ -75,15 +75,13 @@ int defOrient(std::string orient);
 int defDieArea(defrCallbackType_e typ, defiBox* box, defiUserData ud);
 int defTrack(defrCallbackType_e typ, defiTrack* track, defiUserData data);
 int defPin(defrCallbackType_e, defiPin* pin, defiUserData ud);
-//int defSpecialNetStart(defrCallbackType_e c, int num, defiUserData ud);
-//int defSpecialNet(defrCallbackType_e c, defiNet* net, defiUserData ud);
 
 DefDscp& getDesignFromUserData(defiUserData userData) {
         return *((DefDscp*)userData);
-}  // end function
+} 
 
 void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
-	    defrInit();
+        defrInit();
         defrReset();
 
         defrSetComponentCbk(defComp);
@@ -93,9 +91,9 @@ void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
         defrSetVersionCbk(defVersion);
         defrSetComponentStartCbk(defComponentStart);
         defrSetDieAreaCbk(defDieArea);
-//        defrSetMallocFunction(mallocCB);
-//        defrSetReallocFunction(reallocCB);
-//        defrSetFreeFunction(freeCB);
+        //        defrSetMallocFunction(mallocCB);
+        //        defrSetReallocFunction(reallocCB);
+        //        defrSetFreeFunction(freeCB);
         defrSetNetStartCbk(defNetStart);
         defrSetNetCbk(defNet);
 
@@ -120,7 +118,6 @@ void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
 
         if (res) printf("Reader returns bad status. %s\n", filename.c_str());
 
-        //(void) defrPrintUnusedCallbacks(fout);
         (void)defrReleaseNResetMemory();
         (void)defrUnsetNonDefaultCbk();
         (void)defrUnsetNonDefaultStartCbk();
@@ -128,9 +125,7 @@ void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
         defrClear();
 }
 
-char* defAddress(const char* in) { return ((char*)in); }  // end method
-
-
+char* defAddress(const char* in) { return ((char*)in); }
 
 void defCheckType(defrCallbackType_e c) {
         if (c >= 0 && c <= defrDesignEndCbkType) {
@@ -138,13 +133,13 @@ void defCheckType(defrCallbackType_e c) {
         } else {
                 printf("ERROR: callback type is out of bounds!\n");
         }
-}  // end method
+}
 
 int defPin(defrCallbackType_e, defiPin* pin, defiUserData userData) {
         DefDscp& defDscp = getDesignFromUserData(userData);
         defDscp.IOPins.resize(defDscp.IOPins.size() + 1);
         IOPinDscp& defPin = defDscp.IOPins.back();
-		
+
         defPin.name = pin->pinName();
         defPin.netName = pin->netName();
         defPin.direction = pin->direction();
@@ -155,23 +150,23 @@ int defPin(defrCallbackType_e, defiPin* pin, defiUserData userData) {
                 defPin.layerName = pin->layer(0);
                 int xl, yl, xh, yh;
                 pin->bounds(0, &xl, &yl, &xh, &yh);
-				Coordinate lowerBound(xl, yl);
-				Coordinate upperBound(xh, yh);
+                Coordinate lowerBound(xl, yl);
+                Coordinate upperBound(xh, yh);
                 defPin.layerBounds = Box(lowerBound, upperBound);
         }
-		
-		if (pin->isPlaced()) {
-			defPin.locationType = "PLACED";
-		} else if (pin->isCover()) {
-			defPin.locationType = "COVER";
-		} else if (pin->isFixed()) {
-			defPin.locationType = "FIXED";
-		}
-		
-		defPin.use = pin->use();
-		
+
+        if (pin->isPlaced()) {
+                defPin.locationType = "PLACED";
+        } else if (pin->isCover()) {
+                defPin.locationType = "COVER";
+        } else if (pin->isFixed()) {
+                defPin.locationType = "FIXED";
+        }
+
+        defPin.use = pin->use();
+
         return 0;
-}  // end method
+}
 
 int defComp(defrCallbackType_e c, defiComponent* co, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
@@ -187,33 +182,25 @@ int defComp(defrCallbackType_e c, defiComponent* co, defiUserData ud) {
         defComp.orientation = co->placementOrientStr();
 
         return 0;
-}  // end method
-
-
+}
 
 int defComponentStart(defrCallbackType_e c, int num, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
         defDscp.Comps.reserve(num);
         return 0;
-}  // end method
-
-
+}
 
 int defNetStart(defrCallbackType_e c, int num, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
         defDscp.Nets.reserve(num);
         return 0;
-}  // end method
-
-
+}
 
 int defDesignName(defrCallbackType_e c, const char* string, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
         defDscp.clsDesignName = string;
         return 0;
-}  // end method
-
-
+}
 
 int defNet(defrCallbackType_e c, defiNet* net, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
@@ -223,17 +210,17 @@ int defNet(defrCallbackType_e c, defiNet* net, defiUserData ud) {
         const char* use = net->use();
         if (use) {
                 netDscp.use = use;
-        }  // end if
+        }
         netDscp.connections.resize(net->numConnections());
         for (int i = 0; i < net->numConnections(); i++) {
                 NetConnection& connection = netDscp.connections[i];
                 connection.pinName = net->pin(i);
                 connection.componentName =
                     DEFParser::unescape(net->instance(i));
-        }  // end for
+        }
 
         return 0;
-}  // end method
+}
 
 int defTrack(defrCallbackType_e typ, defiTrack* track, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
@@ -246,9 +233,9 @@ int defTrack(defrCallbackType_e typ, defiTrack* track, defiUserData ud) {
         trackDscp.layers.reserve(track->numLayers());
         for (int i = 0; i < track->numLayers(); i++) {
                 trackDscp.layers.push_back(track->layer(i));
-        }  // end for
+        }
         return 0;
-}  // end method
+}
 
 char* defOrientStr(int orient) {
         switch (orient) {
@@ -270,7 +257,7 @@ char* defOrientStr(int orient) {
                         return ((char*)"FE");
         };
         return ((char*)"BOGUS");
-}  // end method
+}
 
 int defOrient(std::string orient) {
         if (orient.compare("N") == 0) return 0;
@@ -282,16 +269,16 @@ int defOrient(std::string orient) {
         if (orient.compare("FS") == 0) return 6;
         if (orient.compare("FE") == 0) return 7;
         return -1;
-}  // end method
+}
 
 int defDieArea(defrCallbackType_e typ, defiBox* box, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
-		Coordinate lowerBound(box->defiBox::xl(), box->defiBox::yl());
-		Coordinate upperBound(box->defiBox::xh(), box->defiBox::yh());
+        Coordinate lowerBound(box->defiBox::xl(), box->defiBox::yl());
+        Coordinate upperBound(box->defiBox::xh(), box->defiBox::yh());
         defDscp.clsDieBounds = Box(lowerBound, upperBound);
-		
+
         return 0;
-}  // end method
+}
 
 #define CHECK_STATUS(status)            \
         if (status) {                   \
@@ -311,20 +298,20 @@ std::string DEFParser::unescape(const std::string& str) {
                 } else {
                         result += ch;
                         scapeNext = false;
-                }  // end else
-        }          // end if
+                }
+        }
 
         return result;
-}  // end method
+}
 
 int defUnits(defrCallbackType_e c, double d, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
         defDscp.clsDatabaseUnits = static_cast<int>(d);
         return 0;
-}  // end method
+}
 
 int defVersion(defrCallbackType_e c, double d, defiUserData ud) {
         DefDscp& defDscp = getDesignFromUserData(ud);
         defDscp.clsVersion = d;
         return 0;
-}  // end method
+}

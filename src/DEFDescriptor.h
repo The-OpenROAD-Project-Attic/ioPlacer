@@ -46,12 +46,12 @@
 static const std::string INVALID = "INVALID_STRING*";
 
 class ComponentDscp {
-public:
+       public:
         std::string name = INVALID;
         std::string macroName = INVALID;
         std::string locationType =
-                INVALID; // {FIXED | COVER | PLACED | UNPLACED }
-        Coordinate position = Coordinate(0,0);
+            INVALID;  // {FIXED | COVER | PLACED | UNPLACED }
+        Coordinate position = Coordinate(0, 0);
         std::string orientation = INVALID;
         bool isFixed = false;
         bool isPlaced = false;
@@ -59,31 +59,29 @@ public:
 };
 
 class IOPinDscp {
-public:
+       public:
         std::string name = INVALID;
         std::string netName = INVALID;
-        std::string direction =
-                INVALID; // {INPUT | OUTPUT | INOUT | FEEDTHRU}
-        std::string locationType =
-                INVALID; // {FIXED | COVER | PLACED }
+        std::string direction = INVALID;  // {INPUT | OUTPUT | INOUT | FEEDTHRU}
+        std::string locationType = INVALID;  // {FIXED | COVER | PLACED }
         std::string orientation = INVALID;
         std::string layerName = INVALID;
-        std::string use = INVALID; // { SIGNAL | POWER | GROUND |
+        std::string use = INVALID;  // { SIGNAL | POWER | GROUND |
         // CLOCK | TIEOFF | ANALOG}
-        Coordinate position = Coordinate(0,0);
+        Coordinate position = Coordinate(0, 0);
         Box layerBounds;
         IOPinDscp() = default;
 };
 
 class NetConnection {
-public:
+       public:
         std::string pinName = INVALID;
         std::string componentName = INVALID;
         NetConnection() = default;
 };
 
 class NetDscp {
-public:
+       public:
         std::string name = INVALID;
         std::string use = INVALID;
         std::vector<NetConnection> connections;
@@ -91,7 +89,7 @@ public:
 };
 
 class TrackDscp {
-public:
+       public:
         bool hasRect : 1;
         bool hasPolygon : 1;
         std::string direction = INVALID;
@@ -106,7 +104,6 @@ public:
         }
 };
 
-
 class DefDscp {
        public:
         bool clsHasVersion : 1;
@@ -120,14 +117,9 @@ class DefDscp {
         std::string clsDesignName = INVALID;
         Box clsDieBounds;
         int clsDatabaseUnits = 0;
-//        std::vector<DefRowDscp> clsRows;
         std::vector<ComponentDscp> Comps;
         std::vector<IOPinDscp> IOPins;
         std::vector<NetDscp> Nets;
-//        std::vector<DefRegionDscp> clsRegions;
-//        std::vector<DefGroupDscp> clsGroups;
-//        std::vector<DefSpecialNetDscp> clsSpecialNets;
-//        std::vector<DefViaDscp> clsVias;
         std::vector<TrackDscp> clsTracks;
         DefDscp() {
                 clsHasVersion = false;
@@ -135,8 +127,7 @@ class DefDscp {
                 clsHasBusBitChar = false;
                 clsHasDieBounds = false;
                 clsHasDatabaseUnits = false;
-        }  // end constructor
-};         // end class
+        }
+};
 
 #endif /* DEFDESCRIPTOR_H */
-
