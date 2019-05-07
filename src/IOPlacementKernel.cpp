@@ -261,7 +261,8 @@ void IOPlacementKernel::run() {
         }
 
         WriterIOPins writer(_netlistIOPins, assignment, _horizontalMetalLayer,
-                            _verticalMetalLayer, _parms->getOutputDefFile());
+                            _verticalMetalLayer, _parms->getInputDefFile(),
+                            _parms->getOutputDefFile());
 
         writer.run();
 }

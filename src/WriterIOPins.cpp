@@ -38,15 +38,17 @@
 #include "WriterIOPins.h"
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 WriterIOPins::WriterIOPins(Netlist& netlist, std::vector<IOPin>& av,
                            std::string horizontalMetalLayer,
                            std::string verticalMetalLayer,
-                           std::string outFileName) {
+                           std::string inFileName, std::string outFileName) {
         _netlist = &netlist;
         _assignment = &av;
         _horizontalMetalLayer = horizontalMetalLayer;
         _verticalMetalLayer = verticalMetalLayer;
+        _inFileName = inFileName;
         _outFileName = outFileName;
 }
 
@@ -59,76 +61,105 @@ void WriterIOPins::run() {
 
 bool WriterIOPins::writeFile() {
         std::ofstream pinsFile;
-        std::ofstream postPos;
+        std::ifstream defFile;
+        std::string line;
+        std::string pins;
+        std::string numPins;
+        std::string buff;
+        bool pinsSection = false;
+        bool pinsSectionEnd = true;
 
         pinsFile.open(_outFileName);
-        postPos.open(_outFileName + ".pos");
+        defFile.open(_inFileName);
 
-        std::vector<IOPin> assignment = *_assignment;
-
-        if (!postPos.is_open()) {
-                std::cout << "Could not create " << _outFileName + ".pos"
-                          << "\n";
-                pinsFile.close();
-                return false;
-        }
-        if (!pinsFile.is_open()) {
-                std::cout << "Could not open file pinsFile.\n";
-                pinsFile.close();
-                return false;
+        if (!defFile.is_open()) {
+                std::cout << "DEF file could not been open\n";
+                std::exit(-1);
         }
 
-        for (IOPin ioPin : assignment) {
-                std::string name = ioPin.getName();
-                std::string netName = ioPin.getNetName();
-                Direction direction = ioPin.getDirection();
-                std::string layer;
-
-                Coordinate position(ioPin.getX(), ioPin.getY());
-                Orientation orientation = ioPin.getOrientation();
-                Coordinate lowerBound = ioPin.getLowerBound();
-                Coordinate upperBound = ioPin.getUpperBound();
-
-                std::string dir =
-                    (direction == Direction::IN) ? "INPUT" : "OUTPUT";
-                std::string orient;
-                switch (orientation) {
-                        case Orientation::EAST:
-                                orient = "E";
-                                break;
-                        case Orientation::WEST:
-                                orient = "W";
-                                break;
-                        case Orientation::NORTH:
-                                orient = "N";
-                                break;
-                        case Orientation::SOUTH:
-                                orient = "S";
-                                break;
+        while (std::getline(defFile, line)) {
+                std::istringstream iss(line);
+                if (iss >> pins >> numPins >> buff) {
+                        if (pins == "PINS") {
+                                pinsFile << line << std::endl;
+                                pinsSection = true;
+                        }
                 }
 
-                if (orientation == Orientation::EAST ||
-                    orientation == Orientation::WEST) {
-                        layer = _horizontalMetalLayer;
+                if (pinsSection) {
+                        std::vector<IOPin> assignment = *_assignment;
+
+                        if (!pinsFile.is_open()) {
+                                std::cout << "Could not open file pinsFile.\n";
+                                pinsFile.close();
+                                return false;
+                        }
+
+                        for (IOPin ioPin : assignment) {
+                                std::string name = ioPin.getName();
+                                std::string netName = ioPin.getNetName();
+                                Direction direction = ioPin.getDirection();
+                                std::string layer;
+
+                                Coordinate position(ioPin.getX(), ioPin.getY());
+                                Orientation orientation =
+                                    ioPin.getOrientation();
+                                Coordinate lowerBound = ioPin.getLowerBound();
+                                Coordinate upperBound = ioPin.getUpperBound();
+
+                                std::string dir = (direction == Direction::IN)
+                                                      ? "INPUT"
+                                                      : "OUTPUT";
+                                std::string orient;
+                                switch (orientation) {
+                                        case Orientation::EAST:
+                                                orient = "E";
+                                                break;
+                                        case Orientation::WEST:
+                                                orient = "W";
+                                                break;
+                                        case Orientation::NORTH:
+                                                orient = "N";
+                                                break;
+                                        case Orientation::SOUTH:
+                                                orient = "S";
+                                                break;
+                                }
+
+                                if (orientation == Orientation::EAST ||
+                                    orientation == Orientation::WEST) {
+                                        layer = _horizontalMetalLayer;
+                                } else {
+                                        layer = _verticalMetalLayer;
+                                }
+
+                                pinsFile << "- " << name << " + NET " << netName
+                                         << " + DIRECTION " << dir
+                                         << " + USE SIGNAL" << std::endl;
+                                pinsFile << "  + LAYER " << layer << " ( "
+                                         << lowerBound.getX() << " "
+                                         << lowerBound.getY() << " ) ( "
+                                         << upperBound.getX() << " "
+                                         << upperBound.getY() << " )"
+                                         << std::endl;
+                                pinsFile << "  + PLACED ( " << position.getX()
+                                         << " " << position.getY() << " ) "
+                                         << orient << " ;" << std::endl;
+                        }
+                        pinsSection = false;
+                        pinsSectionEnd = false;
+                } else if (pinsSectionEnd) {
+                        pinsFile << line << std::endl;
                 } else {
-                        layer = _verticalMetalLayer;
+                        if (line == "END PINS") {
+                                pinsFile << line << std::endl;
+                                pinsSectionEnd = true;
+                        }
                 }
-
-                pinsFile << "- " << name << " + NET " << netName
-                         << " + DIRECTION " << dir << " + USE SIGNAL\n";
-                pinsFile << "  + LAYER " << layer << " ( " << lowerBound.getX()
-                         << " " << lowerBound.getY() << " ) ( "
-                         << upperBound.getX() << " " << upperBound.getY()
-                         << " )\n";
-                pinsFile << "  + PLACED ( " << position.getX() << " "
-                         << position.getY() << " ) " << orient << " ;\n";
-
-                postPos << name << " " << position.getX() << " "
-                        << position.getY() << "\n";
         }
 
         pinsFile.close();
-        postPos.close();
+        defFile.close();
 
         return true;
 }
