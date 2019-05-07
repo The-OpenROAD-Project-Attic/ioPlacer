@@ -50,6 +50,8 @@
 #include "Core.h"
 #include "Netlist.h"
 #include "Parameters.h"
+#include "DEFDescriptor.h"
+#include "DEFParser.h"
 
 class Parser {
         typedef boost::geometry::model::d2::point_xy<DBU> point;
@@ -75,7 +77,10 @@ class Parser {
         Core* _core;
         box _dieArea;
         std::vector<ioPin> _ioPins;
+        DEFParser _defParser;
+        DefDscp _defDscp;
 
+        point getInstPosition(std::string instName);
         void readDieArea();
         void readConnections();
         void initNetlist();

@@ -44,14 +44,15 @@
 
 class Parameters {
        private:
-        std::string _floorplanFile;
-        std::string _netlistFile;
-        DBU _minimumSpacingX;
-        DBU _minimumSpacingY;
-        DBU _initTracksX;
-        DBU _initTracksY;
+        //        std::string _floorplanFile;
+        //        std::string _netlistFile;
+        //        DBU _minimumSpacingX;
+        //        DBU _minimumSpacingY;
+        //        DBU _initTracksX;
+        //        DBU _initTracksY;
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
+        std::string _inputDefFile;
         std::string _outputDefFile;
 
         void printAll() const;
@@ -59,17 +60,19 @@ class Parameters {
        public:
         Parameters(int, char**);
 
-        std::string getFloorplanFile() const { return _floorplanFile; }
-        std::string getNetlistFile() const { return _netlistFile; }
+        //        std::string getFloorplanFile() const { return _floorplanFile;
+        // }
+        //        std::string getNetlistFile() const { return _netlistFile; }
+        std::string getInputDefFile() const { return _inputDefFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
-        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
-        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
-        DBU getInitTrackX() const {
-                return _initTracksX;
-        };
-        DBU getInitTrackY() const {
-                return _initTracksY;
-        };
+        //        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
+        //        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
+        //        DBU getInitTrackX() const {
+        //                return _initTracksX;
+        //        };
+        //        DBU getInitTrackY() const {
+        //                return _initTracksY;
+        //        };
         std::string getHorizontalMetalLayer() const {
                 return _horizontalMetalLayer;
         };

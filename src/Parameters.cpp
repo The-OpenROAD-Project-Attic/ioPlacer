@@ -45,18 +45,25 @@ Parameters::Parameters(int argc, char** argv) {
         namespace po = boost::program_options;
         po::options_description dscp("Usage");
         /* TODO:  <25-04-19, this parameter list needs revisoin> */
-        dscp.add_options()("fpn,f", po::value<std::string>(),
-                           "Floorplan file (mandatory)")(
-            "net,n", po::value<std::string>(), "Netlist file (mandatory)")(
-            "spX,x", po::value<DBU>(), "Minimum spacing X value (mandatory)")(
-            "spY,y", po::value<DBU>(), "Minimum spacing Y value (mandatory)")(
-            "beX,t", po::value<DBU>(), "Begin of the tracks X (mandatory)")(
-            "beY,r", po::value<DBU>(), "Begin of the tracks Y (mandatory)")(
+        dscp.add_options()("idf,i", po::value<std::string>(),
+                           "Input DEF file (mandatory)")(
+            "def,d", po::value<std::string>(), "Output DEF file (mandatory)")(
             "mlh,h", po::value<std::string>(),
             "Horizontal metal layer (mandatory)")(
             "mlv,v", po::value<std::string>(),
-            "Vertical metal layer (mandatory)")(
-            "def,d", po::value<std::string>(), "Output DEF file (mandatory)");
+            "Vertical metal layer (mandatory)");
+        //		("fpn,f", po::value<std::string>(),
+        //                           "Floorplan file (mandatory)")(
+        //            "net,n", po::value<std::string>(), "Netlist file
+        // (mandatory)")(
+        //            "spX,x", po::value<DBU>(), "Minimum spacing X value
+        // (mandatory)")(
+        //            "spY,y", po::value<DBU>(), "Minimum spacing Y value
+        // (mandatory)")(
+        //            "beX,t", po::value<DBU>(), "Begin of the tracks X
+        // (mandatory)")(
+        //            "beY,r", po::value<DBU>(), "Begin of the tracks Y
+        // (mandatory)")(
 
         po::variables_map vm;
         try {
@@ -69,23 +76,28 @@ Parameters::Parameters(int argc, char** argv) {
                     vm);
                 po::notify(vm);
 
-                if (vm.count("help") || !vm.count("fpn") || !vm.count("net") ||
-                    !vm.count("spX") || !vm.count("spY") || !vm.count("beX") ||
-                    !vm.count("beY") || !vm.count("mlh") || !vm.count("mlv") ||
-                    !vm.count("def")) {
+                //				!vm.count("fpn") || !vm.count("net")
+                //||
+                //                    !vm.count("spX") || !vm.count("spY") ||
+                // !vm.count("beX") ||
+                //                    !vm.count("beY") || !vm.count("mlh") ||
+
+                if (vm.count("help") || !vm.count("mlh") || !vm.count("mlv") ||
+                    !vm.count("def") || !vm.count("idf")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
 
-                _floorplanFile = vm["fpn"].as<std::string>();
-                _netlistFile = vm["net"].as<std::string>();
-                _minimumSpacingX = vm["spX"].as<DBU>();
-                _minimumSpacingY = vm["spY"].as<DBU>();
-                _initTracksX = vm["beX"].as<DBU>();
-                _initTracksY = vm["beY"].as<DBU>();
+                //                _floorplanFile = vm["fpn"].as<std::string>();
+                //                _netlistFile = vm["net"].as<std::string>();
+                //                _minimumSpacingX = vm["spX"].as<DBU>();
+                //                _minimumSpacingY = vm["spY"].as<DBU>();
+                //                _initTracksX = vm["beX"].as<DBU>();
+                //                _initTracksY = vm["beY"].as<DBU>();
+                _inputDefFile = vm["idf"].as<std::string>();
+                _outputDefFile = vm["def"].as<std::string>();
                 _horizontalMetalLayer = vm["mlh"].as<std::string>();
                 _verticalMetalLayer = vm["mlv"].as<std::string>();
-                _outputDefFile = vm["def"].as<std::string>();
         }
         catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
@@ -97,21 +109,30 @@ Parameters::Parameters(int argc, char** argv) {
 void Parameters::printAll() const {
         std::cout << "\nOptions: \n";
 
-        std::cout << std::setw(20) << std::left << "Floorplan file: ";
-        std::cout << _floorplanFile << "\n";
-        std::cout << std::setw(20) << std::left << "Netlist file: ";
-        std::cout << _netlistFile << "\n";
-        std::cout << std::setw(20) << std::left << "Minimum spacing: ";
-        std::cout << "X: " << _minimumSpacingX << ", Y: " << _minimumSpacingY
-                  << "\n";
-        std::cout << std::setw(20) << std::left << "Tracks beginning: ";
-        std::cout << "X: " << _initTracksX << ", Y: " << _initTracksY << "\n";
+        //        std::cout << std::setw(20) << std::left << "Floorplan file: ";
+        //        std::cout << _floorplanFile << "\n";
+        //        std::cout << std::setw(20) << std::left << "Netlist file: ";
+        //        std::cout << _netlistFile << "\n";
+        //        std::cout << std::setw(20) << std::left << "Minimum spacing:
+        // ";
+        //        std::cout << "X: " << _minimumSpacingX << ", Y: " <<
+        // _minimumSpacingY
+        //                  << "\n";
+        //        std::cout << std::setw(20) << std::left << "Tracks beginning:
+        // ";
+        //        std::cout << "X: " << _initTracksX << ", Y: " << _initTracksY
+        // << "\n";
+        //        std::cout << std::setw(20) << std::left << "Horizontal metal
+        // layer: ";
+
+        std::cout << std::setw(20) << std::left << "Input DEF file: ";
+        std::cout << _inputDefFile << "\n";
+        std::cout << std::setw(20) << std::left << "Output DEF file: ";
+        std::cout << _outputDefFile << "\n";
         std::cout << std::setw(20) << std::left << "Horizontal metal layer: ";
         std::cout << _horizontalMetalLayer << "\n";
         std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
         std::cout << _verticalMetalLayer << "\n";
-        std::cout << std::setw(20) << std::left << "Output DEF file: ";
-        std::cout << _outputDefFile << "\n";
 
         std::cout << "\n";
 }

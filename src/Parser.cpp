@@ -44,99 +44,78 @@ Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
     : _parms(&parms), _netlist(&netlist), _core(&core) {}
 
 void Parser::run() {
+        _defParser.parseDEF(_parms->getInputDefFile(), _defDscp);
         readDieArea();
         readConnections();
         initNetlist();
         initCore();
 }
 
+Parser::point Parser::getInstPosition(std::string instName) {
+        point position = point(-1, -1);
+        for (ComponentDscp comp : _defDscp.Comps) {
+                if (instName == comp.name) {
+                        DBU x = comp.position.getX();
+                        DBU y = comp.position.getY();
+                        position = point(x, y);
+                        break;
+                }
+        }
+        return position;
+}
+
 void Parser::readDieArea() {
-        std::ifstream infile;
-        infile.open(_parms->getFloorplanFile());
+        point lower = point(_defDscp.clsDieBounds.getLowerBound().getX(),
+                            _defDscp.clsDieBounds.getLowerBound().getY());
+        point upper = point(_defDscp.clsDieBounds.getUpperBound().getX(),
+                            _defDscp.clsDieBounds.getUpperBound().getY());
 
-        if (!infile.is_open())
-                std::cout << "File " << _parms->getFloorplanFile()
-                          << " not found!!!\n";
-
-        std::string line;
-
-        std::string trash_buffer;
-        int lowerX, lowerY, upperX, upperY;
-
-        while (std::getline(infile, line)) {
-                std::istringstream iss(line);
-                if (iss >> trash_buffer >> lowerX >> lowerY >> upperX >>
-                    upperY) {
-                        point lowerBound = point(lowerX, lowerY);
-                        point upperBound = point(upperX, upperY);
-                        _dieArea = box(lowerBound, upperBound);
-                }  // end if
-        }          // end while
-        infile.close();
+        _dieArea = box(lower, upper);
 }  // end method
 
 void Parser::readConnections() {
-        std::ifstream infile;
-        std::ofstream previousPos;
-
-        infile.open(_parms->getNetlistFile());
-        previousPos.open(_parms->getOutputDefFile() + ".pre");
-
-        if (!previousPos.is_open())
-                std::cout << "File " << _parms->getNetlistFile() + ".pre"
-                          << " not created!!!\n";
-
-        if (!infile.is_open())
-                std::cout << "File " << _parms->getNetlistFile()
-                          << " not found!!!\n";
-
-        std::string line;
-
         int ioCounter = -1;
-        std::string pinName;
-        std::string netName;
-        std::string direction;
-        int lowerX, lowerY, upperX, upperY;
-        DBU x, y;
 
-        while (std::getline(infile, line)) {
-                if (line[0] == '\t') {
-                        line.erase(0, 1);
-                }  // end if
+        for (IOPinDscp io : _defDscp.IOPins) {
+                ioPin pin;
+                pin.name = io.name;
+                pin.position = point(io.position.getX(), io.position.getY());
+                pin.netName = io.netName;
+                pin.bounds = box(point(io.layerBounds.getLowerBound().getX(),
+                                       io.layerBounds.getLowerBound().getY()),
+                                 point(io.layerBounds.getUpperBound().getX(),
+                                       io.layerBounds.getUpperBound().getY()));
+                pin.direction = io.direction;
+                _ioPins.push_back(pin);
+                ioCounter++;
 
-                std::istringstream iss(line);
-                if (iss >> pinName >> netName >> x >> y >> lowerX >> lowerY >>
-                    upperX >> upperY >> direction) {
-                        ioPin pin;
-                        pin.name = pinName;
-                        pin.position = point(x, y);
-                        pin.netName = netName;
-                        pin.bounds =
-                            box(point(lowerX, lowerY), point(upperX, upperY));
-                        pin.direction = direction;
-                        _ioPins.push_back(pin);
-                        previousPos << pinName << " " << x << " " << y << "\n";
-                        ioCounter++;
-                        continue;
-                }  // end if
+                for (NetDscp net : _defDscp.Nets) {
+                        if (net.name != io.netName) {
+                                continue;
+                        } else {
+                                for (NetConnection conn : net.connections) {
+                                        if (conn.componentName == "PIN")
+                                                continue;
 
-                std::istringstream iss2(line);
-                if (iss2 >> pinName >> x >> y) {
-                        cellPin cPin;
-                        cPin.name = pinName;
-                        cPin.position = point(x, y);
-                        _ioPins[ioCounter].connections.push_back(cPin);
-                }  // end if
-        }          // end while
-        infile.close();
-        previousPos.close();
+                                        cellPin cPin;
+                                        cPin.name = conn.componentName + ":" +
+                                                    conn.pinName;
+
+                                        cPin.position =
+                                            getInstPosition(conn.componentName);
+                                        _ioPins[ioCounter]
+                                            .connections.push_back(cPin);
+                                }
+                        }
+                }
+        }
 }  // end method
 
 void Parser::initNetlist() {
         for (unsigned i = 0; i < _ioPins.size(); ++i) {
                 ioPin& io = _ioPins[i];
                 Direction dir = IN;
-                if (io.direction == "OUT") {
+                if (io.direction == "OUTPUT") {
                         dir = OUT;
                 } else if (io.direction == "INOUT") {
                         dir = INOUT;
@@ -168,7 +147,23 @@ void Parser::initCore() {
                               _dieArea.min_corner().y());
         Coordinate upperBound(_dieArea.max_corner().x(),
                               _dieArea.max_corner().y());
-        *_core = Core(lowerBound, upperBound, _parms->getMinimumSpacingX(),
-                      _parms->getMinimumSpacingY(), _parms->getInitTrackX(),
-                      _parms->getInitTrackY());
+        DBU minSpacingX = 0;
+        DBU minSpacingY = 0;
+        DBU initTrackX = 0;
+        DBU initTrackY = 0;
+
+        for (TrackDscp track : _defDscp.clsTracks) {
+                if (track.layers[0] == _parms->getHorizontalMetalLayer()) {
+                        if (track.direction == "X") {
+                                minSpacingX = track.space;
+                                initTrackX = track.location;
+                        } else if (track.direction == "Y") {
+                                minSpacingY = track.space;
+                                initTrackY = track.location;
+                        }
+                }
+        }
+
+        *_core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
+                      initTrackX, initTrackY);
 }
