@@ -35,6 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
+/* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
+ * distribute correctly the pins in the sections... > */
 #define MAX_SLOTS_IN_SECTION 320
 #define COST_MULT 1000
 
@@ -256,10 +258,19 @@ bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
                 int added_cost =
                     sections[idx].net.numIOPins() - sections[idx].sv.size();
                 if (added_cost > 0) {
+                        /* int old = _sections[idx].cost; */
                         _sections[idx].cost += added_cost * COST_MULT;
+                        /* int newv = _sections[idx].cost; */
+                        /* std::cout << "idx = " << idx */
+                        /*           << " num pins > num slots, lets add " */
+                        /*           << added_cost << " to " << _sections[idx].cost */
+                        /*           << " was " << old << " is " << newv */
+                        /*           << std::endl; */
                         balanced = false;
                 }
         }
+        /* std::cout << "next iteration" << std::endl; */
+        /* std::cout << std::endl; */
         return balanced;
 }
 
