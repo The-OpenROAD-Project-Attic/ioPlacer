@@ -2,7 +2,8 @@ cmake_minimum_required (VERSION 2.6)
 project (ioPlacement)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-Wall -Werror")
+set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 

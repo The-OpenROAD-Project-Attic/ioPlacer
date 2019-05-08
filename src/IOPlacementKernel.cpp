@@ -35,6 +35,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#define MAX_SLOTS_IN_SECTION 320
+#define COST_MULT 1000
+
 #include "IOPlacementKernel.h"
 #include "Parser.h"
 #include "WriterIOPins.h"
@@ -69,10 +72,10 @@ void IOPlacementKernel::initIOLists() {
                 /* TODO:  <23-04-19, do we need this check to remove pins
                  * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(idx,
-                                                 [&](InstancePin& instPin) {
-                                instPinsVector.push_back(instPin);
-                        });
+                        _netlist.forEachSinkOfIO(
+                            idx, [&](InstancePin& instPin) {
+                                    instPinsVector.push_back(instPin);
+                            });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
@@ -212,6 +215,65 @@ void IOPlacementKernel::defineSlots() {
         }
 }
 
+void IOPlacementKernel::createSections() {
+        slotVector_t& slots = _slots;
+        sectionVector_t& sections = _sections;
+        unsigned numSlots = slots.size();
+        unsigned counter = 0;
+        while (counter < numSlots) {
+                slotVector_t new_slots;
+                for (unsigned idx = 0;
+                     idx < MAX_SLOTS_IN_SECTION && counter < numSlots; ++idx) {
+                        new_slots.push_back(slots[counter++]);
+                }
+                Section_t new_section = {
+                    new_slots, new_slots.at(new_slots.size() / 2).pos};
+                sections.push_back(new_section);
+        }
+}
+
+void IOPlacementKernel::assignPinsSections(sectionVector_t& sections) {
+        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                std::vector<DBU> dst;
+                for (Section_t& curr_sec : sections) {
+                        DBU d = _netlist.computeIONetHPWL(idx, curr_sec.pos);
+                        dst.push_back(d + curr_sec.cost);
+                }
+                std::vector<InstancePin> instPinsVector;
+                _netlist.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
+                        instPinsVector.push_back(instPin);
+                });
+                // Find Smallest Value in dst
+                auto smallest = std::min_element(dst.begin(), dst.end());
+                unsigned i = std::distance(dst.begin(), smallest);
+                sections[i].net.addIONet(ioPin, instPinsVector);
+        });
+}
+
+bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
+        bool balanced = true;
+        for (unsigned idx = 0; idx < sections.size(); ++idx) {
+                int added_cost =
+                    sections[idx].net.numIOPins() - sections[idx].sv.size();
+                if (added_cost > 0) {
+                        _sections[idx].cost += added_cost * COST_MULT;
+                        balanced = false;
+                }
+        }
+        return balanced;
+}
+
+void IOPlacementKernel::setupSections() {
+        createSections();
+        /* TODO:  <08-05-19, this is a copy, right? i want a copy> */
+        sectionVector_t sections = _sections;
+        do {
+                sections = _sections;
+                assignPinsSections(sections);
+        } while (not checkSections(sections));
+        _sections = sections;
+}
+
 inline Orientation IOPlacementKernel::checkOrientation(
     const DBU x, const DBU y, Orientation currentOrient) {
         DBU lowerXBound = _core.getLowerBound().getX();
@@ -239,7 +301,7 @@ void IOPlacementKernel::run() {
         initNetlistAndCore();
         initIOLists();
         defineSlots();
-
+        setupSections();
         bool random = false;
         if (random) {
                 randomPlacement(assignment);
@@ -247,9 +309,13 @@ void IOPlacementKernel::run() {
                 std::cout << "!!!WARNING!!! hard coded run of random"
                           << std::endl;
         } else {
-                HungarianMatching hgMatching(_netlistIOPins, _core, _slots);
-                hgMatching.run();
-                hgMatching.getFinalAssignment(assignment, _zeroSinkIOs);
+                std::vector<IOPin> vp;
+#pragma omp parallel for
+                for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                        HungarianMatching hgMatching(_sections[idx], _core);
+                        hgMatching.run();
+                        hgMatching.getFinalAssignment(assignment, vp);
+                }
         }
 
         for (IOPin& ioPin : assignment) {

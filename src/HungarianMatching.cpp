@@ -47,6 +47,17 @@ HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
         _numIOPins = _netlist->numIOPins();
 }
 
+HungarianMatching::HungarianMatching(Section_t& section, Core& core) {
+        _netlist = &section.net;
+        _core = &core;
+        _slots = &section.sv;
+        // since we are starting with a section, we must consider all slots
+        for (Slot_t& s : *_slots) {
+                s.current = true;
+        }
+        _numIOPins = _netlist->numIOPins();
+}
+
 void HungarianMatching::run() {
         createMatrix();
         _hungarianSolver.solve(_hungarianMatrix);

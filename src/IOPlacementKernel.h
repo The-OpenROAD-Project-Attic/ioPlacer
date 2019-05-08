@@ -50,6 +50,7 @@ class IOPlacementKernel {
         Netlist _netlistIOPins;
         Core _core;
         slotVector_t _slots;
+        sectionVector_t _sections;
         std::vector<IOPin> _zeroSinkIOs;
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
@@ -58,9 +59,15 @@ class IOPlacementKernel {
         void initNetlistAndCore();
         void initIOLists();
         void defineSlots();
+        void createSections();
+        void setupSections();
+        void assignPinsSections(sectionVector_t&);
+        bool checkSections(sectionVector_t&);
+
+        /* TODO:  <08-05-19, if this is a check why not return a bool?! > */
+        inline Orientation checkOrientation(const DBU x, const DBU y, Orientation);
+
         int getKValue() { return 1; }
-        inline Orientation checkOrientation(const DBU x, const DBU y,
-                                            Orientation currentOrient);
 
        public:
         IOPlacementKernel(Parameters&);

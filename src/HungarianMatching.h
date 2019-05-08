@@ -68,6 +68,7 @@ class HungarianMatching {
 
        public:
         HungarianMatching(Netlist&, Core&, slotVector_t&);
+        HungarianMatching(Section_t&, Core&);
         virtual ~HungarianMatching() = default;
         void run();
         void getFinalAssignment(std::vector<IOPin>&, std::vector<IOPin>&);
