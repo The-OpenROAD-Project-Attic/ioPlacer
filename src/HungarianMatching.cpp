@@ -54,7 +54,7 @@ void HungarianMatching::run() {
 
 void HungarianMatching::setNumSlots() {
         _numSlots = 0;
-        for (slot_t& i : *_slots) {
+        for (Slot_t& i : *_slots) {
                 if (i.current) {
                         if (i.visited) {
                                 i.current = false;
@@ -69,7 +69,7 @@ void HungarianMatching::createMatrix() {
         setNumSlots();
         _hungarianMatrix = Matrix<DBU>(_numSlots, _numIOPins);
         unsigned slotIndex = 0;
-        for (slot_t& i : *_slots) {
+        for (Slot_t& i : *_slots) {
                 unsigned pinIndex = 0;
                 if (i.current && i.visited) {
                         i.current = false;
@@ -119,7 +119,7 @@ bool HungarianMatching::updateNeighborhood(bool last_pass) {
         return stable;
 }
 
-inline bool HungarianMatching::addSlot(slot_t& s) {
+inline bool HungarianMatching::addSlot(Slot_t& s) {
         if (!s.visited && !s.current) {
                 s.current = true;
                 _numSlots++;
@@ -149,7 +149,7 @@ inline void HungarianMatching::markExplore(std::vector<unsigned> v) {
 
 inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
         unsigned curr = 0;
-        for (slot_t& i : *_slots) {
+        for (Slot_t& i : *_slots) {
                 if (i.current) {
                         if (v.size() > 0 && v.at(0) == curr) {
                                 i.visited = true;

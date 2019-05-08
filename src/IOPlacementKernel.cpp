@@ -58,6 +58,8 @@ void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
 
 void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
+        _horizontalMetalLayer = _parms->getHorizontalMetalLayer();
+        _verticalMetalLayer = _parms->getVerticalMetalLayer();
         parser.run();
 }
 
@@ -172,13 +174,13 @@ void IOPlacementKernel::defineSlots() {
                 _slots.push_back({use, false, Coordinate(currX, currY)});
                 i++;
         }
+
         for (Coordinate pos : slotsEdge2) {
                 if (i % interval) {
                         use = false;
                 } else {
                         use = true;
                 }
-
                 currX = pos.getX();
                 currY = pos.getY();
                 _slots.push_back({use, false, Coordinate(currX, currY)});
@@ -191,7 +193,6 @@ void IOPlacementKernel::defineSlots() {
                 } else {
                         use = true;
                 }
-
                 currX = pos.getX();
                 currY = pos.getY();
                 _slots.push_back({use, false, Coordinate(currX, currY)});
@@ -204,7 +205,6 @@ void IOPlacementKernel::defineSlots() {
                 } else {
                         use = true;
                 }
-
                 currX = pos.getX();
                 currY = pos.getY();
                 _slots.push_back({use, false, Coordinate(currX, currY)});
@@ -239,8 +239,6 @@ void IOPlacementKernel::run() {
         initNetlistAndCore();
         initIOLists();
         defineSlots();
-        _horizontalMetalLayer = _parms->getHorizontalMetalLayer();
-        _verticalMetalLayer = _parms->getVerticalMetalLayer();
 
         bool random = false;
         if (random) {

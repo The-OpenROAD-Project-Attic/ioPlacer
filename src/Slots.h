@@ -5,11 +5,19 @@
 
 #include "Coordinate.h"
 
-struct slot {
+/*! \struct _Slot_t
+ *  \brief Brief struct description
+ *
+ *  Detailed description
+ */
+struct _Slot_t {
         bool current;
         bool visited;
         Coordinate pos;
-} typedef slot_t;
-typedef std::vector<slot_t> slotVector_t;
+        /* IOPin* pin; // TODO: do we need this? */
+} typedef Slot_t;
+
+typedef std::vector<Slot_t> slotVector_t;
+
 
 #endif /* __SLOTS_H */
