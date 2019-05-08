@@ -37,7 +37,7 @@
 
 /* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
  * distribute correctly the pins in the sections... > */
-#define MAX_SLOTS_IN_SECTION 320
+#define MAX_SLOTS_IN_SECTION 100
 #define COST_MULT 1000
 
 #include "IOPlacementKernel.h"
@@ -235,14 +235,15 @@ void IOPlacementKernel::createSections() {
 }
 
 void IOPlacementKernel::assignPinsSections(sectionVector_t& sections) {
-        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+        Netlist& net = _netlistIOPins;
+        net.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 std::vector<DBU> dst;
                 for (Section_t& curr_sec : sections) {
-                        DBU d = _netlist.computeIONetHPWL(idx, curr_sec.pos);
+                        DBU d = net.computeIONetHPWL(idx, curr_sec.pos);
                         dst.push_back(d + curr_sec.cost);
                 }
                 std::vector<InstancePin> instPinsVector;
-                _netlist.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
+                net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);
                 });
                 // Find Smallest Value in dst
@@ -258,19 +259,10 @@ bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
                 int added_cost =
                     sections[idx].net.numIOPins() - sections[idx].sv.size();
                 if (added_cost > 0) {
-                        /* int old = _sections[idx].cost; */
                         _sections[idx].cost += added_cost * COST_MULT;
-                        /* int newv = _sections[idx].cost; */
-                        /* std::cout << "idx = " << idx */
-                        /*           << " num pins > num slots, lets add " */
-                        /*           << added_cost << " to " << _sections[idx].cost */
-                        /*           << " was " << old << " is " << newv */
-                        /*           << std::endl; */
                         balanced = false;
                 }
         }
-        /* std::cout << "next iteration" << std::endl; */
-        /* std::cout << std::endl; */
         return balanced;
 }
 
@@ -307,12 +299,16 @@ inline Orientation IOPlacementKernel::checkOrientation(
 }
 
 void IOPlacementKernel::run() {
-        std::vector<IOPin> assignment;
-
         initNetlistAndCore();
         initIOLists();
         defineSlots();
         setupSections();
+
+        std::vector<IOPin> assignment;
+        for (IOPin& i : _zeroSinkIOs) {
+            assignment.push_back(i);
+        }
+
         bool random = false;
         if (random) {
                 randomPlacement(assignment);
