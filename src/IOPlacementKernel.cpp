@@ -321,9 +321,11 @@ void IOPlacementKernel::run() {
                 std::vector<IOPin> vp;
 #pragma omp parallel for
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
-                        HungarianMatching hgMatching(_sections[idx], _core);
-                        hgMatching.run();
-                        hgMatching.getFinalAssignment(assignment, vp);
+                        if (_sections[idx].net.numIOPins() > 0) {
+                                HungarianMatching hgMatching(_sections[idx], _core);
+                                hgMatching.run();
+                                hgMatching.getFinalAssignment(assignment, vp);
+                        }
                 }
         }
 
