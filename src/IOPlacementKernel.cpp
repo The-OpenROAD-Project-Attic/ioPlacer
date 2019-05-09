@@ -63,8 +63,10 @@ void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
 
 void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
-        _horizontalMetalLayer = _parms->getHorizontalMetalLayer();
-        _verticalMetalLayer = _parms->getVerticalMetalLayer();
+        _horizontalMetalLayer = "Metal" + 
+				std::to_string(_parms->getHorizontalMetalLayer());
+        _verticalMetalLayer = "Metal" + 
+				std::to_string(_parms->getVerticalMetalLayer());
         parser.run();
 }
 

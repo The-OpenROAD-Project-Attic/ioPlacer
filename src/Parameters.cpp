@@ -47,10 +47,10 @@ Parameters::Parameters(int argc, char** argv) {
         /* TODO:  <25-04-19, this parameter list needs revisoin> */
         dscp.add_options()("idf,i", po::value<std::string>(),
                            "Input DEF file (mandatory)")(
-            "def,d", po::value<std::string>(), "Output DEF file (mandatory)")(
-            "mlh,h", po::value<std::string>(),
+            "def,o", po::value<std::string>(), "Output DEF file (mandatory)")(
+            "mlh,h", po::value<int>(),
             "Horizontal metal layer (mandatory)")(
-            "mlv,v", po::value<std::string>(),
+            "mlv,v", po::value<int>(),
             "Vertical metal layer (mandatory)");
 
         po::variables_map vm;
@@ -72,8 +72,8 @@ Parameters::Parameters(int argc, char** argv) {
 
                 _inputDefFile = vm["idf"].as<std::string>();
                 _outputDefFile = vm["def"].as<std::string>();
-                _horizontalMetalLayer = vm["mlh"].as<std::string>();
-                _verticalMetalLayer = vm["mlv"].as<std::string>();
+                _horizontalMetalLayer = vm["mlh"].as<int>();
+                _verticalMetalLayer = vm["mlv"].as<int>();
         }
         catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
@@ -89,9 +89,9 @@ void Parameters::printAll() const {
         std::cout << std::setw(20) << std::left << "Output DEF file: ";
         std::cout << _outputDefFile << "\n";
         std::cout << std::setw(20) << std::left << "Horizontal metal layer: ";
-        std::cout << _horizontalMetalLayer << "\n";
+        std::cout << "Metal" << _horizontalMetalLayer+1 << "\n";
         std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
-        std::cout << _verticalMetalLayer << "\n";
+        std::cout << "Metal" << _verticalMetalLayer+1 << "\n";
 
         std::cout << "\n";
 }

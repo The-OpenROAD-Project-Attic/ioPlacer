@@ -50,8 +50,8 @@ class Parameters {
         //        DBU _minimumSpacingY;
         //        DBU _initTracksX;
         //        DBU _initTracksY;
-        std::string _horizontalMetalLayer;
-        std::string _verticalMetalLayer;
+        int _horizontalMetalLayer;
+        int _verticalMetalLayer;
         std::string _inputDefFile;
         std::string _outputDefFile;
 
@@ -73,10 +73,10 @@ class Parameters {
         //        DBU getInitTrackY() const {
         //                return _initTracksY;
         //        };
-        std::string getHorizontalMetalLayer() const {
+        int getHorizontalMetalLayer() const {
                 return _horizontalMetalLayer;
         };
-        std::string getVerticalMetalLayer() const {
+        int getVerticalMetalLayer() const {
                 return _verticalMetalLayer;
         };
 };
