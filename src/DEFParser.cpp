@@ -75,10 +75,10 @@ int defPin(defrCallbackType_e, defiPin* pin, defiUserData ud);
 
 DefDscp& getDesignFromUserData(defiUserData userData) {
         return *((DefDscp*)userData);
-} 
+}
 
 void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
-	    defrInit();
+        defrInit();
         defrReset();
 
         defrSetComponentCbk(defComp);

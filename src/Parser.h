@@ -73,7 +73,7 @@ class Parser {
                 std::string direction;
                 std::vector<cellPin> connections;
         };
-        
+
         std::map<std::string, NetDscp> mapIOPinToNet;
         std::map<std::string, point> mapInstToPosition;
 

@@ -48,10 +48,8 @@ Parameters::Parameters(int argc, char** argv) {
         dscp.add_options()("idf,i", po::value<std::string>(),
                            "Input DEF file (mandatory)")(
             "def,o", po::value<std::string>(), "Output DEF file (mandatory)")(
-            "mlh,h", po::value<int>(),
-            "Horizontal metal layer (mandatory)")(
-            "mlv,v", po::value<int>(),
-            "Vertical metal layer (mandatory)");
+            "mlh,h", po::value<int>(), "Horizontal metal layer (mandatory)")(
+            "mlv,v", po::value<int>(), "Vertical metal layer (mandatory)");
 
         po::variables_map vm;
         try {
@@ -89,9 +87,9 @@ void Parameters::printAll() const {
         std::cout << std::setw(20) << std::left << "Output DEF file: ";
         std::cout << _outputDefFile << "\n";
         std::cout << std::setw(20) << std::left << "Horizontal metal layer: ";
-        std::cout << "Metal" << _horizontalMetalLayer+1 << "\n";
+        std::cout << "Metal" << _horizontalMetalLayer << "\n";
         std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
-        std::cout << "Metal" << _verticalMetalLayer+1 << "\n";
+        std::cout << "Metal" << _verticalMetalLayer << "\n";
 
         std::cout << "\n";
 }

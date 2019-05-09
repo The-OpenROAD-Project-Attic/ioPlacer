@@ -63,10 +63,10 @@ void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
 
 void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
-        _horizontalMetalLayer = "Metal" + 
-				std::to_string(_parms->getHorizontalMetalLayer());
-        _verticalMetalLayer = "Metal" + 
-				std::to_string(_parms->getVerticalMetalLayer());
+        _horizontalMetalLayer =
+            "Metal" + std::to_string(_parms->getHorizontalMetalLayer());
+        _verticalMetalLayer =
+            "Metal" + std::to_string(_parms->getVerticalMetalLayer());
         parser.run();
 }
 
@@ -76,10 +76,10 @@ void IOPlacementKernel::initIOLists() {
                 /* TODO:  <23-04-19, do we need this check to remove pins
                  * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
+                        _netlist.forEachSinkOfIO(idx,
+                                                 [&](InstancePin& instPin) {
+                                instPinsVector.push_back(instPin);
+                        });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
@@ -308,7 +308,7 @@ void IOPlacementKernel::run() {
 
         std::vector<IOPin> assignment;
         for (IOPin& i : _zeroSinkIOs) {
-            assignment.push_back(i);
+                assignment.push_back(i);
         }
 
         bool random = false;

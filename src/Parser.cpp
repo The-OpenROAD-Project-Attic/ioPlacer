@@ -45,8 +45,8 @@ Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
 
 void Parser::run() {
         _defParser.parseDEF(_parms->getInputDefFile(), _defDscp);
-		initMapIOtoNet();
-		initMapInstToPosition();
+        initMapIOtoNet();
+        initMapInstToPosition();
         readDieArea();
         readConnections();
         initNetlist();
@@ -78,7 +78,7 @@ void Parser::readDieArea() {
 void Parser::readConnections() {
         int ioCounter = -1;
         for (IOPinDscp io : _defDscp.IOPins) {
-				ioPin pin;
+                ioPin pin;
                 pin.name = io.name;
                 pin.position = point(io.position.getX(), io.position.getY());
                 pin.netName = io.netName;
@@ -92,13 +92,12 @@ void Parser::readConnections() {
 
                 NetDscp net = mapIOPinToNet[io.name];
                 for (NetConnection conn : net.connections) {
-				        if (conn.componentName == "PIN") {
-							continue;
-						}
+                        if (conn.componentName == "PIN") {
+                                continue;
+                        }
 
                         cellPin cPin;
-                        cPin.name = conn.componentName + ":" +
-							conn.pinName;
+                        cPin.name = conn.componentName + ":" + conn.pinName;
 
                         cPin.position = mapInstToPosition[conn.componentName];
                         _ioPins[ioCounter].connections.push_back(cPin);
@@ -148,7 +147,9 @@ void Parser::initCore() {
         DBU initTrackY = 0;
 
         for (TrackDscp track : _defDscp.clsTracks) {
-                if (track.layers[0] == "Metal"+std::to_string(_parms->getHorizontalMetalLayer())) {
+                if (track.layers[0] ==
+                    "Metal" +
+                        std::to_string(_parms->getHorizontalMetalLayer())) {
                         if (track.direction == "X") {
                                 minSpacingX = track.space;
                                 initTrackX = track.location;
@@ -163,21 +164,19 @@ void Parser::initCore() {
                       initTrackX, initTrackY);
 }
 
-void Parser::initMapIOtoNet () {
-		for (NetDscp net : _defDscp.Nets) {
+void Parser::initMapIOtoNet() {
+        for (NetDscp net : _defDscp.Nets) {
                 for (NetConnection conn : net.connections) {
-                        if (conn.componentName != "PIN")
-                                continue;
+                        if (conn.componentName != "PIN") continue;
 
                         mapIOPinToNet[conn.pinName] = net;
                 }
         }
-		std::cout << "Map size: " << mapIOPinToNet.size() << "\n";
 }
 
 void Parser::initMapInstToPosition() {
-		for (ComponentDscp comp : _defDscp.Comps) {
-			point p = point(comp.position.getX(), comp.position.getY());
-			mapInstToPosition[comp.name] = p;
-		}
+        for (ComponentDscp comp : _defDscp.Comps) {
+                point p = point(comp.position.getX(), comp.position.getY());
+                mapInstToPosition[comp.name] = p;
+        }
 }
