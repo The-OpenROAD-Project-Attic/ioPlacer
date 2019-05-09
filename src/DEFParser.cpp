@@ -63,13 +63,10 @@ void defCheckType(defrCallbackType_e c);
 int defComp(defrCallbackType_e c, defiComponent* co, defiUserData ud);
 int defComponentStart(defrCallbackType_e c, int num, defiUserData ud);
 int defDesignName(defrCallbackType_e c, const char* string, defiUserData ud);
-int defEndFunc(defrCallbackType_e c, void* dummy, defiUserData ud);
-int defExt(defrCallbackType_e t, const char* c, defiUserData ud);
 int defNetStart(defrCallbackType_e c, int num, defiUserData ud);
 int defNet(defrCallbackType_e c, defiNet* net, defiUserData ud);
 int defUnits(defrCallbackType_e c, double d, defiUserData ud);
 int defVersion(defrCallbackType_e c, double d, defiUserData ud);
-int defRow(defrCallbackType_e type, defiRow* rowInfo, defiUserData userData);
 char* defOrientStr(int orient);
 int defOrient(std::string orient);
 int defDieArea(defrCallbackType_e typ, defiBox* box, defiUserData ud);
@@ -81,7 +78,7 @@ DefDscp& getDesignFromUserData(defiUserData userData) {
 } 
 
 void DEFParser::parseDEF(const std::string& filename, DefDscp& defDscp) {
-        defrInit();
+	    defrInit();
         defrReset();
 
         defrSetComponentCbk(defComp);

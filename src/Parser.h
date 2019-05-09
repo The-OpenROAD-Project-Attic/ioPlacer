@@ -43,6 +43,7 @@
 #include <sstream>
 #include <string>
 #include <cstdlib>
+#include <map>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
@@ -50,6 +51,7 @@
 #include "Core.h"
 #include "Netlist.h"
 #include "Parameters.h"
+#include "Coordinate.h"
 #include "DEFDescriptor.h"
 #include "DEFParser.h"
 
@@ -71,6 +73,9 @@ class Parser {
                 std::string direction;
                 std::vector<cellPin> connections;
         };
+        
+        std::map<std::string, NetDscp> mapIOPinToNet;
+        std::map<std::string, point> mapInstToPosition;
 
         Parameters* _parms;
         Netlist* _netlist;
@@ -85,6 +90,8 @@ class Parser {
         void readConnections();
         void initNetlist();
         void initCore();
+        void initMapIOtoNet();
+        void initMapInstToPosition();
 
        public:
         Parser(Parameters&, Netlist&, Core&);
