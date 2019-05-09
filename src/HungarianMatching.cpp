@@ -173,29 +173,45 @@ inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
 }
 
 void HungarianMatching::getFinalAssignment(std::vector<IOPin>& v,
-                                           std::vector<IOPin>& zeroSinkIOs) {
+                                           slotVector_t& slots) {
         slotVector_t matrixSlots;
         for (auto& i : *_slots) {
                 if (i.current) {
                         matrixSlots.push_back(i);
                 }
-                if (!(i.current && not i.visited) && zeroSinkIOs.size() > 0) {
-                        zeroSinkIOs[0].setPos(i.pos);
-                        v.push_back(zeroSinkIOs[0]);
-                        zeroSinkIOs.erase(zeroSinkIOs.begin());
-                }
         }
 
         size_t rows = _hungarianMatrix.rows();
         size_t col = 0;
-
         _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 for (size_t row = 0; row < rows; row++) {
                         if (_hungarianMatrix(row, col) == 0) {
                                 ioPin.setPos(matrixSlots[row].pos);
                                 v.push_back(ioPin);
+                                Coordinate sPos = matrixSlots[row].pos;
+                                for (unsigned i = 0; i < slots.size(); i++) {
+                                        if (slots[i].pos.getX() ==
+                                                sPos.getX() &&
+                                            slots[i].pos.getY() ==
+                                                sPos.getY()) {
+                                                slots[i].current = true;
+                                                break;
+                                        }
+                                }
                         }
                 }
                 col++;
         });
+}
+
+void HungarianMatching::assignZeroSinkIOs(std::vector<IOPin>& v,
+                                          const slotVector_t& slots,
+                                          std::vector<IOPin>& zeroSinkIOs) {
+        for (auto& i : slots) {
+                if (!(i.current) && zeroSinkIOs.size() > 0) {
+                        zeroSinkIOs[0].setPos(i.pos);
+                        v.push_back(zeroSinkIOs[0]);
+                        zeroSinkIOs.erase(zeroSinkIOs.begin());
+                }
+        }
 }

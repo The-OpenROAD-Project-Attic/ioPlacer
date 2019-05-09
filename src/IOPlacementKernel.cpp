@@ -37,6 +37,9 @@
 
 /* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
  * distribute correctly the pins in the sections... > */
+/* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
+ * distribute correctly the pins in the sections... > */
+
 #define MAX_SLOTS_IN_SECTION 100
 #define COST_MULT 1000
 
@@ -173,8 +176,6 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge1) {
                 if (i % interval) {
                         use = false;
-                } else {
-                        use = true;
                 }
                 currX = pos.getX();
                 currY = pos.getY();
@@ -185,8 +186,6 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge2) {
                 if (i % interval) {
                         use = false;
-                } else {
-                        use = true;
                 }
                 currX = pos.getX();
                 currY = pos.getY();
@@ -197,8 +196,6 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge3) {
                 if (i % interval) {
                         use = false;
-                } else {
-                        use = true;
                 }
                 currX = pos.getX();
                 currY = pos.getY();
@@ -209,8 +206,6 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge4) {
                 if (i % interval) {
                         use = false;
-                } else {
-                        use = true;
                 }
                 currX = pos.getX();
                 currY = pos.getY();
@@ -307,8 +302,9 @@ void IOPlacementKernel::run() {
         setupSections();
 
         std::vector<IOPin> assignment;
-        for (IOPin& i : _zeroSinkIOs) {
-                assignment.push_back(i);
+        std::vector<IOPin> vp;
+        for (IOPin i : _zeroSinkIOs) {
+                vp.push_back(i);
         }
 
         bool random = false;
@@ -318,7 +314,6 @@ void IOPlacementKernel::run() {
                 std::cout << "!!!WARNING!!! hard coded run of random"
                           << std::endl;
         } else {
-                std::vector<IOPin> vp;
 #pragma omp parallel for
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
@@ -328,6 +323,9 @@ void IOPlacementKernel::run() {
                         }
                 }
         }
+
+        HungarianMatching hg(_sections[0], _core);
+        hg.assignZeroSinkIOs(assignment, _slots, vp);
 
         for (IOPin& ioPin : assignment) {
                 Orientation orient = checkOrientation(

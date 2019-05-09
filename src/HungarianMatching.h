@@ -71,7 +71,9 @@ class HungarianMatching {
         HungarianMatching(Section_t&, Core&);
         virtual ~HungarianMatching() = default;
         void run();
-        void getFinalAssignment(std::vector<IOPin>&, std::vector<IOPin>&);
+        void getFinalAssignment(std::vector<IOPin>&, slotVector_t&);
+        void assignZeroSinkIOs(std::vector<IOPin>&, const slotVector_t&,
+                               std::vector<IOPin>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */
