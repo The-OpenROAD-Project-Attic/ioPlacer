@@ -54,6 +54,7 @@ class Parameters {
         int _verticalMetalLayer;
         std::string _inputDefFile;
         std::string _outputDefFile;
+        bool _returnHPWL = false;
 
         void printAll() const;
 
@@ -78,6 +79,9 @@ class Parameters {
         };
         int getVerticalMetalLayer() const {
                 return _verticalMetalLayer;
+        };
+        int returnHPWL() const {
+                return _returnHPWL;
         };
 };
 

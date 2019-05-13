@@ -48,8 +48,11 @@ Parameters::Parameters(int argc, char** argv) {
         dscp.add_options()("idf,i", po::value<std::string>(),
                            "Input DEF file (mandatory)")(
             "def,o", po::value<std::string>(), "Output DEF file (mandatory)")(
-            "mlh,h", po::value<int>(), "Horizontal metal layer (mandatory)")(
-            "mlv,v", po::value<int>(), "Vertical metal layer (mandatory)");
+            "mlh,h", po::value<int>(),
+            "Horizontal metal layer (int) (mandatory)")(
+            "mlv,v", po::value<int>(),
+            "Vertical metal layer (int) (mandatory)")(
+            "wrl,l", po::value<int>(), "Return IO nets HPWL (bool) (optional)");
 
         po::variables_map vm;
         try {
@@ -72,6 +75,9 @@ Parameters::Parameters(int argc, char** argv) {
                 _outputDefFile = vm["def"].as<std::string>();
                 _horizontalMetalLayer = vm["mlh"].as<int>();
                 _verticalMetalLayer = vm["mlv"].as<int>();
+                if (vm.count("wrl")) {
+                        _returnHPWL = vm["wrl"].as<int>();
+                }
         }
         catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
@@ -90,6 +96,7 @@ void Parameters::printAll() const {
         std::cout << "Metal" << _horizontalMetalLayer << "\n";
         std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
         std::cout << "Metal" << _verticalMetalLayer << "\n";
+        std::cout << "Get IO nets HPWL: " << _returnHPWL << "\n";
 
         std::cout << "\n";
 }

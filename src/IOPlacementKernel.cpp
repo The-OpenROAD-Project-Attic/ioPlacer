@@ -40,7 +40,7 @@
 /* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
  * distribute correctly the pins in the sections... > */
 
-#define MAX_SLOTS_IN_SECTION 100
+#define MAX_SLOTS_IN_SECTION 300
 #define COST_MULT 1000
 
 #include "IOPlacementKernel.h"
@@ -295,11 +295,27 @@ inline Orientation IOPlacementKernel::checkOrientation(
         return currentOrient;
 }
 
+DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
+        unsigned pinIndex = 0;
+        DBU hpwl = 0;
+        netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                hpwl += netlist.computeIONetHPWL(idx, ioPin.getPosition());
+                pinIndex++;
+        });
+
+        return hpwl / 2000;
+}
+
 void IOPlacementKernel::run() {
         initNetlistAndCore();
         initIOLists();
         defineSlots();
         setupSections();
+
+        if (_parms->returnHPWL()) {
+                std::cout << "***HPWL before IOPlacement: "
+                          << returnIONetsHPWL(_netlist) << "***\n";
+        }
 
         std::vector<IOPin> assignment;
         std::vector<IOPin> vp;

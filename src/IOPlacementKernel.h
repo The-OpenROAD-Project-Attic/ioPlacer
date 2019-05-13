@@ -63,9 +63,11 @@ class IOPlacementKernel {
         void setupSections();
         void assignPinsSections(sectionVector_t&);
         bool checkSections(sectionVector_t&);
+        DBU returnIONetsHPWL(Netlist&);
 
         /* TODO:  <08-05-19, if this is a check why not return a bool?! > */
-        inline Orientation checkOrientation(const DBU x, const DBU y, Orientation);
+        inline Orientation checkOrientation(const DBU x, const DBU y,
+                                            Orientation);
 
         int getKValue() { return 1; }
 

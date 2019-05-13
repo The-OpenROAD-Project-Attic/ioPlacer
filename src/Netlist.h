@@ -93,6 +93,7 @@ class IOPin : public InstancePin {
 
         void setOrientation(const Orientation o) { _orientation = o; }
         Orientation getOrientation() const { return _orientation; }
+        Coordinate getPosition() const { return _pos; }
         void setX(const DBU x) { _pos.setX(x); }
         void setY(const DBU y) { _pos.setY(y); }
         void setPos(const Coordinate pos) { _pos = pos; }
