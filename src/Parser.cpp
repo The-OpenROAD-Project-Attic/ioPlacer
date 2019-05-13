@@ -160,6 +160,16 @@ void Parser::initCore() {
                 }
         }
 
+        DBU IOWidth = _ioPins[0].bounds.max_corner().x() -
+                      _ioPins[0].bounds.min_corner().x();
+
+        if (minSpacingX <= IOWidth) {
+                minSpacingX *= 2;
+        }
+        if (minSpacingY <= IOWidth) {
+                minSpacingY *= 2;
+        }
+
         *_core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
                       initTrackX, initTrackY);
 }
