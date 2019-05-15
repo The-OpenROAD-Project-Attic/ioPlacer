@@ -316,6 +316,8 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
+		
+		DBU totalHPWL = 0;
 
         std::vector<IOPin> assignment;
         std::vector<IOPin> vp;
@@ -330,7 +332,8 @@ void IOPlacementKernel::run() {
                 std::cout << "!!!WARNING!!! hard coded run of random"
                           << std::endl;
         } else {
-#pragma omp parallel for
+			    DBU val;
+#pragma omp parallel for private(val) reduction(+:totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
                                 HungarianMatching hgMatching(_sections[idx],
@@ -338,6 +341,8 @@ void IOPlacementKernel::run() {
                                 hgMatching.run();
                                 hgMatching.getFinalAssignment(assignment,
                                                               _slots);
+								val = returnIONetsHPWL(_sections[idx].net);
+								totalHPWL += val;
                         }
                 }
         }
@@ -356,4 +361,9 @@ void IOPlacementKernel::run() {
                             _parms->getOutputDefFile());
 
         writer.run();
+		
+		if (_parms->returnHPWL()) {
+                std::cout << "***HPWL after IOPlacement: "
+                          << totalHPWL << "***\n";
+        }
 }
