@@ -44,15 +44,14 @@
 Parameters::Parameters(int argc, char** argv) {
         namespace po = boost::program_options;
         po::options_description dscp("Usage");
-        /* TODO:  <25-04-19, this parameter list needs revisoin> */
-        dscp.add_options()("idf,i", po::value<std::string>(),
-                           "Input DEF file (mandatory)")(
-            "def,o", po::value<std::string>(), "Output DEF file (mandatory)")(
-            "mlh,h", po::value<int>(),
-            "Horizontal metal layer (int) (mandatory)")(
-            "mlv,v", po::value<int>(),
-            "Vertical metal layer (int) (mandatory)")(
-            "wrl,l", po::value<int>(), "Return IO nets HPWL (bool) (optional)");
+        // clang-format off
+        dscp.add_options()
+                ("input,i"   ,  po::value<std::string>() ,  "Input DEF file (mandatory)")
+                ("output,o"  ,  po::value<std::string>() ,  "Output DEF file (mandatory)")
+                ("hmetal,h"  ,  po::value<int>()         ,  "Horizontal metal layer (int) (mandatory)")
+                ("vmetal,v"  ,  po::value<int>()         ,  "Vertical metal layer (int) (mandatory)")
+                ("wirelen,w" ,  po::value<int>()         ,  "Return IO nets HPWL (bool) (optional)");
+        // clang-format on
 
         po::variables_map vm;
         try {
@@ -65,18 +64,19 @@ Parameters::Parameters(int argc, char** argv) {
                     vm);
                 po::notify(vm);
 
-                if (vm.count("help") || !vm.count("mlh") || !vm.count("mlv") ||
-                    !vm.count("def") || !vm.count("idf")) {
+                if (vm.count("help") || !vm.count("hmetal") ||
+                    !vm.count("vmetal") || !vm.count("output") ||
+                    !vm.count("input")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
 
-                _inputDefFile = vm["idf"].as<std::string>();
-                _outputDefFile = vm["def"].as<std::string>();
-                _horizontalMetalLayer = vm["mlh"].as<int>();
-                _verticalMetalLayer = vm["mlv"].as<int>();
-                if (vm.count("wrl")) {
-                        _returnHPWL = vm["wrl"].as<int>();
+                _inputDefFile = vm["input"].as<std::string>();
+                _outputDefFile = vm["output"].as<std::string>();
+                _horizontalMetalLayer = vm["hmetal"].as<int>();
+                _verticalMetalLayer = vm["vmetal"].as<int>();
+                if (vm.count("wirelen")) {
+                        _returnHPWL = vm["wirelen"].as<int>();
                 }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
