@@ -1,6 +1,8 @@
 BIN_NAME = ioPlacement
 
-BIN_ARGS = -i input.def -d out.def -h Metal9 -v Metal5
+INPUT_FILE = input.def
+
+BIN_ARGS = -i $(INPUT_FILE) -o out.def -h 5 -v 6
 
 PRE_ARGS = timeout 1s
 
