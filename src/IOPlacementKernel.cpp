@@ -319,6 +319,8 @@ void IOPlacementKernel::run() {
 		
 		DBU totalHPWL = 0;
 
+		DBU totalHPWL = 0;
+
         std::vector<IOPin> assignment;
         std::vector<IOPin> vp;
         for (IOPin i : _zeroSinkIOs) {
@@ -361,9 +363,7 @@ void IOPlacementKernel::run() {
                             _parms->getOutputDefFile());
 
         writer.run();
-		
 		if (_parms->returnHPWL()) {
-                std::cout << "***HPWL after IOPlacement: "
-                          << totalHPWL << "***\n";
+                std::cout << "***HPWL after IOPlacement: " << totalHPWL << "***\n";
         }
 }
