@@ -85,6 +85,30 @@ unsigned Netlist::numSinksOfIO(unsigned idx) {
 
 int Netlist::numIOPins() { return _ioPins.size(); }
 
+Box Netlist::getBB(unsigned idx, Coordinate slotPos) {
+        unsigned netStart = _netPointer[idx];
+        unsigned netEnd = _netPointer[idx + 1];
+
+        DBU minX = slotPos.getX();
+        DBU minY = slotPos.getY();
+        DBU maxX = slotPos.getX();
+        DBU maxY = slotPos.getY();
+
+        for (unsigned idx = netStart; idx < netEnd; ++idx) {
+                Coordinate pos = _instPins[idx].getPos();
+                minX = std::min(minX, pos.getX());
+                maxX = std::max(maxX, pos.getX());
+                minY = std::min(minY, pos.getY());
+                maxY = std::max(maxY, pos.getY());
+        }
+
+        Coordinate upperBounds = Coordinate(maxX, maxY);
+        Coordinate lowerBounds = Coordinate(minX, minY);
+
+        Box netBBox(lowerBounds, upperBounds);
+        return netBBox;
+}
+
 DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
         unsigned netStart = _netPointer[idx];
         unsigned netEnd = _netPointer[idx + 1];
