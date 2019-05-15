@@ -74,15 +74,9 @@ class Parameters {
         //        DBU getInitTrackY() const {
         //                return _initTracksY;
         //        };
-        int getHorizontalMetalLayer() const {
-                return _horizontalMetalLayer;
-        };
-        int getVerticalMetalLayer() const {
-                return _verticalMetalLayer;
-        };
-        int returnHPWL() const {
-                return _returnHPWL;
-        };
+        int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
+        int getVerticalMetalLayer() const { return _verticalMetalLayer; };
+        int returnHPWL() const { return _returnHPWL; };
 };
 
 #endif /* __PARAMETERS_H_ */

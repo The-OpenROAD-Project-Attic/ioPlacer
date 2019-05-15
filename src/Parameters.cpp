@@ -78,8 +78,7 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("wrl")) {
                         _returnHPWL = vm["wrl"].as<int>();
                 }
-        }
-        catch (const po::error& ex) {
+        } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
 
