@@ -35,10 +35,9 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-/* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
- * distribute correctly the pins in the sections... > */
-/* TODO:  <08-05-19, there is some bug in the checkSectionn that does not
- * distribute correctly the pins in the sections... > */
+/* TODO:  <15-05-19, the algorithm to assign an IOPin to a section does not
+ * take into account if the net has N pins and N is greater than number of
+ * slots in section > */
 
 #define MAX_SLOTS_IN_SECTION 300
 #define COST_MULT 1000
@@ -76,8 +75,6 @@ void IOPlacementKernel::initNetlistAndCore() {
 void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 std::vector<InstancePin> instPinsVector;
-                /* TODO:  <23-04-19, do we need this check to remove pins
-                 * without sinks? TBD > */
                 if (_netlist.numSinksOfIO(idx) != 0) {
                         _netlist.forEachSinkOfIO(
                             idx, [&](InstancePin& instPin) {
@@ -265,7 +262,6 @@ bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
 
 void IOPlacementKernel::setupSections() {
         createSections();
-        /* TODO:  <08-05-19, this is a copy, right? i want a copy> */
         sectionVector_t sections = _sections;
         do {
                 sections = _sections;
