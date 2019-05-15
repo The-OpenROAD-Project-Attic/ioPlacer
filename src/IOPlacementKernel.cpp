@@ -214,17 +214,17 @@ void IOPlacementKernel::defineSlots() {
 void IOPlacementKernel::createSections() {
         slotVector_t& slots = _slots;
         sectionVector_t& sections = _sections;
-        unsigned numSlots = slots.size();
         unsigned counter = 0;
+        unsigned idx = 0;
+        unsigned maxSlots = MAX_SLOTS_IN_SECTION;
+        unsigned numSlots = slots.size();
         while (counter < numSlots) {
-                slotVector_t new_slots;
-                for (unsigned idx = 0;
-                     idx < MAX_SLOTS_IN_SECTION && counter < numSlots; ++idx) {
-                        new_slots.push_back(slots[counter++]);
+                slotVector_t nSlot;
+                for (idx = 0; idx < maxSlots && counter < numSlots; ++idx) {
+                        nSlot.push_back(slots[counter++]);
                 }
-                Section_t new_section = {
-                    new_slots, new_slots.at(new_slots.size() / 2).pos};
-                sections.push_back(new_section);
+                Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
+                sections.push_back(nSec);
         }
 }
 
