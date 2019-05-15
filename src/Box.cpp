@@ -37,6 +37,15 @@
 
 #include "Box.h"
 
+Coordinate Box::getMiddle() {
+        DBU lowerX = _lowerBound.getX();
+        DBU lowerY = _lowerBound.getY();
+        DBU upperX = _upperBound.getX();
+        DBU upperY = _upperBound.getY();
+
+        return Coordinate ((upperX - lowerX)/2.0, (upperY - lowerY)/2.0);
+}
+
 DBU Box::getHalfPerimeter() {
         DBU lowerX = _lowerBound.getX();
         DBU lowerY = _lowerBound.getY();
