@@ -1,7 +1,5 @@
 #!/bin/bash
 
-cd ..
-
 ioBin="./IOPlacement/ioPlacement"
 replaceBin="./RePlAce/src/RePlAce"
 
