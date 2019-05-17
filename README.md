@@ -59,4 +59,34 @@ You can also check the arguments and a brief description by running the followin
 
 ### Manual integration with RePlAce
 
-[...]
+You can run IOPlacement with RePlAce, using the following script:
+
+````
+
+/IOPlacement/scripts/replace_ioplace_loop.sh
+
+````
+
+This script implement a loop with RePlAce and IOPlacement, as shown bellow:
+
+// Image here (TODO)
+
+To execute the script, you will need both RePlAce and IOPlacement repositories in the same directory:
+
+````
+
+--root_dir
+------RePlAce
+------IOPlacement
+
+````
+
+In the root directory, just run the following command line:
+
+````
+
+bash IOPlacement/scripts/replace_ioplace_loop.sh N
+
+````
+
+where N is the number of iterations of the loop.
