@@ -44,10 +44,14 @@
 Parameters::Parameters(int argc, char** argv) {
         namespace po = boost::program_options;
         po::options_description dscp("Usage");
-        dscp.add_options()("fpn,f", po::value<std::string>(),
-                           "Floorplan file (mandatory)")(
-            "net,n", po::value<std::string>(), "Netlist file (mandatory)")(
-            "def,d", po::value<std::string>(), "Output DEF file (mandatory)");
+        // clang-format off
+        dscp.add_options()
+                ("input,i"   ,  po::value<std::string>() ,  "Input DEF file (mandatory)")
+                ("output,o"  ,  po::value<std::string>() ,  "Output DEF file (mandatory)")
+                ("hmetal,h"  ,  po::value<int>()         ,  "Horizontal metal layer (int) (mandatory)")
+                ("vmetal,v"  ,  po::value<int>()         ,  "Vertical metal layer (int) (mandatory)")
+                ("wirelen,w" ,  po::value<int>()         ,  "Return IO nets HPWL (bool) (optional)");
+        // clang-format on
 
         po::variables_map vm;
         try {
@@ -60,16 +64,20 @@ Parameters::Parameters(int argc, char** argv) {
                     vm);
                 po::notify(vm);
 
-                if (vm.count("help") || !vm.count("fpn") || !vm.count("net") ||
-                    !vm.count("def")) {
+                if (vm.count("help") || !vm.count("hmetal") ||
+                    !vm.count("vmetal") || !vm.count("output") ||
+                    !vm.count("input")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
 
-                _floorplanFile = vm["fpn"].as<std::string>();
-                _netlistFile = vm["net"].as<std::string>();
-                _outputDefFile = vm["def"].as<std::string>();
-
+                _inputDefFile = vm["input"].as<std::string>();
+                _outputDefFile = vm["output"].as<std::string>();
+                _horizontalMetalLayer = vm["hmetal"].as<int>();
+                _verticalMetalLayer = vm["vmetal"].as<int>();
+                if (vm.count("wirelen")) {
+                        _returnHPWL = vm["wirelen"].as<int>();
+                }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
@@ -79,13 +87,15 @@ Parameters::Parameters(int argc, char** argv) {
 
 void Parameters::printAll() const {
         std::cout << "\nOptions: \n";
-
-        std::cout << std::setw(20) << std::left << "Floorplan file: ";
-        std::cout << _floorplanFile << "\n";
-        std::cout << std::setw(20) << std::left << "Netlist file: ";
-        std::cout << _netlistFile << "\n";
+        std::cout << std::setw(20) << std::left << "Input DEF file: ";
+        std::cout << _inputDefFile << "\n";
         std::cout << std::setw(20) << std::left << "Output DEF file: ";
         std::cout << _outputDefFile << "\n";
+        std::cout << std::setw(20) << std::left << "Horizontal metal layer: ";
+        std::cout << "Metal" << _horizontalMetalLayer << "\n";
+        std::cout << std::setw(20) << std::left << "Vertical metal layer: ";
+        std::cout << "Metal" << _verticalMetalLayer << "\n";
+        std::cout << "Get IO nets HPWL: " << _returnHPWL << "\n";
 
         std::cout << "\n";
 }

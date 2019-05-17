@@ -35,24 +35,40 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __IOPLACEMENTKERNEL_H_
-#define __IOPLACEMENTKERNEL_H_
+#ifndef __SLOTS_H
+#define __SLOTS_H
 
-#include <iostream>
-#include "Parameters.h"
-#include "HungarianMatching.h"
+#include <vector>
 
-class IOPlacementKernel {
-       private:
-        Parameters* _parms;
-        Netlist _netlist;
-        Core _core;
+#include "Coordinate.h"
+#include "Netlist.h"
 
-        void initNetlistAndCore();
+/*! \struct _Slot_t
+ *  \brief Brief struct description
+ *
+ *  Detailed description
+ */
+struct _Slot_t {
+        bool current;
+        bool visited;
+        Coordinate pos;
+        /* IOPin* pin; // TODO: do we need this? */
+} typedef Slot_t;
 
-       public:
-        IOPlacementKernel(Parameters& parms);
-        void run();
-};
+typedef std::vector<Slot_t> slotVector_t;
 
-#endif /* __IOPLACEMENTKERNEL_H_ */
+/*! \struct _Section_t
+ *  \brief Brief struct description
+ *
+ *  Detailed description
+ */
+typedef struct _Section_t {
+        slotVector_t sv;
+        Coordinate pos;
+        Netlist net;
+        unsigned cost;
+} Section_t;
+
+typedef std::vector<Section_t> sectionVector_t;
+
+#endif /* __SLOTS_H */

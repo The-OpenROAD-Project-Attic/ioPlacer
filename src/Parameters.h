@@ -40,20 +40,43 @@
 
 #include <string>
 
+#include "Coordinate.h"
+
 class Parameters {
        private:
-        std::string _floorplanFile;
-        std::string _netlistFile;
+        //        std::string _floorplanFile;
+        //        std::string _netlistFile;
+        //        DBU _minimumSpacingX;
+        //        DBU _minimumSpacingY;
+        //        DBU _initTracksX;
+        //        DBU _initTracksY;
+        int _horizontalMetalLayer;
+        int _verticalMetalLayer;
+        std::string _inputDefFile;
         std::string _outputDefFile;
+        bool _returnHPWL = false;
 
         void printAll() const;
 
        public:
-        Parameters(int argc, char** argv);
+        Parameters(int, char**);
 
-        std::string getFloorplanFile() const { return _floorplanFile; }
-        std::string getNetlistFile() const { return _netlistFile; }
+        //        std::string getFloorplanFile() const { return _floorplanFile;
+        // }
+        //        std::string getNetlistFile() const { return _netlistFile; }
+        std::string getInputDefFile() const { return _inputDefFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
+        //        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
+        //        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
+        //        DBU getInitTrackX() const {
+        //                return _initTracksX;
+        //        };
+        //        DBU getInitTrackY() const {
+        //                return _initTracksY;
+        //        };
+        int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
+        int getVerticalMetalLayer() const { return _verticalMetalLayer; };
+        int returnHPWL() const { return _returnHPWL; };
 };
 
 #endif /* __PARAMETERS_H_ */

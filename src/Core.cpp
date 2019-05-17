@@ -48,15 +48,3 @@ DBU Core::getPerimeter() {
 
         return (x + y) * 2;
 }
-
-DBU Core::getHPWL() {
-        DBU lowerX = _lowerBound.getX();
-        DBU lowerY = _lowerBound.getY();
-        DBU upperX = _upperBound.getX();
-        DBU upperY = _upperBound.getY();
-
-        DBU x = upperX - lowerX;
-        DBU y = upperY - lowerY;
-
-        return (x + y);
-}

@@ -36,80 +36,182 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "HungarianMatching.h"
+#include <istream>
+#include <fstream>
 
-HungarianMatching::HungarianMatching(Netlist& netlist, Core& core) {
-        _netlist = netlist;
-        _core = core;
+HungarianMatching::HungarianMatching(Netlist& netlist, Core& core,
+                                     slotVector_t& v) {
+        _netlist = &netlist;
+        _core = &core;
+        _slots = &v;
+        _numIOPins = _netlist->numIOPins();
+}
+
+HungarianMatching::HungarianMatching(Section_t& section, Core& core) {
+        _netlist = &section.net;
+        _core = &core;
+        _slots = &section.sv;
+        // since we are starting with a section, we must consider all slots
+        for (Slot_t& s : *_slots) {
+                s.current = true;
+        }
+        _numIOPins = _netlist->numIOPins();
 }
 
 void HungarianMatching::run() {
-        setIOListWithSinks();
-        defineSlotSize();
         createMatrix();
-
-        ostlindo.solve(hungarianMatrix);
-        std::cout << hungarianMatrix;
+        _hungarianSolver.solve(_hungarianMatrix);
 }
 
-void HungarianMatching::defineSlotSize() {
-        int nPins = getNumIOPins();
-        int k = getKValue();
-        DBU corePerimeter = _core.getPerimeter();
-        numSlots = nPins * k;
-
-        slotSize = std::floor(corePerimeter / numSlots);
-}
-
-int HungarianMatching::getKValue() { return 1; }
-
-void HungarianMatching::setIOListWithSinks() {
-        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                std::vector<InstancePin> instPinsVector;
-                if (_netlist.numSinkofIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
-                        netlistIOPins.addIONet(ioPin, instPinsVector);
+void HungarianMatching::setNumSlots() {
+        _numSlots = 0;
+        for (Slot_t& i : *_slots) {
+                if (i.current) {
+                        if (i.visited) {
+                                i.current = false;
+                        } else {
+                                _numSlots++;
+                        }
                 }
-        });
+        }
 }
-
-int HungarianMatching::getNumIOPins() { return netlistIOPins.numIOPins(); }
 
 void HungarianMatching::createMatrix() {
-        hungarianMatrix = Matrix<DBU>(getNumIOPins(), numSlots);
+        setNumSlots();
+        _hungarianMatrix = Matrix<DBU>(_numSlots, _numIOPins);
+        unsigned slotIndex = 0;
+        for (Slot_t& i : *_slots) {
+                unsigned pinIndex = 0;
+                if (i.current && i.visited) {
+                        i.current = false;
+                } else if (!i.current) {
+                        continue;
+                }
+                Coordinate newPos = i.pos;
+                _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                        DBU hpwl = _netlist->computeIONetHPWL(idx, newPos);
+                        _hungarianMatrix(slotIndex, pinIndex) = hpwl;
+                        pinIndex++;
+                });
+                slotIndex++;
+        }
+}
 
-        for (int i = 0; i < numSlots; i++) {
-                int pinIndex = 0;
-                int y = 0;
-                DBU slotBeginning = slotSize * i;
-                DBU halfSlot = slotBeginning + std::floor(slotSize / 2);
-                Coordinate coreLowerBounds = _core.getLowerBound();
-                Coordinate coreUpperBounds = _core.getUpperBound();
-                int x = halfSlot;
-                if (x > coreUpperBounds.getX()) {
-                        y = x - coreUpperBounds.getX();
-                        x = coreUpperBounds.getX();
-                        if (y > coreUpperBounds.getY()) {
-                                x = x - (y - coreUpperBounds.getY());
-                                y = coreUpperBounds.getY();
-                                if (x < coreLowerBounds.getX()) {
-                                        y = y - std::abs(
-                                                    coreLowerBounds.getX() - x);
-                                        x = coreLowerBounds.getX();
+bool HungarianMatching::updateNeighborhood(bool last_pass) {
+        Coordinate pos(0, 0);
+        bool will_remove;
+        bool stable;
+        std::vector<unsigned> to_remove;
+        std::vector<unsigned> to_explore;
+        /* TODO:  <23-04-19, transpose io pins and slots in matrix> */
+        for (size_t row = 0; row < _hungarianMatrix.rows(); row++) {
+                will_remove = true;
+                for (size_t col = 0; col < _hungarianMatrix.columns(); col++) {
+                        if (_hungarianMatrix(row, col) == 0) {
+                                will_remove = false;
+                                break;
+                        }
+                }
+                if (will_remove) {
+                        to_remove.push_back(row);
+                } else {
+                        to_explore.push_back(row);
+                }
+        }
+        if (to_remove.size() != 0) {
+                stable = false;
+        } else {
+                stable = true;
+        }
+        markRemove(to_remove);
+        if (not last_pass) {
+                markExplore(to_explore);
+        }
+        return stable;
+}
+
+inline bool HungarianMatching::addSlot(Slot_t& s) {
+        if (!s.visited && !s.current) {
+                s.current = true;
+                _numSlots++;
+                return true;
+        }
+        return false;
+}
+
+inline void HungarianMatching::markExplore(std::vector<unsigned> v) {
+        unsigned curr = 0;
+        slotVector_t& slots = *_slots;
+        bool added;
+        for (unsigned i = 0; i < slots.size(); ++i) {
+                if (slots.at(i).current) {
+                        if (v.size() > 0 && v.at(0) == curr) {
+                                if (i > 0) {
+                                        added = addSlot(slots.at(i - 1));
+                                }
+                                added = addSlot(slots.at(i + 1));
+                                v.erase(v.begin());
+                                if (added) i++;
+                        }
+                        curr++;
+                }
+        }
+}
+
+inline void HungarianMatching::markRemove(std::vector<unsigned> v) {
+        unsigned curr = 0;
+        for (Slot_t& i : *_slots) {
+                if (i.current) {
+                        if (v.size() > 0 && v.at(0) == curr) {
+                                i.visited = true;
+                                v.erase(v.begin());
+                                _numSlots--;
+                        }
+                        curr++;
+                }
+        }
+}
+
+void HungarianMatching::getFinalAssignment(std::vector<IOPin>& v,
+                                           slotVector_t& slots) {
+        slotVector_t matrixSlots;
+        for (auto& i : *_slots) {
+                if (i.current) {
+                        matrixSlots.push_back(i);
+                }
+        }
+
+        size_t rows = _hungarianMatrix.rows();
+        size_t col = 0;
+        _netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                for (size_t row = 0; row < rows; row++) {
+                        if (_hungarianMatrix(row, col) == 0) {
+                                ioPin.setPos(matrixSlots[row].pos);
+                                v.push_back(ioPin);
+                                Coordinate sPos = matrixSlots[row].pos;
+                                for (unsigned i = 0; i < slots.size(); i++) {
+                                        if (slots[i].pos.getX() ==
+                                                sPos.getX() &&
+                                            slots[i].pos.getY() ==
+                                                sPos.getY()) {
+                                                slots[i].current = true;
+                                                break;
+                                        }
                                 }
                         }
                 }
+                col++;
+        });
+}
 
-                Coordinate newPos = Coordinate(x, y);
-
-                netlistIOPins.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                        DBU hpwl = netlistIOPins.computeIONetHPWL(idx, newPos);
-                        hungarianMatrix(pinIndex, i) = hpwl;
-                        pinIndex++;
-                });
+void HungarianMatching::assignZeroSinkIOs(std::vector<IOPin>& v,
+                                          const slotVector_t& slots,
+                                          std::vector<IOPin>& zeroSinkIOs) {
+        for (auto& i : slots) {
+                if (!(i.current) && zeroSinkIOs.size() > 0) {
+                        zeroSinkIOs[0].setPos(i.pos);
+                        v.push_back(zeroSinkIOs[0]);
+                        zeroSinkIOs.erase(zeroSinkIOs.begin());
+                }
         }
-
-        std::cout << hungarianMatrix << "\n";
 }

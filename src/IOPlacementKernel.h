@@ -35,36 +35,45 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __HUNGARIANMATCHING_H_
-#define __HUNGARIANMATCHING_H_
+#ifndef __IOPLACEMENTKERNEL_H_
+#define __IOPLACEMENTKERNEL_H_
 
-#include "Coordinate.h"
-#include "Core.h"
+#include "Parameters.h"
+#include "HungarianMatching.h"
 #include "Netlist.h"
-#include "munkres/munkres.h"
+#include "Slots.h"
 
-#include <iostream>
-#include <math.h>
-
-class HungarianMatching {
-       public:
-        HungarianMatching(Netlist& netlist, Core& core);
-        virtual ~HungarianMatching() = default;
-        void run();
-
+class IOPlacementKernel {
        private:
-        DBU slotSize;
-        int numSlots;
+        Parameters* _parms;
         Netlist _netlist;
+        Netlist _netlistIOPins;
         Core _core;
-        Netlist netlistIOPins;
-        Munkres<DBU> ostlindo;
-        Matrix<DBU> hungarianMatrix;
-        void defineSlotSize();
-        void createMatrix();
-        int getKValue();
-        void setIOListWithSinks();
-        int getNumIOPins();
+        slotVector_t _slots;
+        sectionVector_t _sections;
+        std::vector<IOPin> _zeroSinkIOs;
+        std::string _horizontalMetalLayer;
+        std::string _verticalMetalLayer;
+
+        void randomPlacement(std::vector<IOPin>&);
+        void initNetlistAndCore();
+        void initIOLists();
+        void defineSlots();
+        void createSections();
+        void setupSections();
+        void assignPinsSections(sectionVector_t&);
+        bool checkSections(sectionVector_t&);
+        DBU returnIONetsHPWL(Netlist&);
+
+        /* TODO:  <08-05-19, if this is a check why not return a bool?! > */
+        inline Orientation checkOrientation(const DBU x, const DBU y,
+                                            Orientation);
+
+        int getKValue() { return 1; }
+
+       public:
+        IOPlacementKernel(Parameters&);
+        void run();
 };
 
-#endif /* __HUNGARIANMATCHING_H_ */
+#endif /* __IOPLACEMENTKERNEL_H_ */

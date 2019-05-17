@@ -1,61 +1,59 @@
 BIN_NAME = ioPlacement
 
-BIN_ARGS =
+INPUT_FILE = input.def
+
+BIN_ARGS = -i $(INPUT_FILE) -o out.def -h 5 -v 6
+
+PRE_ARGS = timeout 1s
 
 BUILD_DIR = build
 
 PARALLEL = 1
 
-default: normal
+TYPE = normal
+
+default: $(TYPE)
 
 all: clean release
 
-run: normal
-	-@( \
-		./$(BIN_NAME) $(BIN_ARGS) ;\
-		)
+run:
+	/usr/bin/time -v ./$(BIN_NAME) $(BIN_ARGS)
 
-normal: dirs
+debug: dirs cmake_debug call_make
+normal: dirs cmake_normal call_make
+release: dirs cmake_release call_make
+
+call_make:
+	@echo Call make
+	@make -C $(BUILD_DIR) $(MK_OPT) -j$(PARALLEL) --no-print-directory
+	@echo Remove old binary
+	@rm -f $(BIN_NAME)
+	@echo Copy binary
+	@cp $(BUILD_DIR)/$(BIN_NAME) .
+
+cmake_normal:
 	@( \
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
 		cmake $(CM_OPT) .. ;\
-		echo Call make ;\
-		make $(MK_OPT) -j$(PARALLEL) --no-print-directory ;\
-		echo Remove old binary ;\
-		rm -f ../$(BIN_NAME) ;\
-		echo Copy binary ;\
-		cp $(BIN_NAME) .. ;\
 		)
 
 
-release: dirs
+cmake_release:
 	@( \
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
 		cmake $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
-		echo Call make ;\
-		make $(MK_OPT) -j$(PARALLEL) --no-print-directory ;\
-		echo Remove old binary ;\
-		rm -f ../$(BIN_NAME) ;\
-		echo Copy binary ;\
-		cp $(BIN_NAME) .. ;\
 		)
 
-debug: dirs
+cmake_debug:
 	@( \
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
 		cmake $(CM_OPT) -DCMAKE_BUILD_TYPE=Debug .. ;\
-		echo Call make ;\
-		make $(MK_OPT) -j$(PARALLEL) --no-print-directory ;\
-		echo Remove old binary ;\
-		rm -f ../$(BIN_NAME) ;\
-		echo Copy binary ;\
-		cp $(BIN_NAME) .. ;\
 		)
 
 dirs:
@@ -66,3 +64,7 @@ dirs:
 
 clean:
 	rm -rf $(BUILD_DIR)
+
+clean_all:
+	rm -rf $(BUILD_DIR)
+	rm -rf $(BIN_NAME)

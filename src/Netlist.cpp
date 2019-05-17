@@ -36,7 +36,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "Netlist.h"
-#include "Core.h"
 
 Netlist::Netlist() { _netPointer.push_back(0); }
 
@@ -78,7 +77,7 @@ void Netlist::forEachSinkOfIO(
         }
 }
 
-unsigned Netlist::numSinkofIO(unsigned idx) {
+unsigned Netlist::numSinksOfIO(unsigned idx) {
         unsigned netStart = _netPointer[idx];
         unsigned netEnd = _netPointer[idx + 1];
         return netEnd - netStart;
@@ -89,23 +88,24 @@ int Netlist::numIOPins() { return _ioPins.size(); }
 DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
         unsigned netStart = _netPointer[idx];
         unsigned netEnd = _netPointer[idx + 1];
-        Coordinate upperBounds = Coordinate(slotPos.getX(), slotPos.getY());
-        Coordinate lowerBounds = Coordinate(slotPos.getX(), slotPos.getY());
+
+        DBU minX = slotPos.getX();
+        DBU minY = slotPos.getY();
+        DBU maxX = slotPos.getX();
+        DBU maxY = slotPos.getY();
 
         for (unsigned idx = netStart; idx < netEnd; ++idx) {
                 Coordinate pos = _instPins[idx].getPos();
-
-                if (pos.getX() < lowerBounds.getX())
-                        lowerBounds.setX(pos.getX());
-                if (pos.getX() > upperBounds.getX())
-                        upperBounds.setX(pos.getX());
-                if (pos.getY() < lowerBounds.getY())
-                        lowerBounds.setY(pos.getY());
-                if (pos.getY() > upperBounds.getY())
-                        upperBounds.setY(pos.getY());
+                minX = std::min(minX, pos.getX());
+                maxX = std::max(maxX, pos.getX());
+                minY = std::min(minY, pos.getY());
+                maxY = std::max(maxY, pos.getY());
         }
 
-        Core netBBox(lowerBounds, upperBounds);
+        Coordinate upperBounds = Coordinate(maxX, maxY);
+        Coordinate lowerBounds = Coordinate(minX, minY);
 
-        return netBBox.getHPWL();
+        Box netBBox(lowerBounds, upperBounds);
+
+        return netBBox.getHalfPerimeter();
 }

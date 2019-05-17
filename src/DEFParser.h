@@ -35,25 +35,26 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __CORE_H_
-#define __CORE_H_
+#ifndef DEFPARSER_H
+#define DEFPARSER_H
 
-#include "Coordinate.h"
+#include <string>
+using std::string;
+#include <iostream>
+using std::cout;
+#include <vector>
+using std::vector;
 
-class Core {
-        Coordinate _lowerBound;
-        Coordinate _upperBound;
+#include "DEFDescriptor.h"
+#include <cmath>
 
+class DEFParser {
        public:
-        Core() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
-        Core(const Coordinate& lowerBound, const Coordinate& upperBound)
-            : _lowerBound(lowerBound), _upperBound(upperBound) {}
+        DEFParser();
+        void parseDEF(const std::string &filename, DefDscp &defDscp);
+        virtual ~DEFParser();
 
-        Coordinate getLowerBound() const { return _lowerBound; }
-        Coordinate getUpperBound() const { return _upperBound; }
-
-        DBU getPerimeter();
-        DBU getHPWL();
+        static std::string unescape(const std::string &str);
 };
 
-#endif /* __CORE_H_ */
+#endif /* DEFPARSER_H */
