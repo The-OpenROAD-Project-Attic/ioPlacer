@@ -69,7 +69,7 @@ You can run IOPlacement with RePlAce, using the following script:
 
 This script implement a loop with RePlAce and IOPlacement, as shown bellow:
 
-// Image here (TODO)
+<img src="doc/loop.png" alt="loop-ioplace-replace" width="50%" heigth="50%"/>
 
 To execute the script, you will need both RePlAce and IOPlacement repositories in the same directory:
 
