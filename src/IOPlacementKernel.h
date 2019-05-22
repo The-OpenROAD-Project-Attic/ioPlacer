@@ -65,9 +65,7 @@ class IOPlacementKernel {
         bool checkSections(sectionVector_t&);
         DBU returnIONetsHPWL(Netlist&);
 
-        /* TODO:  <08-05-19, if this is a check why not return a bool?! > */
-        inline Orientation checkOrientation(const DBU x, const DBU y,
-                                            Orientation);
+        inline void updateOrientation(IOPin&);
 
         int getKValue() { return 1; }
 

@@ -270,25 +270,40 @@ void IOPlacementKernel::setupSections() {
         _sections = sections;
 }
 
-inline Orientation IOPlacementKernel::checkOrientation(
-    const DBU x, const DBU y, Orientation currentOrient) {
+inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
+        const DBU x = pin.getX();
+        const DBU y = pin.getY();
         DBU lowerXBound = _core.getLowerBound().getX();
         DBU lowerYBound = _core.getLowerBound().getY();
         DBU upperXBound = _core.getUpperBound().getX();
         DBU upperYBound = _core.getUpperBound().getY();
 
         if (x == lowerXBound) {
-                if (y == upperYBound) return Orientation::SOUTH;
-                return Orientation::EAST;
+                if (y == upperYBound) {
+                        pin.setOrientation(Orientation::SOUTH);
+                        return;
+                } else {
+                        pin.setOrientation(Orientation::EAST);
+                        return;
+                }
         }
         if (x == upperXBound) {
-                if (y == lowerYBound) return Orientation::NORTH;
-                return Orientation::WEST;
+                if (y == lowerYBound) {
+                        pin.setOrientation(Orientation::NORTH);
+                        return;
+                } else {
+                        pin.setOrientation(Orientation::WEST);
+                        return;
+                }
         }
-        if (y == lowerYBound) return Orientation::NORTH;
-        if (y == upperYBound) return Orientation::SOUTH;
-
-        return currentOrient;
+        if (y == lowerYBound) {
+                pin.setOrientation(Orientation::NORTH);
+                return;
+        }
+        if (y == upperYBound) {
+                pin.setOrientation(Orientation::SOUTH);
+                return;
+        }
 }
 
 DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
@@ -346,10 +361,9 @@ void IOPlacementKernel::run() {
         HungarianMatching hg(_sections[0], _core);
         hg.assignZeroSinkIOs(assignment, _slots, vp);
 
-        for (IOPin& ioPin : assignment) {
-                Orientation orient = checkOrientation(
-                    ioPin.getX(), ioPin.getY(), ioPin.getOrientation());
-                ioPin.setOrientation(orient);
+#pragma omp parallel for
+        for (unsigned i = 0; i < assignment.size(); ++i) {
+                updateOrientation(assignment[i]);
         }
 
         WriterIOPins writer(_netlistIOPins, assignment, _horizontalMetalLayer,
