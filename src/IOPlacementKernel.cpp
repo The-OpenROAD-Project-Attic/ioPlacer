@@ -35,13 +35,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-/* TODO:  <15-05-19, the algorithm to assign an IOPin to a section does not
- * take into account if the net has N pins and N is greater than number of
- * slots in section > */
-
-#define MAX_SLOTS_IN_SECTION 300
-#define COST_MULT 1000
-
 #include "IOPlacementKernel.h"
 #include "Parser.h"
 #include "WriterIOPins.h"
