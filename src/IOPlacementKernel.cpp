@@ -43,7 +43,26 @@
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         initNetlistAndCore();
-        if (_parms->returnHPWL()) returnHPWL = true;
+        if (_parms->returnHPWL()) {
+                _returnHPWL = true;
+        }
+        if (_parms->returnForceSpread()) {
+                _forcePinSpread = true;
+        } else {
+                _forcePinSpread = false;
+        }
+        if (_parms->returnNslots() > -1) {
+                _slotsPerSection = _parms->returnNslots();
+        }
+        if (_parms->returnSlotsFactor() > -1) {
+                _slotsIncreaseFactor = _parms->returnSlotsFactor();
+        }
+        if (_parms->returnUsage() > -1) {
+                _usagePerSection = _parms->returnUsage();
+        }
+        if (_parms->returnUsageFactor() > -1) {
+                _usageIncreaseFactor = _parms->returnUsageFactor();
+        }
 }
 
 void IOPlacementKernel::randomPlacement() {
@@ -342,12 +361,22 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 void IOPlacementKernel::run() {
         std::vector<HungarianMatching> hgVec;
 
+        std::cout << "_slotsPerSection     " << _slotsPerSection << std::endl;
+        std::cout << "_slotsIncreaseFactor " << _slotsIncreaseFactor
+                  << std::endl;
+        std::cout << "_usagePerSection     " << _usagePerSection << std::endl;
+        std::cout << "_usageIncreaseFactor " << _usageIncreaseFactor
+                  << std::endl;
+        std::cout << "_forcePinSpread      " << _forcePinSpread << std::endl;
+
+        exit(0);
+
         initIOLists();
         defineSlots();
 
         setupSections();
 
-        if (returnHPWL) {
+        if (_returnHPWL) {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
@@ -386,7 +415,7 @@ void IOPlacementKernel::run() {
                 updateOrientation(_assignment[i]);
         }
 
-        if (returnHPWL) {
+        if (_returnHPWL) {
                 DBU totalHPWL = 0;
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {

@@ -73,10 +73,11 @@ class IOPlacement {
 
         // net connected to the pin, pin name, pin position
         void addInstPin(std::string net, std::string pinName, point pos);
-        
-        //optional
+
+        // optional
         void setSlotsPerSection(unsigned slotsPerSection, float increaseFactor);
-        void setSlotsUsagePerSection(float usagePerSection, float increaseFactor);
+        void setSlotsUsagePerSection(float usagePerSection,
+                                     float increaseFactor);
         void forcePinSpread(bool force);
 
         // run IOPlacement, returns a vector with all a pin name, its new

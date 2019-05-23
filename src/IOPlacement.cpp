@@ -134,23 +134,25 @@ void IOPlacement::getResults(std::vector<pinS>& pinAssignment) {
         }
 }
 
-void IOPlacement::setSlotsPerSection(unsigned slotsPerSection, float increaseFactor){
+void IOPlacement::setSlotsPerSection(unsigned slotsPerSection,
+                                     float increaseFactor) {
         ioKernel._slotsPerSection = slotsPerSection;
         ioKernel._slotsIncreaseFactor = increaseFactor;
 }
-        
-void IOPlacement::setSlotsUsagePerSection(float usagePerSection, float increaseFactor){
+
+void IOPlacement::setSlotsUsagePerSection(float usagePerSection,
+                                          float increaseFactor) {
         ioKernel._usagePerSection = usagePerSection;
         ioKernel._usageIncreaseFactor = increaseFactor;
 }
 
-void IOPlacement::forcePinSpread(bool force){
-        ioKernel._forcePinSpread = force;	
+void IOPlacement::forcePinSpread(bool force) {
+        ioKernel._forcePinSpread = force;
 }
 
 std::vector<pinS> IOPlacement::run(bool returnHPWL) {
         initNetlist();
-        ioKernel.returnHPWL = returnHPWL;
+        ioKernel._returnHPWL = returnHPWL;
         ioKernel.run();
         std::vector<pinS> pinAssignment;
         getResults(pinAssignment);

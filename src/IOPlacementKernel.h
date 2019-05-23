@@ -52,8 +52,8 @@ class IOPlacementKernel {
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
         std::vector<IOPin> _assignment;
-        bool returnHPWL = false;
-        
+        bool _returnHPWL = false;
+
         unsigned _slotsPerSection = 100;
         float _slotsIncreaseFactor = 0.1f;
 
