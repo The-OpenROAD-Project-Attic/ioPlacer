@@ -55,7 +55,6 @@
 struct _Slot_t {
         bool used;
         Coordinate pos;
-        /* IOPin* pin; // TODO: do we need this? */
 } typedef Slot_t;
 
 typedef std::vector<Slot_t> slotVector_t;
