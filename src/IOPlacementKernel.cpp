@@ -318,6 +318,9 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 }
 
 void IOPlacementKernel::run() {
+        std::vector<IOPin> assignment;
+        std::vector<HungarianMatching> hgVec;
+
         initNetlistAndCore();
         initIOLists();
         defineSlots();
@@ -328,33 +331,20 @@ void IOPlacementKernel::run() {
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
 
-        DBU totalHPWL = 0;
-
-        std::vector<IOPin> assignment;
-        std::vector<IOPin> vp;
-        for (IOPin i : _zeroSinkIOs) {
-                vp.push_back(i);
+        for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                if (_sections[idx].net.numIOPins() > 0) {
+                        HungarianMatching hg(_sections[idx]);
+                        hgVec.push_back(hg);
+                }
         }
 
-        bool random = false;
-        if (random) {
-                randomPlacement(assignment);
-                /* TODO:  <25-04-19, remove hard coded> */
-                std::cout << "!!!WARNING!!! hard coded run of random"
-                          << std::endl;
-        } else {
-                DBU val;
-#pragma omp parallel for private(val) reduction(+ : totalHPWL)
-                for (unsigned idx = 0; idx < _sections.size(); idx++) {
-                        if (_sections[idx].net.numIOPins() > 0) {
-                                HungarianMatching hgMatching(_sections[idx]);
-                                hgMatching.run();
-                                hgMatching.getFinalAssignment(assignment,
-                                                              _slots);
-                                val = returnIONetsHPWL(_sections[idx].net);
-                                totalHPWL += val;
-                        }
-                }
+#pragma omp parallel for
+        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                hgVec[idx].run();
+        }
+
+        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                hgVec[idx].getFinalAssignment(assignment, _slots);
         }
 
         for (auto& i : _slots) {
@@ -379,6 +369,11 @@ void IOPlacementKernel::run() {
         writer.run();
 
         if (_parms->returnHPWL()) {
+                DBU totalHPWL = 0;
+#pragma omp parallel for reduction(+ : totalHPWL)
+                for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                        totalHPWL += returnIONetsHPWL(_sections[idx].net);
+                }
                 std::cout << "***HPWL after IOPlacement: " << totalHPWL
                           << "***\n";
         }
