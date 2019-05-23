@@ -45,6 +45,7 @@
 
 #include "Coordinate.h"
 #include "Netlist.h"
+#include <numeric>
 
 /*! \struct _Slot_t
  *  \brief Brief struct description
