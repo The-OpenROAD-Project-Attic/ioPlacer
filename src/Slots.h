@@ -38,6 +38,9 @@
 #ifndef __SLOTS_H
 #define __SLOTS_H
 
+#define MAX_SLOTS_RECOMMENDED 600
+#define MAX_SECTIONS_RECOMMENDED 600
+
 #include <vector>
 
 #include "Coordinate.h"
