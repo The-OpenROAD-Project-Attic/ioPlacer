@@ -56,14 +56,21 @@ class IOPlacementKernel {
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
 
+        unsigned _slotsPerSection = 100;
+        float _slotsIncreaseFactor = 0.1f;
+
+        float _usagePerSection = .1f;
+        float _usageIncreaseFactor = 0.1f;
+
+        bool _forcePinSpread = true;
+
         void randomPlacement(std::vector<IOPin>&);
         void initNetlistAndCore();
         void initIOLists();
         void defineSlots();
         void createSections();
         void setupSections();
-        void assignPinsSections(sectionVector_t&);
-        bool checkSections(sectionVector_t&);
+        bool assignPinsSections();
         DBU returnIONetsHPWL(Netlist&);
 
         inline void updateOrientation(IOPin&);

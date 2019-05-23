@@ -212,61 +212,108 @@ void IOPlacementKernel::defineSlots() {
 
 void IOPlacementKernel::createSections() {
         slotVector_t& slots = _slots;
-        sectionVector_t& sections = _sections;
+        _sections.clear();
         unsigned counter = 0;
-        unsigned idx = 0;
-        unsigned maxSlots = MAX_SLOTS_IN_SECTION;
+        unsigned i = 0;
         unsigned numSlots = slots.size();
         while (counter < numSlots) {
                 slotVector_t nSlot;
-                for (idx = 0; idx < maxSlots && counter < numSlots; ++idx) {
+                for (i = 0; i < _slotsPerSection && counter < numSlots; ++i) {
                         nSlot.push_back(slots[counter++]);
                 }
                 Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
-                sections.push_back(nSec);
+                if (_usagePerSection > 1.f) {
+                        std::cout << "WARNING: section usage exeeded max\n";
+                        _usagePerSection = 1.;
+                        std::cout << "Forcing slots per section to increase\n";
+                        if (_slotsIncreaseFactor != 0.0f) {
+                                _slotsPerSection *= (1 + _slotsIncreaseFactor);
+                        } else if (_usageIncreaseFactor != 0.0f) {
+                                _slotsPerSection *= (1 + _usageIncreaseFactor);
+                        } else {
+                                _slotsPerSection *= 1.1;
+                        }
+                }
+                nSec.maxSlots = _slotsPerSection * _usagePerSection;
+                nSec.curSlots = 0;
+                _sections.push_back(nSec);
         }
 }
 
-void IOPlacementKernel::assignPinsSections(sectionVector_t& sections) {
+bool IOPlacementKernel::assignPinsSections() {
         Netlist& net = _netlistIOPins;
+        sectionVector_t& sections = _sections;
+        createSections();
+        int totalPinsAssigned = 0;
         net.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                std::vector<DBU> dst;
-                for (Section_t& curr_sec : sections) {
-                        DBU d = net.computeIONetHPWL(idx, curr_sec.pos);
-                        dst.push_back(d + curr_sec.cost);
-                }
+                bool pinAssigned = false;
+                std::vector<DBU> dst(sections.size());
                 std::vector<InstancePin> instPinsVector;
+#pragma omp parallel for
+                for (unsigned i = 0; i < sections.size(); i++) {
+                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
+                }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);
                 });
-                // Find Smallest Value in dst
-                auto smallest = std::min_element(dst.begin(), dst.end());
-                unsigned i = std::distance(dst.begin(), smallest);
-                sections[i].net.addIONet(ioPin, instPinsVector);
-        });
-}
-
-bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
-        bool balanced = true;
-        for (unsigned idx = 0; idx < sections.size(); ++idx) {
-                int added_cost =
-                    sections[idx].net.numIOPins() - sections[idx].sv.size();
-                if (added_cost > 0) {
-                        _sections[idx].cost += added_cost * COST_MULT;
-                        balanced = false;
+                for (auto i : sort_indexes(dst)) {
+                        if (sections[i].curSlots < sections[i].maxSlots) {
+                                sections[i].net.addIONet(ioPin, instPinsVector);
+                                sections[i].curSlots++;
+                                pinAssigned = true;
+                                totalPinsAssigned++;
+                                break;
+                        }
+                        // Try to add pin just to first
+                        if (not _forcePinSpread) break;
                 }
+                if (!pinAssigned) {
+                        return;  // "break" forEachIOPin
+                }
+        });
+        // if forEachIOPin ends or returns/breaks goes here
+        if (totalPinsAssigned == net.numIOPins()) {
+                return true;
+        } else {
+                return false;
         }
-        return balanced;
 }
 
 void IOPlacementKernel::setupSections() {
-        createSections();
-        sectionVector_t sections = _sections;
-        do {
-                sections = _sections;
-                assignPinsSections(sections);
-        } while (not checkSections(sections));
-        _sections = sections;
+        if (!(_slotsPerSection > 1)) {
+                std::cout << "_slotsPerSection must be grater than one\n";
+                exit(1);
+        }
+        if (!(_usagePerSection > 0.0f)) {
+                std::cout << "_usagePerSection must be grater than zero\n";
+                exit(1);
+        }
+        if (not _forcePinSpread && _usageIncreaseFactor == 0.0f &&
+            _slotsIncreaseFactor == 0.0f) {
+                std::cout << "WARNING: if _forcePinSpread = false than either "
+                             "_usageIncreaseFactor or _slotsIncreaseFactor "
+                             "must be != 0\n";
+        }
+        while (not assignPinsSections()) {
+                _usagePerSection *= (1 + _usageIncreaseFactor);
+                _slotsPerSection *= (1 + _slotsIncreaseFactor);
+                if (_sections.size() > MAX_SECTIONS_RECOMMENDED) {
+                        std::cout
+                            << "WARNING: number of sections is "
+                            << _sections.size()
+                            << " while the maximum recommended value is "
+                            << MAX_SECTIONS_RECOMMENDED
+                            << " this may negatively affect performance\n";
+                }
+                if (_slotsPerSection > MAX_SLOTS_RECOMMENDED) {
+                        std::cout
+                            << "WARNING: number of slots per sections is "
+                            << _slotsPerSection
+                            << " while the maximum recommended value is "
+                            << MAX_SLOTS_RECOMMENDED
+                            << " this may negatively affect performance\n";
+                }
+        };
 }
 
 inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
