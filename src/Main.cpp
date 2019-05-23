@@ -64,6 +64,7 @@ int main(int argc, char** argv) {
         Parameters parms(argc, argv);
         IOPlacementKernel kernel(parms);
         kernel.run();
+        kernel.getResults();
 
         return 0;
 }

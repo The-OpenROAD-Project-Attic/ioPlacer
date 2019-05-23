@@ -86,5 +86,4 @@ std::vector<size_t> sort_indexes(const std::vector<T>& v) {
         return idx;
 }
 
-
 #endif /* __SLOTS_H */
