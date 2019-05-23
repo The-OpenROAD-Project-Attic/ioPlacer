@@ -55,6 +55,7 @@ class Box {
         Coordinate getUpperBound() const { return _upperBound; }
 
         DBU getHalfPerimeter();
+        Coordinate getMiddle();
 };
 
 #endif /* __BOX_H_ */

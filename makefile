@@ -1,10 +1,11 @@
-BIN_NAME = ioPlacement
-
 INPUT_FILE = input.def
+OUTPUT_FILE = out.def
 
-BIN_ARGS = -i $(INPUT_FILE) -o out.def -h 5 -v 6
+BIN_NAME = ioPlacement
+BIN_ARGS = -i $(INPUT_FILE) -o $(OUTPUT_FILE) -h 5 -v 6 -w 1
 
-PRE_ARGS = timeout 1s
+PRE_CMD = /usr/bin/time -v
+POS_CMD = 2>&1 | tee $(INPUT_FILE).log
 
 BUILD_DIR = build
 
@@ -17,7 +18,7 @@ default: $(TYPE)
 all: clean release
 
 run:
-	/usr/bin/time -v ./$(BIN_NAME) $(BIN_ARGS)
+	$(PRE_CMD) ./$(BIN_NAME) $(BIN_ARGS) $(POS_CMD)
 
 debug: dirs cmake_debug call_make
 normal: dirs cmake_normal call_make

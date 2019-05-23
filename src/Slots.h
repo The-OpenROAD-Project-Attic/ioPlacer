@@ -38,6 +38,9 @@
 #ifndef __SLOTS_H
 #define __SLOTS_H
 
+#define MAX_SLOTS_RECOMMENDED 600
+#define MAX_SECTIONS_RECOMMENDED 600
+
 #include <vector>
 
 #include "Coordinate.h"
@@ -49,8 +52,7 @@
  *  Detailed description
  */
 struct _Slot_t {
-        bool current;
-        bool visited;
+        bool used;
         Coordinate pos;
         /* IOPin* pin; // TODO: do we need this? */
 } typedef Slot_t;
@@ -67,8 +69,22 @@ typedef struct _Section_t {
         Coordinate pos;
         Netlist net;
         unsigned cost;
+        float maxSlots;
+        float curSlots;
 } Section_t;
 
 typedef std::vector<Section_t> sectionVector_t;
+
+template <typename T>
+std::vector<size_t> sort_indexes(const std::vector<T>& v) {
+        // initialize original index locations
+        std::vector<size_t> idx(v.size());
+        std::iota(idx.begin(), idx.end(), 0);
+        // sort indexes based on comparing values in v
+        std::sort(idx.begin(), idx.end(),
+                  [&v](size_t i1, size_t i2) { return v[i1] < v[i2]; });
+        return idx;
+}
+
 
 #endif /* __SLOTS_H */

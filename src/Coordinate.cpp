@@ -35,4 +35,12 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <cmath>
+
 #include "Coordinate.h"
+
+DBU Coordinate::dst(Coordinate a) {
+        DBU ax = a.getX();
+        DBU ay = a.getY();
+        return std::sqrt(std::pow(_x - ax, 2) + std::pow(_y - ay, 2));
+}

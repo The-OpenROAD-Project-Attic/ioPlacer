@@ -53,6 +53,7 @@ class Coordinate {
         void setY(const DBU y) { _y = y; }
         DBU getX() const { return _x; }
         DBU getY() const { return _y; }
+        DBU dst(Coordinate);
 };
 
 #endif /* __COORDINATE_H_ */

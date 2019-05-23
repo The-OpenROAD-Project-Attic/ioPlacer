@@ -35,13 +35,6 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-/* TODO:  <15-05-19, the algorithm to assign an IOPin to a section does not
- * take into account if the net has N pins and N is greater than number of
- * slots in section > */
-
-#define MAX_SLOTS_IN_SECTION 300
-#define COST_MULT 1000
-
 #include "IOPlacementKernel.h"
 #include "Parser.h"
 #include "WriterIOPins.h"
@@ -88,7 +81,6 @@ void IOPlacementKernel::initIOLists() {
 }
 
 void IOPlacementKernel::defineSlots() {
-        Netlist& netlist = _netlistIOPins;
         Coordinate lb = _core.getLowerBound();
         Coordinate ub = _core.getUpperBound();
         DBU lbX = lb.getX();
@@ -100,17 +92,9 @@ void IOPlacementKernel::defineSlots() {
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
 
-        bool use = false;
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
-
-        unsigned numPins = netlist.numIOPins();
-
-        unsigned interval = std::floor(totalNumSlots / (getKValue() * numPins));
-        if (std::floor(totalNumSlots / interval) <= numPins) {
-                interval = std::floor(totalNumSlots / numPins);
-        }
 
         /*******************************************
          * How the for bellow follows core boundary *
@@ -171,124 +155,174 @@ void IOPlacementKernel::defineSlots() {
 
         int i = 0;
         for (Coordinate pos : slotsEdge1) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge2) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge3) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge4) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 }
 
 void IOPlacementKernel::createSections() {
         slotVector_t& slots = _slots;
-        sectionVector_t& sections = _sections;
-        unsigned numSlots = slots.size();
+        _sections.clear();
         unsigned counter = 0;
+        unsigned i = 0;
+        unsigned numSlots = slots.size();
         while (counter < numSlots) {
-                slotVector_t new_slots;
-                for (unsigned idx = 0;
-                     idx < MAX_SLOTS_IN_SECTION && counter < numSlots; ++idx) {
-                        new_slots.push_back(slots[counter++]);
+                slotVector_t nSlot;
+                for (i = 0; i < _slotsPerSection && counter < numSlots; ++i) {
+                        nSlot.push_back(slots[counter++]);
                 }
-                Section_t new_section = {
-                    new_slots, new_slots.at(new_slots.size() / 2).pos};
-                sections.push_back(new_section);
+                Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
+                if (_usagePerSection > 1.f) {
+                        std::cout << "WARNING: section usage exeeded max\n";
+                        _usagePerSection = 1.;
+                        std::cout << "Forcing slots per section to increase\n";
+                        if (_slotsIncreaseFactor != 0.0f) {
+                                _slotsPerSection *= (1 + _slotsIncreaseFactor);
+                        } else if (_usageIncreaseFactor != 0.0f) {
+                                _slotsPerSection *= (1 + _usageIncreaseFactor);
+                        } else {
+                                _slotsPerSection *= 1.1;
+                        }
+                }
+                nSec.maxSlots = _slotsPerSection * _usagePerSection;
+                nSec.curSlots = 0;
+                _sections.push_back(nSec);
         }
 }
 
-void IOPlacementKernel::assignPinsSections(sectionVector_t& sections) {
+bool IOPlacementKernel::assignPinsSections() {
         Netlist& net = _netlistIOPins;
+        sectionVector_t& sections = _sections;
+        createSections();
+        int totalPinsAssigned = 0;
         net.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                std::vector<DBU> dst;
-                for (Section_t& curr_sec : sections) {
-                        DBU d = net.computeIONetHPWL(idx, curr_sec.pos);
-                        dst.push_back(d + curr_sec.cost);
-                }
+                bool pinAssigned = false;
+                std::vector<DBU> dst(sections.size());
                 std::vector<InstancePin> instPinsVector;
+#pragma omp parallel for
+                for (unsigned i = 0; i < sections.size(); i++) {
+                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
+                }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);
                 });
-                // Find Smallest Value in dst
-                auto smallest = std::min_element(dst.begin(), dst.end());
-                unsigned i = std::distance(dst.begin(), smallest);
-                sections[i].net.addIONet(ioPin, instPinsVector);
-        });
-}
-
-bool IOPlacementKernel::checkSections(sectionVector_t& sections) {
-        bool balanced = true;
-        for (unsigned idx = 0; idx < sections.size(); ++idx) {
-                int added_cost =
-                    sections[idx].net.numIOPins() - sections[idx].sv.size();
-                if (added_cost > 0) {
-                        _sections[idx].cost += added_cost * COST_MULT;
-                        balanced = false;
+                for (auto i : sort_indexes(dst)) {
+                        if (sections[i].curSlots < sections[i].maxSlots) {
+                                sections[i].net.addIONet(ioPin, instPinsVector);
+                                sections[i].curSlots++;
+                                pinAssigned = true;
+                                totalPinsAssigned++;
+                                break;
+                        }
+                        // Try to add pin just to first
+                        if (not _forcePinSpread) break;
                 }
+                if (!pinAssigned) {
+                        return;  // "break" forEachIOPin
+                }
+        });
+        // if forEachIOPin ends or returns/breaks goes here
+        if (totalPinsAssigned == net.numIOPins()) {
+                return true;
+        } else {
+                return false;
         }
-        return balanced;
 }
 
 void IOPlacementKernel::setupSections() {
-        createSections();
-        sectionVector_t sections = _sections;
-        do {
-                sections = _sections;
-                assignPinsSections(sections);
-        } while (not checkSections(sections));
-        _sections = sections;
+        if (!(_slotsPerSection > 1)) {
+                std::cout << "_slotsPerSection must be grater than one\n";
+                exit(1);
+        }
+        if (!(_usagePerSection > 0.0f)) {
+                std::cout << "_usagePerSection must be grater than zero\n";
+                exit(1);
+        }
+        if (not _forcePinSpread && _usageIncreaseFactor == 0.0f &&
+            _slotsIncreaseFactor == 0.0f) {
+                std::cout << "WARNING: if _forcePinSpread = false than either "
+                             "_usageIncreaseFactor or _slotsIncreaseFactor "
+                             "must be != 0\n";
+        }
+        while (not assignPinsSections()) {
+                _usagePerSection *= (1 + _usageIncreaseFactor);
+                _slotsPerSection *= (1 + _slotsIncreaseFactor);
+                if (_sections.size() > MAX_SECTIONS_RECOMMENDED) {
+                        std::cout
+                            << "WARNING: number of sections is "
+                            << _sections.size()
+                            << " while the maximum recommended value is "
+                            << MAX_SECTIONS_RECOMMENDED
+                            << " this may negatively affect performance\n";
+                }
+                if (_slotsPerSection > MAX_SLOTS_RECOMMENDED) {
+                        std::cout
+                            << "WARNING: number of slots per sections is "
+                            << _slotsPerSection
+                            << " while the maximum recommended value is "
+                            << MAX_SLOTS_RECOMMENDED
+                            << " this may negatively affect performance\n";
+                }
+        };
 }
 
-inline Orientation IOPlacementKernel::checkOrientation(
-    const DBU x, const DBU y, Orientation currentOrient) {
+inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
+        const DBU x = pin.getX();
+        const DBU y = pin.getY();
         DBU lowerXBound = _core.getLowerBound().getX();
         DBU lowerYBound = _core.getLowerBound().getY();
         DBU upperXBound = _core.getUpperBound().getX();
         DBU upperYBound = _core.getUpperBound().getY();
 
         if (x == lowerXBound) {
-                if (y == upperYBound) return Orientation::SOUTH;
-                return Orientation::EAST;
+                if (y == upperYBound) {
+                        pin.setOrientation(Orientation::SOUTH);
+                        return;
+                } else {
+                        pin.setOrientation(Orientation::EAST);
+                        return;
+                }
         }
         if (x == upperXBound) {
-                if (y == lowerYBound) return Orientation::NORTH;
-                return Orientation::WEST;
+                if (y == lowerYBound) {
+                        pin.setOrientation(Orientation::NORTH);
+                        return;
+                } else {
+                        pin.setOrientation(Orientation::WEST);
+                        return;
+                }
         }
-        if (y == lowerYBound) return Orientation::NORTH;
-        if (y == upperYBound) return Orientation::SOUTH;
-
-        return currentOrient;
+        if (y == lowerYBound) {
+                pin.setOrientation(Orientation::NORTH);
+                return;
+        }
+        if (y == upperYBound) {
+                pin.setOrientation(Orientation::SOUTH);
+                return;
+        }
 }
 
 DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
@@ -303,6 +337,9 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 }
 
 void IOPlacementKernel::run() {
+        std::vector<IOPin> assignment;
+        std::vector<HungarianMatching> hgVec;
+
         initNetlistAndCore();
         initIOLists();
         defineSlots();
@@ -313,43 +350,38 @@ void IOPlacementKernel::run() {
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
 
-        DBU totalHPWL = 0;
-
-        std::vector<IOPin> assignment;
-        std::vector<IOPin> vp;
-        for (IOPin i : _zeroSinkIOs) {
-                vp.push_back(i);
-        }
-
-        bool random = false;
-        if (random) {
-                randomPlacement(assignment);
-                /* TODO:  <25-04-19, remove hard coded> */
-                std::cout << "!!!WARNING!!! hard coded run of random"
-                          << std::endl;
-        } else {
-                DBU val;
-#pragma omp parallel for private(val) reduction(+ : totalHPWL)
-                for (unsigned idx = 0; idx < _sections.size(); idx++) {
-                        if (_sections[idx].net.numIOPins() > 0) {
-                                HungarianMatching hgMatching(_sections[idx],
-                                                             _core);
-                                hgMatching.run();
-                                hgMatching.getFinalAssignment(assignment,
-                                                              _slots);
-                                val = returnIONetsHPWL(_sections[idx].net);
-                                totalHPWL += val;
-                        }
+        for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                if (_sections[idx].net.numIOPins() > 0) {
+                        HungarianMatching hg(_sections[idx]);
+                        hgVec.push_back(hg);
                 }
         }
 
-        HungarianMatching hg(_sections[0], _core);
-        hg.assignZeroSinkIOs(assignment, _slots, vp);
+#pragma omp parallel for
+        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                hgVec[idx].run();
+        }
 
-        for (IOPin& ioPin : assignment) {
-                Orientation orient = checkOrientation(
-                    ioPin.getX(), ioPin.getY(), ioPin.getOrientation());
-                ioPin.setOrientation(orient);
+        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                hgVec[idx].getFinalAssignment(assignment, _slots);
+        }
+
+        for (auto& i : _slots) {
+                if (_zeroSinkIOs.size() > 0) {
+                        if (not i.used) {
+                                i.used = true;
+                                _zeroSinkIOs[0].setPos(i.pos);
+                                assignment.push_back(_zeroSinkIOs[0]);
+                                _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                        }
+                } else {
+                        break;
+                }
+        }
+
+#pragma omp parallel for
+        for (unsigned i = 0; i < assignment.size(); ++i) {
+                updateOrientation(assignment[i]);
         }
 
         WriterIOPins writer(_netlistIOPins, assignment, _horizontalMetalLayer,
@@ -359,6 +391,11 @@ void IOPlacementKernel::run() {
         writer.run();
 
         if (_parms->returnHPWL()) {
+                DBU totalHPWL = 0;
+#pragma omp parallel for reduction(+ : totalHPWL)
+                for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                        totalHPWL += returnIONetsHPWL(_sections[idx].net);
+                }
                 std::cout << "***HPWL after IOPlacement: " << totalHPWL
                           << "***\n";
         }

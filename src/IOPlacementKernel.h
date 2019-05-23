@@ -38,6 +38,7 @@
 #ifndef __IOPLACEMENTKERNEL_H_
 #define __IOPLACEMENTKERNEL_H_
 
+#include "Core.h"
 #include "Parameters.h"
 #include "HungarianMatching.h"
 #include "Netlist.h"
@@ -55,19 +56,24 @@ class IOPlacementKernel {
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
 
+        unsigned _slotsPerSection = 100;
+        float _slotsIncreaseFactor = 0.1f;
+
+        float _usagePerSection = .1f;
+        float _usageIncreaseFactor = 0.1f;
+
+        bool _forcePinSpread = true;
+
         void randomPlacement(std::vector<IOPin>&);
         void initNetlistAndCore();
         void initIOLists();
         void defineSlots();
         void createSections();
         void setupSections();
-        void assignPinsSections(sectionVector_t&);
-        bool checkSections(sectionVector_t&);
+        bool assignPinsSections();
         DBU returnIONetsHPWL(Netlist&);
 
-        /* TODO:  <08-05-19, if this is a check why not return a bool?! > */
-        inline Orientation checkOrientation(const DBU x, const DBU y,
-                                            Orientation);
+        inline void updateOrientation(IOPin&);
 
         int getKValue() { return 1; }
 
