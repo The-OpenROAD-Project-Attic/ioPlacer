@@ -88,7 +88,8 @@ void IOPlacementKernel::initIOLists() {
 }
 
 void IOPlacementKernel::defineSlots() {
-        Netlist& netlist = _netlistIOPins;
+        unsigned numPins = _netlistIOPins.numIOPins();
+
         Coordinate lb = _core.getLowerBound();
         Coordinate ub = _core.getUpperBound();
         DBU lbX = lb.getX();
@@ -104,8 +105,6 @@ void IOPlacementKernel::defineSlots() {
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
-
-        unsigned numPins = netlist.numIOPins();
 
         unsigned interval = std::floor(totalNumSlots / (getKValue() * numPins));
         if (std::floor(totalNumSlots / interval) <= numPins) {
