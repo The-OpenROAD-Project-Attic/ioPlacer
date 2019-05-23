@@ -170,7 +170,11 @@ void Parser::initCore() {
                 minSpacingY *= 2;
         }
 
-        *_core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
+        /* TODO:  <23-05-19, here we multiply the spacing by two to comply with
+         * minimum spacing in the same metal layer, to position two pins in
+         * neighbour track one need to consider changing metal layers between
+         * them > */
+        *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY);
 }
 
