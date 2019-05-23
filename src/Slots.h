@@ -49,8 +49,7 @@
  *  Detailed description
  */
 struct _Slot_t {
-        bool current;
-        bool visited;
+        bool used;
         Coordinate pos;
         /* IOPin* pin; // TODO: do we need this? */
 } typedef Slot_t;

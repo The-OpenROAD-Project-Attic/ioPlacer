@@ -88,8 +88,6 @@ void IOPlacementKernel::initIOLists() {
 }
 
 void IOPlacementKernel::defineSlots() {
-        unsigned numPins = _netlistIOPins.numIOPins();
-
         Coordinate lb = _core.getLowerBound();
         Coordinate ub = _core.getUpperBound();
         DBU lbX = lb.getX();
@@ -101,15 +99,9 @@ void IOPlacementKernel::defineSlots() {
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
 
-        bool use = false;
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
-
-        unsigned interval = std::floor(totalNumSlots / (getKValue() * numPins));
-        if (std::floor(totalNumSlots / interval) <= numPins) {
-                interval = std::floor(totalNumSlots / numPins);
-        }
 
         /*******************************************
          * How the for bellow follows core boundary *
@@ -170,42 +162,30 @@ void IOPlacementKernel::defineSlots() {
 
         int i = 0;
         for (Coordinate pos : slotsEdge1) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge2) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge3) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge4) {
-                if (i % interval) {
-                        use = false;
-                }
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({use, false, Coordinate(currX, currY)});
+                _slots.push_back({false, Coordinate(currX, currY)});
                 i++;
         }
 }
@@ -395,9 +375,12 @@ void IOPlacementKernel::run() {
 
         for (auto& i : _slots) {
                 if (_zeroSinkIOs.size() > 0) {
-                        _zeroSinkIOs[0].setPos(i.pos);
-                        assignment.push_back(_zeroSinkIOs[0]);
-                        _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                        if (not i.used) {
+                                i.used = true;
+                                _zeroSinkIOs[0].setPos(i.pos);
+                                assignment.push_back(_zeroSinkIOs[0]);
+                                _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                        }
                 } else {
                         break;
                 }

@@ -82,7 +82,7 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigmentVector,
                         Coordinate sPos = matrixSlots[row].pos;
                         for (unsigned i = 0; i < slots.size(); i++) {
                                 if (samePos(slots[i].pos, sPos)) {
-                                        slots[i].current = true;
+                                        slots[i].used = true;
                                         break;
                                 }
                         }
