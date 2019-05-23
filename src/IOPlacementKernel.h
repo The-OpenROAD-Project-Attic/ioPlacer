@@ -53,14 +53,7 @@ class IOPlacementKernel {
         std::string _verticalMetalLayer;
         std::vector<IOPin> _assignment;
         bool returnHPWL = false;
-
-       private:
-        Parameters* _parms;
-        Netlist _netlistIOPins;
-        slotVector_t _slots;
-        sectionVector_t _sections;
-        std::vector<IOPin> _zeroSinkIOs;
-
+        
         unsigned _slotsPerSection = 100;
         float _slotsIncreaseFactor = 0.1f;
 
@@ -68,6 +61,13 @@ class IOPlacementKernel {
         float _usageIncreaseFactor = 0.1f;
 
         bool _forcePinSpread = true;
+
+       private:
+        Parameters* _parms;
+        Netlist _netlistIOPins;
+        slotVector_t _slots;
+        sectionVector_t _sections;
+        std::vector<IOPin> _zeroSinkIOs;
 
         void randomPlacement();
         void initNetlistAndCore();
