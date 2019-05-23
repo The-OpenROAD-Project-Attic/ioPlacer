@@ -38,19 +38,15 @@
 #ifndef __HUNGARIANMATCHING_H_
 #define __HUNGARIANMATCHING_H_
 
+#include "munkres/munkres.h"
+
 #include "Coordinate.h"
-#include "Core.h"
 #include "Netlist.h"
 #include "IOPlacementKernel.h"
 #include "Slots.h"
-#include "munkres/munkres.h"
-
-#include <iostream>
-#include <math.h>
 
 class HungarianMatching {
        private:
-        Core* _core;
         Matrix<DBU> _hungarianMatrix;
         Munkres<DBU> _hungarianSolver;
         Netlist* _netlist;
@@ -58,22 +54,13 @@ class HungarianMatching {
         unsigned _numSlots;
         unsigned _numIOPins;
 
-        void setNumSlots();
-
         void createMatrix();
-        bool updateNeighborhood(bool);
-        inline void markRemove(std::vector<unsigned>);
-        inline void markExplore(std::vector<unsigned>);
-        inline bool addSlot(Slot_t&);
 
        public:
-        HungarianMatching(Netlist&, Core&, slotVector_t&);
-        HungarianMatching(Section_t&, Core&);
+        HungarianMatching(Section_t&);
         virtual ~HungarianMatching() = default;
         void run();
         void getFinalAssignment(std::vector<IOPin>&, slotVector_t&);
-        void assignZeroSinkIOs(std::vector<IOPin>&, const slotVector_t&,
-                               std::vector<IOPin>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

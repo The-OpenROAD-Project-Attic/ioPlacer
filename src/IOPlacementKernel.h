@@ -38,6 +38,7 @@
 #ifndef __IOPLACEMENTKERNEL_H_
 #define __IOPLACEMENTKERNEL_H_
 
+#include "Core.h"
 #include "Parameters.h"
 #include "HungarianMatching.h"
 #include "Netlist.h"

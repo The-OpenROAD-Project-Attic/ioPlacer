@@ -347,8 +347,7 @@ void IOPlacementKernel::run() {
 #pragma omp parallel for private(val) reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
-                                HungarianMatching hgMatching(_sections[idx],
-                                                             _core);
+                                HungarianMatching hgMatching(_sections[idx]);
                                 hgMatching.run();
                                 hgMatching.getFinalAssignment(assignment,
                                                               _slots);
@@ -358,8 +357,15 @@ void IOPlacementKernel::run() {
                 }
         }
 
-        HungarianMatching hg(_sections[0], _core);
-        hg.assignZeroSinkIOs(assignment, _slots, vp);
+        for (auto& i : _slots) {
+                if (_zeroSinkIOs.size() > 0) {
+                        _zeroSinkIOs[0].setPos(i.pos);
+                        assignment.push_back(_zeroSinkIOs[0]);
+                        _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                } else {
+                        break;
+                }
+        }
 
 #pragma omp parallel for
         for (unsigned i = 0; i < assignment.size(); ++i) {
