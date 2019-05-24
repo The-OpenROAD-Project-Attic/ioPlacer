@@ -41,9 +41,31 @@
 
 #include <random>
 
-IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {}
+IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
+        initNetlistAndCore();
+        if (_parms->returnHPWL()) {
+                _returnHPWL = true;
+        }
+        if (_parms->returnForceSpread()) {
+                _forcePinSpread = true;
+        } else {
+                _forcePinSpread = false;
+        }
+        if (_parms->returnNslots() > -1) {
+                _slotsPerSection = _parms->returnNslots();
+        }
+        if (_parms->returnSlotsFactor() > -1) {
+                _slotsIncreaseFactor = _parms->returnSlotsFactor();
+        }
+        if (_parms->returnUsage() > -1) {
+                _usagePerSection = _parms->returnUsage();
+        }
+        if (_parms->returnUsageFactor() > -1) {
+                _usageIncreaseFactor = _parms->returnUsageFactor();
+        }
+}
 
-void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
+void IOPlacementKernel::randomPlacement() {
         static const int kMaxValue = _slots.size() - 1;
         std::vector<int> v(kMaxValue + 1);
         for (size_t i = 0; i < v.size(); ++i) v[i] = i;
@@ -51,7 +73,7 @@ void IOPlacementKernel::randomPlacement(std::vector<IOPin>& assignment) {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 unsigned b = v[0];
                 ioPin.setPos(_slots.at(b).pos);
-                assignment.push_back(ioPin);
+                _assignment.push_back(ioPin);
                 v.erase(v.begin());
         });
 }
@@ -337,15 +359,24 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 }
 
 void IOPlacementKernel::run() {
-        std::vector<IOPin> assignment;
         std::vector<HungarianMatching> hgVec;
 
-        initNetlistAndCore();
+        std::cout << "_slotsPerSection     " << _slotsPerSection << std::endl;
+        std::cout << "_slotsIncreaseFactor " << _slotsIncreaseFactor
+                  << std::endl;
+        std::cout << "_usagePerSection     " << _usagePerSection << std::endl;
+        std::cout << "_usageIncreaseFactor " << _usageIncreaseFactor
+                  << std::endl;
+        std::cout << "_forcePinSpread      " << _forcePinSpread << std::endl;
+
+        exit(0);
+
         initIOLists();
         defineSlots();
+
         setupSections();
 
-        if (_parms->returnHPWL()) {
+        if (_returnHPWL) {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
@@ -363,7 +394,7 @@ void IOPlacementKernel::run() {
         }
 
         for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].getFinalAssignment(assignment, _slots);
+                hgVec[idx].getFinalAssignment(_assignment, _slots);
         }
 
         for (auto& i : _slots) {
@@ -371,7 +402,7 @@ void IOPlacementKernel::run() {
                         if (not i.used) {
                                 i.used = true;
                                 _zeroSinkIOs[0].setPos(i.pos);
-                                assignment.push_back(_zeroSinkIOs[0]);
+                                _assignment.push_back(_zeroSinkIOs[0]);
                                 _zeroSinkIOs.erase(_zeroSinkIOs.begin());
                         }
                 } else {
@@ -380,17 +411,11 @@ void IOPlacementKernel::run() {
         }
 
 #pragma omp parallel for
-        for (unsigned i = 0; i < assignment.size(); ++i) {
-                updateOrientation(assignment[i]);
+        for (unsigned i = 0; i < _assignment.size(); ++i) {
+                updateOrientation(_assignment[i]);
         }
 
-        WriterIOPins writer(_netlistIOPins, assignment, _horizontalMetalLayer,
-                            _verticalMetalLayer, _parms->getInputDefFile(),
-                            _parms->getOutputDefFile());
-
-        writer.run();
-
-        if (_parms->returnHPWL()) {
+        if (_returnHPWL) {
                 DBU totalHPWL = 0;
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
@@ -399,4 +424,12 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL after IOPlacement: " << totalHPWL
                           << "***\n";
         }
+}
+
+void IOPlacementKernel::getResults() {
+        WriterIOPins writer(_netlistIOPins, _assignment, _horizontalMetalLayer,
+                            _verticalMetalLayer, _parms->getInputDefFile(),
+                            _parms->getOutputDefFile());
+
+        writer.run();
 }

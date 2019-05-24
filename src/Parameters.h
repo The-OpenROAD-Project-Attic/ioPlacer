@@ -56,6 +56,12 @@ class Parameters {
         std::string _outputDefFile;
         bool _returnHPWL = false;
 
+        bool _forceSpread = true;
+        int _nslots = -1;
+        float _slotsFactor = -1;
+        float _usage = -1;
+        float _usageFactor = -1;
+
         void printAll() const;
 
        public:
@@ -77,6 +83,11 @@ class Parameters {
         int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
         int getVerticalMetalLayer() const { return _verticalMetalLayer; };
         int returnHPWL() const { return _returnHPWL; };
+        int returnNslots() const { return _nslots; };
+        float returnSlotsFactor() const { return _slotsFactor; };
+        float returnUsage() const { return _usage; };
+        float returnUsageFactor() const { return _usageFactor; };
+        float returnForceSpread() const { return _forceSpread; };
 };
 
 #endif /* __PARAMETERS_H_ */

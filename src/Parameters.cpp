@@ -46,11 +46,17 @@ Parameters::Parameters(int argc, char** argv) {
         po::options_description dscp("Usage");
         // clang-format off
         dscp.add_options()
-                ("input,i"   ,  po::value<std::string>() ,  "Input DEF file (mandatory)")
-                ("output,o"  ,  po::value<std::string>() ,  "Output DEF file (mandatory)")
-                ("hmetal,h"  ,  po::value<int>()         ,  "Horizontal metal layer (int) (mandatory)")
-                ("vmetal,v"  ,  po::value<int>()         ,  "Vertical metal layer (int) (mandatory)")
-                ("wirelen,w" ,  po::value<int>()         ,  "Return IO nets HPWL (bool) (optional)");
+                ("input,i"        , po::value<std::string>() , "Input DEF file (mandatory)")
+                ("output,o"       , po::value<std::string>() , "Output DEF file (mandatory)")
+                ("hmetal,h"       , po::value<int>()         , "Horizontal metal layer (int) (mandatory)")
+                ("vmetal,v"       , po::value<int>()         , "Vertical metal layer (int) (mandatory)")
+                ("wirelen,w"      , po::value<int>()         , "Return IO nets HPWL (bool) (optional)")
+                ("force-spread,f" , po::value<int>()         , "Force pins to be spread in core, i.e., try to respect number os slots (bool) (optional)")
+                ("nslots,n"       , po::value<int>()         , "Number of slots per section (int) (optional)")
+                ("slots-factor,s" , po::value<float>()       , "Increase factor (%) of slots per section (float) (optional)")
+                ("max-slots,m"        , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
+                ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
+                ;
         // clang-format on
 
         po::variables_map vm;
@@ -75,8 +81,24 @@ Parameters::Parameters(int argc, char** argv) {
                 _outputDefFile = vm["output"].as<std::string>();
                 _horizontalMetalLayer = vm["hmetal"].as<int>();
                 _verticalMetalLayer = vm["vmetal"].as<int>();
+
                 if (vm.count("wirelen")) {
                         _returnHPWL = vm["wirelen"].as<int>();
+                }
+                if (vm.count("nslots")) {
+                        _nslots = vm["nslots"].as<int>();
+                }
+                if (vm.count("slots-factor")) {
+                        _slotsFactor = vm["slots-factor"].as<float>();
+                }
+                if (vm.count("max-slots")) {
+                        _usage = vm["max-slots"].as<float>();
+                }
+                if (vm.count("usage-factor")) {
+                        _usageFactor = vm["usage-factor"].as<float>();
+                }
+                if (vm.count("force-spread")) {
+                        _forceSpread = vm["force-spread"].as<int>();
                 }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
@@ -86,6 +108,7 @@ Parameters::Parameters(int argc, char** argv) {
 }
 
 void Parameters::printAll() const {
+        // clang-format off
         std::cout << "\nOptions: \n";
         std::cout << std::setw(20) << std::left << "Input DEF file: ";
         std::cout << _inputDefFile << "\n";
@@ -97,5 +120,12 @@ void Parameters::printAll() const {
         std::cout << "Metal" << _verticalMetalLayer << "\n";
         std::cout << "Get IO nets HPWL: " << _returnHPWL << "\n";
 
+        std::cout << "Number of slots per section: " << _nslots << "\n";
+        std::cout << "Increase factor of slots per section: " << _slotsFactor << "\n";
+        std::cout << "Percentage of usage for each section: " << _usage << "\n";
+        std::cout << "Increase factor of usage for each section: " << _usageFactor << "\n";
+        std::cout << "Force pin spread: " << _forceSpread << "\n";
+
         std::cout << "\n";
+        // clang-format on
 }

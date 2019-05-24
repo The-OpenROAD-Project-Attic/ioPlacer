@@ -45,16 +45,14 @@
 #include "Slots.h"
 
 class IOPlacementKernel {
-       private:
-        Parameters* _parms;
+       protected:
+        friend class IOPlacement;
         Netlist _netlist;
-        Netlist _netlistIOPins;
         Core _core;
-        slotVector_t _slots;
-        sectionVector_t _sections;
-        std::vector<IOPin> _zeroSinkIOs;
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
+        std::vector<IOPin> _assignment;
+        bool _returnHPWL = false;
 
         unsigned _slotsPerSection = 100;
         float _slotsIncreaseFactor = 0.1f;
@@ -64,7 +62,14 @@ class IOPlacementKernel {
 
         bool _forcePinSpread = true;
 
-        void randomPlacement(std::vector<IOPin>&);
+       private:
+        Parameters* _parms;
+        Netlist _netlistIOPins;
+        slotVector_t _slots;
+        sectionVector_t _sections;
+        std::vector<IOPin> _zeroSinkIOs;
+
+        void randomPlacement();
         void initNetlistAndCore();
         void initIOLists();
         void defineSlots();
@@ -79,7 +84,9 @@ class IOPlacementKernel {
 
        public:
         IOPlacementKernel(Parameters&);
+        IOPlacementKernel() = default;
         void run();
+        void getResults();
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */
