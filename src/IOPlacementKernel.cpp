@@ -36,10 +36,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "IOPlacementKernel.h"
-#include "Parser.h"
 #include "WriterIOPins.h"
 
-#include <random>
+#ifdef STANDALONE_MODE
+#include "Parser.h"
+
+void IOPlacementKernel::initNetlistAndCore() {
+        Parser parser(*_parms, _netlist, _core);
+        _horizontalMetalLayer =
+            "Metal" + std::to_string(_parms->getHorizontalMetalLayer());
+        _verticalMetalLayer =
+            "Metal" + std::to_string(_parms->getVerticalMetalLayer());
+        parser.run();
+}
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         initNetlistAndCore();
@@ -64,6 +73,7 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
                 _usageIncreaseFactor = _parms->returnUsageFactor();
         }
 }
+#endif // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement() {
         static const int kMaxValue = _slots.size() - 1;
@@ -76,15 +86,6 @@ void IOPlacementKernel::randomPlacement() {
                 _assignment.push_back(ioPin);
                 v.erase(v.begin());
         });
-}
-
-void IOPlacementKernel::initNetlistAndCore() {
-        Parser parser(*_parms, _netlist, _core);
-        _horizontalMetalLayer =
-            "Metal" + std::to_string(_parms->getHorizontalMetalLayer());
-        _verticalMetalLayer =
-            "Metal" + std::to_string(_parms->getVerticalMetalLayer());
-        parser.run();
 }
 
 void IOPlacementKernel::initIOLists() {
