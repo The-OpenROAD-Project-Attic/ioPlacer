@@ -43,13 +43,11 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "../3rdparty/def/defiComponent.hpp"
-#include "../3rdparty/def/defiNet.hpp"
-#include "../3rdparty/def/defiRowTrack.hpp"
-
-#include "../3rdparty/def/defwWriter.hpp"
-
-#include "../3rdparty/def/defrReader.hpp"
+#include "def/defiComponent.hpp"
+#include "def/defiNet.hpp"
+#include "def/defiRowTrack.hpp"
+#include "def/defwWriter.hpp"
+#include "def/defrReader.hpp"
 
 extern void freeCB(void* name);
 extern void* mallocCB(size_t size);
