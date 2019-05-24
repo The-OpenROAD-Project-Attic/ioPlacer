@@ -19,7 +19,7 @@ git clone https://github.com/mgwoo/RePlAce-pin
 ##### Standalone binary
 
 ````
-cd IOPlacement/
+cd RePlAce-pin/
 make release
 `````
 
@@ -28,11 +28,11 @@ The binary file will be on IOPlacement's base folder.
 ##### Static library
 
 ````
-cd IOPlacement/
+cd RePlAce-pin/
 make lib
 `````
 
-The library file (libioPlace.a) will be on the `./lib` folder
+The library file (libioPlace.a) will be on the `RePlAce-pin/lib` folder
 
 #### IO Placement Arguments
 
@@ -78,7 +78,7 @@ You can run IOPlacement with RePlAce, using the following script:
 
 ````
 
-/IOPlacement/scripts/replace_ioplace_loop.sh
+bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <N>
 
 ````
 This script implement a loop with RePlAce and IOPlacement, as shown bellow:
@@ -91,7 +91,7 @@ To execute the script, you will need both RePlAce and IOPlacement repositories i
 
 --root_dir
 ------RePlAce
-------IOPlacement
+------RePlAce-pin
 
 ````
 
@@ -99,7 +99,7 @@ In the root directory, just run the following command line:
 
 ````
 
-bash IOPlacement/scripts/replace_ioplace_loop.sh N
+bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <N>
 
 ````
 
