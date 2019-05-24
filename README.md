@@ -16,12 +16,23 @@ git clone https://github.com/mgwoo/RePlAce-pin
 
 #### How to Compile
 
+##### Standalone binary
+
 ````
 cd IOPlacement/
 make release
 `````
 
 The binary file will be on IOPlacement's base folder.
+
+##### Static library
+
+````
+cd IOPlacement/
+make lib
+`````
+
+The library file (libioPlace.a) will be on the `./lib` folder
 
 #### IO Placement Arguments
 
