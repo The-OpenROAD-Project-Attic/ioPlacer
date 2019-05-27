@@ -69,7 +69,6 @@ class IOPlacementKernel {
         sectionVector_t _sections;
         std::vector<IOPin> _zeroSinkIOs;
 
-        void randomPlacement();
         void initNetlistAndCore();
         void initIOLists();
         void defineSlots();

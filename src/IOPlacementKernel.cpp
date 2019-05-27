@@ -75,19 +75,6 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
 }
 #endif // STANDALONE_MODE
 
-void IOPlacementKernel::randomPlacement() {
-        static const int kMaxValue = _slots.size() - 1;
-        std::vector<int> v(kMaxValue + 1);
-        for (size_t i = 0; i < v.size(); ++i) v[i] = i;
-        std::shuffle(v.begin(), v.end(), std::default_random_engine(42));
-        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                unsigned b = v[0];
-                ioPin.setPos(_slots.at(b).pos);
-                _assignment.push_back(ioPin);
-                v.erase(v.begin());
-        });
-}
-
 void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 std::vector<InstancePin> instPinsVector;
