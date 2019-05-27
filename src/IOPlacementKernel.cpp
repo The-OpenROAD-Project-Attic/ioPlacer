@@ -357,8 +357,6 @@ void IOPlacementKernel::run() {
                   << std::endl;
         std::cout << "_forcePinSpread      " << _forcePinSpread << std::endl;
 
-        exit(0);
-
         initIOLists();
         defineSlots();
 
