@@ -86,6 +86,8 @@ class IOPlacementKernel {
         IOPlacementKernel() = default;
         void run();
         void getResults();
+        void printConfig();
+
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */

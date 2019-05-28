@@ -73,7 +73,7 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
                 _usageIncreaseFactor = _parms->returnUsageFactor();
         }
 }
-#endif // STANDALONE_MODE
+#endif  // STANDALONE_MODE
 
 void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
@@ -262,7 +262,17 @@ bool IOPlacementKernel::assignPinsSections() {
         }
 }
 
+void IOPlacementKernel::printConfig() {
+        std::cout << "Slots Per Section     " << _slotsPerSection << "\n";
+        std::cout << "Slots Increase Factor " << _slotsIncreaseFactor << "\n";
+        std::cout << "Usage Per Section     " << _usagePerSection << "\n";
+        std::cout << "Usage Increase Factor " << _usageIncreaseFactor << "\n";
+        std::cout << "Force Pin Spread      " << _forcePinSpread << "\n\n";
+}
+
 void IOPlacementKernel::setupSections() {
+        bool allAssigned;
+        unsigned i = 0;
         if (!(_slotsPerSection > 1)) {
                 std::cout << "_slotsPerSection must be grater than one\n";
                 exit(1);
@@ -277,7 +287,12 @@ void IOPlacementKernel::setupSections() {
                              "_usageIncreaseFactor or _slotsIncreaseFactor "
                              "must be != 0\n";
         }
-        while (not assignPinsSections()) {
+        do {
+                std::cout << "Tentative " << i++ << " to setup sections\n";
+                printConfig();
+
+                allAssigned = assignPinsSections();
+
                 _usagePerSection *= (1 + _usageIncreaseFactor);
                 _slotsPerSection *= (1 + _slotsIncreaseFactor);
                 if (_sections.size() > MAX_SECTIONS_RECOMMENDED) {
@@ -296,7 +311,7 @@ void IOPlacementKernel::setupSections() {
                             << MAX_SLOTS_RECOMMENDED
                             << " this may negatively affect performance\n";
                 }
-        };
+        } while (not allAssigned);
 }
 
 inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
@@ -348,14 +363,6 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 
 void IOPlacementKernel::run() {
         std::vector<HungarianMatching> hgVec;
-
-        std::cout << "_slotsPerSection     " << _slotsPerSection << std::endl;
-        std::cout << "_slotsIncreaseFactor " << _slotsIncreaseFactor
-                  << std::endl;
-        std::cout << "_usagePerSection     " << _usagePerSection << std::endl;
-        std::cout << "_usageIncreaseFactor " << _usageIncreaseFactor
-                  << std::endl;
-        std::cout << "_forcePinSpread      " << _forcePinSpread << std::endl;
 
         initIOLists();
         defineSlots();
