@@ -54,7 +54,7 @@ Parameters::Parameters(int argc, char** argv) {
                 ("force-spread,f" , po::value<int>()         , "Force pins to be spread in core, i.e., try to respect number os slots (bool) (optional)")
                 ("nslots,n"       , po::value<int>()         , "Number of slots per section (int) (optional)")
                 ("slots-factor,s" , po::value<float>()       , "Increase factor (%) of slots per section (float) (optional)")
-                ("max-slots,m"        , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
+                ("max-slots,m"    , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
                 ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
                 ;
         // clang-format on

@@ -390,11 +390,13 @@ void IOPlacementKernel::run() {
                 hgVec[idx].getFinalAssignment(_assignment, _slots);
         }
 
-        for (auto& i : _slots) {
+        /* TODO:  <28-05-19, for some reason the first 3 slots/rows always have
+         * overlap violations if used > */
+        for (unsigned i = 3; i < _slots.size(); i++) {
                 if (_zeroSinkIOs.size() > 0) {
-                        if (not i.used) {
-                                i.used = true;
-                                _zeroSinkIOs[0].setPos(i.pos);
+                        if (not _slots[i].used) {
+                                _slots[i].used = true;
+                                _zeroSinkIOs[0].setPos(_slots[i].pos);
                                 _assignment.push_back(_zeroSinkIOs[0]);
                                 _zeroSinkIOs.erase(_zeroSinkIOs.begin());
                         }
