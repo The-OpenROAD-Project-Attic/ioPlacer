@@ -104,7 +104,7 @@ class IOPlacement {
 
         void initNetlist();
         void getResults(std::vector<pinS>& pinAssignment);
-        char getOrientationString(auto orient);
+        char getOrientationString(int orient);
 };
 
 #endif /* __IOPLACEMENT_H_ */
