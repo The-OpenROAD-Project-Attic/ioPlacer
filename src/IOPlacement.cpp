@@ -116,7 +116,7 @@ void IOPlacement::initNetlist() {
         _ioPins.clear();
 }
 
-char IOPlacement::getOrientationString(auto orient) {
+char IOPlacement::getOrientationString(int orient) {
         if (orient == SOUTH) return 'S';
         if (orient == NORTH) return 'N';
         if (orient == EAST) return 'E';
