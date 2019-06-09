@@ -39,14 +39,15 @@
 #define __IOPLACEMENTKERNEL_H_
 
 #include "Core.h"
-#include "Parameters.h"
 #include "HungarianMatching.h"
+#include "IOPlacement.h"
 #include "Netlist.h"
+#include "Parameters.h"
 #include "Slots.h"
 
 class IOPlacementKernel {
        protected:
-        friend class IOPlacement;
+        friend class ioPlacer::IOPlacement;
         Netlist _netlist;
         Core _core;
         std::string _horizontalMetalLayer;
@@ -87,7 +88,6 @@ class IOPlacementKernel {
         void run();
         void getResults();
         void printConfig();
-
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */

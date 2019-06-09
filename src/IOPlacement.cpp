@@ -40,6 +40,8 @@
 #include "Coordinate.h"
 #include <vector>
 
+namespace ioPlacer {
+
 IOPlacementKernel ioKernel;
 
 void IOPlacement::initCore(point lowerBounds, point upperBounds,
@@ -158,3 +160,5 @@ std::vector<pinS> IOPlacement::run(bool returnHPWL) {
         getResults(pinAssignment);
         return pinAssignment;
 }
+
+}  // namespace ioPlacer

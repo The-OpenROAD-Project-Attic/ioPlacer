@@ -45,6 +45,8 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
+namespace ioPlacer {
+
 typedef long long int DBU;
 typedef boost::geometry::model::d2::point_xy<DBU> point;
 typedef boost::geometry::model::box<point> box;
@@ -106,5 +108,7 @@ class IOPlacement {
         void getResults(std::vector<pinS>& pinAssignment);
         char getOrientationString(int orient);
 };
+
+}  // namespace ioPlacer
 
 #endif /* __IOPLACEMENT_H_ */
