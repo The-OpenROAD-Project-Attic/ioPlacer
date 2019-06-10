@@ -11,7 +11,7 @@ IO Placement finds an optimal placement for IO pins through the use of a Hungari
 #### Clone Repository
 
 ```
-git clone https://github.com/mgwoo/RePlAce-pin
+https://github.com/abk-openroad/ioPlacer.git
 ```
 
 #### How to Compile
@@ -19,7 +19,7 @@ git clone https://github.com/mgwoo/RePlAce-pin
 ##### Standalone binary
 
 ````
-cd RePlAce-pin/
+cd ioPlacer/
 make release
 `````
 
@@ -28,11 +28,11 @@ The binary file will be on IOPlacement's base folder.
 ##### Static library
 
 ````
-cd RePlAce-pin/
+cd ioPlacer/
 make lib
 `````
 
-The library file (libioPlace.a) will be on the `RePlAce-pin/lib` folder
+The library file (libioPlace.a) will be on the 'ioPlacer/lib` folder
 
 #### IO Placement Arguments
 
@@ -51,6 +51,7 @@ There are optional flags that can be used.
 - **-s** : Increase factor (%) of slots per section
 - **-m** : Percentage of usage for each section
 - **-x** : Increase factor (%) of usage for each section
+- **-b** : Name of the file containing the blocked areas. One blocked area per line, format: initialX initialY finalX finalY (e.g.: 0 1000 0 902900)
 
 ## Basic Usage
 
