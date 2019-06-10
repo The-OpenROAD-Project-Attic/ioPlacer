@@ -133,3 +133,30 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
 
         return netBBox.getHalfPerimeter();
 }
+
+DBU Netlist::computeDistanceIOtoPins(unsigned idx, Coordinate slotPos) {
+        unsigned netStart = _netPointer[idx];
+        unsigned netEnd = _netPointer[idx + 1];
+
+        //DBU minX = slotPos.getX();
+        //DBU minY = slotPos.getY();
+        //DBU maxX = slotPos.getX();
+        //DBU maxY = slotPos.getY();
+
+        DBU totalDistance = 0;
+        //int counter = 0;
+
+        for (unsigned idx = netStart; idx < netEnd; ++idx) {
+                //if (counter > 50) {
+                        //break;
+                //}
+                //
+                Coordinate pinPos = _instPins[idx].getPos();
+                totalDistance += abs(pinPos.getX() - slotPos.getX()) +
+                                 abs(pinPos.getY() - slotPos.getY());
+
+                //counter++;
+        }
+
+        return totalDistance;
+}

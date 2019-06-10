@@ -234,7 +234,7 @@ bool IOPlacementKernel::assignPinsSections() {
                 std::vector<InstancePin> instPinsVector;
 #pragma omp parallel for
                 for (unsigned i = 0; i < sections.size(); i++) {
-                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
+                        dst[i] = net.computeDistanceIOtoPins(idx, sections[i].pos);
                 }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);

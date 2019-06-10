@@ -115,6 +115,7 @@ class Netlist {
         int numIOPins();
 
         DBU computeIONetHPWL(unsigned, Coordinate);
+        DBU computeDistanceIOtoPins(unsigned, Coordinate);
         Box getBB(unsigned, Coordinate);
 };
 
