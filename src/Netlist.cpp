@@ -146,6 +146,7 @@ DBU Netlist::computeDistanceIOtoPins(unsigned idx, Coordinate slotPos) {
         DBU totalDistance = 0;
         //int counter = 0;
 
+#pragma omp parallel for reduction(+ : totalDistance)
         for (unsigned idx = netStart; idx < netEnd; ++idx) {
                 //if (counter > 50) {
                         //break;
