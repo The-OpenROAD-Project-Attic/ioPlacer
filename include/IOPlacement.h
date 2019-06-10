@@ -75,6 +75,7 @@ class IOPlacement {
 
         // net connected to the pin, pin name, pin position
         void addInstPin(std::string net, std::string pinName, point pos);
+	void addBlockage(point initialPos, point finalPos);
 
         // optional
         void setSlotsPerSection(unsigned slotsPerSection, float increaseFactor);

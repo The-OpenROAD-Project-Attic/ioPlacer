@@ -56,6 +56,7 @@ Parameters::Parameters(int argc, char** argv) {
                 ("slots-factor,s" , po::value<float>()       , "Increase factor (%) of slots per section (float) (optional)")
                 ("max-slots,m"    , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
                 ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
+                ("block-area,b"   , po::value<std::string>() , "File containing areas to be blocked (optional)")
                 ;
         // clang-format on
 
@@ -100,6 +101,9 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("force-spread")) {
                         _forceSpread = vm["force-spread"].as<int>();
                 }
+                if (vm.count("block-area")) {
+                        _blockagesFile = vm["block-area"].as<std::string>();
+                }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
@@ -125,6 +129,7 @@ void Parameters::printAll() const {
         std::cout << "Percentage of usage for each section: " << _usage << "\n";
         std::cout << "Increase factor of usage for each section: " << _usageFactor << "\n";
         std::cout << "Force pin spread: " << _forceSpread << "\n";
+        std::cout << "Blockage area file: " << _blockagesFile << "\n"; 
 
         std::cout << "\n";
         // clang-format on

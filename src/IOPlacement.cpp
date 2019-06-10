@@ -85,6 +85,27 @@ void IOPlacement::addInstPin(std::string net, std::string pinName, point pos) {
         }
 }
 
+void IOPlacement::addBlockage(point initialPos, point finalPos){
+	DBU initialX = initialPos.x();
+	DBU initialY = initialPos.y();
+	DBU finalX = finalPos.x();
+	DBU finalY = finalPos.y();
+	Coordinate coreLowerBound = ioKernel._core.getLowerBound();
+	Coordinate coreUpperBound = ioKernel._core.getUpperBound();
+	if (initialX != finalX && initialY != finalY){
+		std::cout << "ERROR: Blockage should begin and end on the same edge";
+		exit(-1);
+	}
+	initialX = std::max(initialX, coreLowerBound.getX());
+	initialY = std::max(initialY, coreLowerBound.getY());
+	finalX = std::min(finalX, coreUpperBound.getX());
+	finalY = std::min(finalY, coreUpperBound.getY());			
+	Coordinate initialCoord(initialX, initialY);
+	Coordinate finalCoord(finalX, finalY);
+	std::pair<Coordinate, Coordinate> block(initialCoord, finalCoord);
+	ioKernel._blockagesArea.push_back(block);
+}
+
 void IOPlacement::initNetlist() {
         for (unsigned i = 0; i < _ioPins.size(); ++i) {
                 ioPin& io = _ioPins[i];

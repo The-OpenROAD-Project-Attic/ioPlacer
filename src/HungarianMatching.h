@@ -53,6 +53,7 @@ class HungarianMatching {
         slotVector_t* _slots;
         unsigned _numSlots;
         unsigned _numIOPins;
+	unsigned _nonBlockedSlots;
 
         void createMatrix();
 

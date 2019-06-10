@@ -38,6 +38,7 @@
 #include <cstdio>
 #include <istream>
 #include <fstream>
+#include <iostream>
 #include "Parser.h"
 
 Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
@@ -193,4 +194,32 @@ void Parser::initMapInstToPosition() {
                 point p = point(comp.position.getX(), comp.position.getY());
                 mapInstToPosition[comp.name] = p;
         }
+}
+
+void Parser::getBlockages(std::string filename, std::vector<std::pair<Coordinate, Coordinate>> & blockages) {
+	std::ifstream f;
+	f.open(filename);
+	DBU initialX;
+	DBU initialY;
+	DBU finalX;
+	DBU finalY;
+	Coordinate coreLowerBound = _core->getLowerBound();
+	Coordinate coreUpperBound = _core->getUpperBound();
+	if (f.is_open()){
+		while (f >> initialX >> initialY >> finalX >> finalY){
+			if (initialX != finalX && initialY != finalY){
+				std::cout << "ERROR: Blockage should begin and end on the same edge";
+				exit(-1);
+			}
+			initialX = std::max(initialX, coreLowerBound.getX());
+			initialY = std::max(initialY, coreLowerBound.getY());
+			finalX = std::min(finalX, coreUpperBound.getX());
+			finalY = std::min(finalY, coreUpperBound.getY());			
+			Coordinate initialCoord(initialX, initialY);
+			Coordinate finalCoord(finalX, finalY);
+			std::pair<Coordinate, Coordinate> block(initialCoord, finalCoord);
+			blockages.push_back(block);
+		}
+	}
+	f.close();
 }
