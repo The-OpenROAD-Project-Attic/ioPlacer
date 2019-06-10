@@ -55,11 +55,11 @@ class IOPlacementKernel {
         std::vector<IOPin> _assignment;
         bool _returnHPWL = false;
 
-        unsigned _slotsPerSection = 100;
-        float _slotsIncreaseFactor = 0.1f;
+        unsigned _slotsPerSection = 200;
+        float _slotsIncreaseFactor = 0.01f;
 
-        float _usagePerSection = .1f;
-        float _usageIncreaseFactor = 0.1f;
+        float _usagePerSection = .8f;
+        float _usageIncreaseFactor = 0.01f;
 
         bool _forcePinSpread = true;
         std::string _blockagesFile;
