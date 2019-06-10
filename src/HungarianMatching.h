@@ -49,8 +49,8 @@ class HungarianMatching {
        private:
         Matrix<DBU> _hungarianMatrix;
         Munkres<DBU> _hungarianSolver;
-        Netlist* _netlist;
-        slotVector_t* _slots;
+        Netlist& _netlist;
+        slotVector_t& _slots;
         unsigned _numSlots;
         unsigned _numIOPins;
         unsigned _nonBlockedSlots;
