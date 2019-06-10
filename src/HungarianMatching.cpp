@@ -81,11 +81,10 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigmentVector,
 	_netlist->forEachIOPin([&](unsigned idx, IOPin& ioPin) {
         	slotIndex = 0;
                 for (size_t row = 0; row < rows; row++) {
+			while (matrixSlots[slotIndex].blocked && slotIndex < matrixSlots.size())
+				slotIndex++;
                         if (_hungarianMatrix(row, col) != 0) {
 				slotIndex++;
-				while (matrixSlots[slotIndex].blocked && slotIndex < matrixSlots.size()){
-					slotIndex++;
-				}	
                                 continue;
                         }
                         ioPin.setPos(matrixSlots[slotIndex].pos);
@@ -97,10 +96,7 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigmentVector,
                                        	break;
                                 }
                         }
-			slotIndex++;
-			while (matrixSlots[slotIndex].blocked && slotIndex < matrixSlots.size()){
-				slotIndex++;
-			}	
+			break;
                 }
                 col++;
         });
