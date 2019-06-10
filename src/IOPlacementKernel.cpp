@@ -48,6 +48,10 @@ void IOPlacementKernel::initNetlistAndCore() {
         _verticalMetalLayer =
             "Metal" + std::to_string(_parms->getVerticalMetalLayer());
         parser.run();
+        if (_parms->returnBlockagesFile().size() != 0) {
+                _blockagesFile = _parms->returnBlockagesFile();
+		parser.getBlockages(_blockagesFile, _blockagesArea);
+        }
 }
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
@@ -167,28 +171,60 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge1) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+		bool blocked = false;
+		for (std::pair<Coordinate,Coordinate> blockage : _blockagesArea){
+			if (currX >= std::get<0>(blockage).getX())
+				if (currY >= std::get<0>(blockage).getY())
+					if (currX <= std::get<1>(blockage).getX())
+						if (currY <= std::get<1>(blockage).getY())
+							blocked = true;
+		}	
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge2) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+		bool blocked = false;
+		for (std::pair<Coordinate,Coordinate> blockage : _blockagesArea){
+			if (currX >= std::get<0>(blockage).getX())
+				if (currY >= std::get<0>(blockage).getY())
+					if (currX <= std::get<1>(blockage).getX())
+						if (currY <= std::get<1>(blockage).getY())
+							blocked = true;
+		}	
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge3) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+		bool blocked = false;
+		for (std::pair<Coordinate,Coordinate> blockage : _blockagesArea){
+			if (currX >= std::get<0>(blockage).getX())
+				if (currY >= std::get<0>(blockage).getY())
+					if (currX <= std::get<1>(blockage).getX())
+						if (currY <= std::get<1>(blockage).getY())
+							blocked = true;
+		}	
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge4) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+		bool blocked = false;
+		for (std::pair<Coordinate,Coordinate> blockage : _blockagesArea){
+			if (currX >= std::get<0>(blockage).getX()) 
+				if (currY >= std::get<0>(blockage).getY())
+					if (currX <= std::get<1>(blockage).getX())
+						if (currY <= std::get<1>(blockage).getY())
+							blocked = true; 
+		}
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 }
@@ -199,10 +235,17 @@ void IOPlacementKernel::createSections() {
         unsigned counter = 0;
         unsigned i = 0;
         unsigned numSlots = slots.size();
+	int totalBlocked = 0;
         while (counter < numSlots) {
                 slotVector_t nSlot;
+		int blockedSlots = 0;
                 for (i = 0; i < _slotsPerSection && counter < numSlots; ++i) {
-                        nSlot.push_back(slots[counter++]);
+                        nSlot.push_back(slots[counter]);
+			if (slots[counter].blocked){
+				blockedSlots++;
+				totalBlocked++;
+			}
+			counter++;
                 }
                 Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
                 if (_usagePerSection > 1.f) {
@@ -217,7 +260,8 @@ void IOPlacementKernel::createSections() {
                                 _slotsPerSection *= 1.1;
                         }
                 }
-                nSec.maxSlots = _slotsPerSection * _usagePerSection;
+		nSec.numSlots = nSec.sv.size() - blockedSlots;
+                nSec.maxSlots = nSec.numSlots * _usagePerSection;
                 nSec.curSlots = 0;
                 _sections.push_back(nSec);
         }
@@ -373,8 +417,8 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
-
-        for (unsigned idx = 0; idx < _sections.size(); idx++) {
+        
+	for (unsigned idx = 0; idx < _sections.size(); idx++) {
                 if (_sections[idx].net.numIOPins() > 0) {
                         HungarianMatching hg(_sections[idx]);
                         hgVec.push_back(hg);
@@ -385,26 +429,25 @@ void IOPlacementKernel::run() {
         for (unsigned idx = 0; idx < hgVec.size(); idx++) {
                 hgVec[idx].run();
         }
-
         for (unsigned idx = 0; idx < hgVec.size(); idx++) {
                 hgVec[idx].getFinalAssignment(_assignment, _slots);
         }
-
         /* TODO:  <28-05-19, for some reason the first 3 slots/rows always have
          * overlap violations if used > */
         for (unsigned i = 3; i < _slots.size(); i++) {
                 if (_zeroSinkIOs.size() > 0) {
                         if (not _slots[i].used) {
-                                _slots[i].used = true;
-                                _zeroSinkIOs[0].setPos(_slots[i].pos);
-                                _assignment.push_back(_zeroSinkIOs[0]);
-                                _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+				if (! _slots[i].blocked){
+                                	_slots[i].used = true;
+                                	_zeroSinkIOs[0].setPos(_slots[i].pos);
+                                	_assignment.push_back(_zeroSinkIOs[0]);
+                                	_zeroSinkIOs.erase(_zeroSinkIOs.begin());
+				}
                         }
                 } else {
                         break;
                 }
         }
-
 #pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);

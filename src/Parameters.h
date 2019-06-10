@@ -61,6 +61,7 @@ class Parameters {
         float _slotsFactor = -1;
         float _usage = -1;
         float _usageFactor = -1;
+        std::string _blockagesFile;
 
         void printAll() const;
 
@@ -88,6 +89,7 @@ class Parameters {
         float returnUsage() const { return _usage; };
         float returnUsageFactor() const { return _usageFactor; };
         float returnForceSpread() const { return _forceSpread; };
+	std::string returnBlockagesFile() const { return _blockagesFile; };
 };
 
 #endif /* __PARAMETERS_H_ */

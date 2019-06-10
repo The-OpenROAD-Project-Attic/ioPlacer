@@ -62,6 +62,7 @@ class IOPlacementKernel {
         float _usageIncreaseFactor = 0.1f;
 
         bool _forcePinSpread = true;
+	std::string _blockagesFile;
 
        private:
         Parameters* _parms;
@@ -69,6 +70,7 @@ class IOPlacementKernel {
         slotVector_t _slots;
         sectionVector_t _sections;
         std::vector<IOPin> _zeroSinkIOs;
+	std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
 
         void initNetlistAndCore();
         void initIOLists();

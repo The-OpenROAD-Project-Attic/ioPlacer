@@ -96,6 +96,7 @@ class Parser {
        public:
         Parser(Parameters&, Netlist&, Core&);
         void run();
+	void getBlockages(std::string filename, std::vector<std::pair<Coordinate, Coordinate>>  &blockages);
 };
 
 #endif /* __PARSER_H_ */
