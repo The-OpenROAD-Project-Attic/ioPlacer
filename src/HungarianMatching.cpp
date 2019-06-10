@@ -37,10 +37,12 @@
 
 #include "HungarianMatching.h"
 
-HungarianMatching::HungarianMatching(Section_t& section)
-    : _netlist(section.net), _slots(section.sv) {
+HungarianMatching::HungarianMatching(Section_t& section, slotVector_t& slots)
+    : _netlist(section.net), _slots(slots) {
         _numIOPins = _netlist.numIOPins();
-        _numSlots = _slots.size();
+        _beginSlot = section.beginSlot;
+        _endSlot = section.endSlot;
+        _numSlots = _endSlot - _beginSlot;
         _nonBlockedSlots = section.numSlots;
 }
 
@@ -53,7 +55,7 @@ void HungarianMatching::createMatrix() {
         _hungarianMatrix = Matrix<DBU>(_nonBlockedSlots, _numIOPins);
         unsigned slotIndex = 0;
 #pragma omp parallel for
-        for (unsigned i = 0; i < _numSlots; ++i) {
+        for (unsigned i = _beginSlot; i < _endSlot; ++i) {
                 unsigned pinIndex = 0;
                 Coordinate newPos = _slots[i].pos;
                 if (_slots[i].blocked) {
@@ -72,13 +74,12 @@ inline bool samePos(Coordinate& a, Coordinate& b) {
         return (a.getX() == b.getX() && a.getY() == b.getY());
 }
 
-void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigmentVector,
-                                           slotVector_t& slots) {
+void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigment) {
         size_t rows = _hungarianMatrix.rows();
         size_t col = 0;
         unsigned slotIndex = 0;
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                slotIndex = 0;
+                slotIndex = _beginSlot;
                 for (size_t row = 0; row < rows; row++) {
                         while (_slots[slotIndex].blocked &&
                                slotIndex < _slots.size())
@@ -88,11 +89,11 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigmentVector,
                                 continue;
                         }
                         ioPin.setPos(_slots[slotIndex].pos);
-                        assigmentVector.push_back(ioPin);
+                        assigment.push_back(ioPin);
                         Coordinate sPos = _slots[slotIndex].pos;
-                        for (unsigned i = 0; i < slots.size(); i++) {
-                                if (samePos(slots[i].pos, sPos)) {
-                                        slots[i].used = true;
+                        for (unsigned i = 0; i < _slots.size(); i++) {
+                                if (samePos(_slots[i].pos, sPos)) {
+                                        _slots[i].used = true;
                                         break;
                                 }
                         }

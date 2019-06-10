@@ -222,22 +222,22 @@ void IOPlacementKernel::defineSlots() {
 void IOPlacementKernel::createSections() {
         slotVector_t& slots = _slots;
         _sections.clear();
-        unsigned counter = 0;
-        unsigned i = 0;
         unsigned numSlots = slots.size();
-        int totalBlocked = 0;
-        while (counter < numSlots) {
-                slotVector_t nSlot;
+        unsigned beginSlot = 0;
+        unsigned endSlot = 0;
+        while (endSlot < numSlots) {
                 int blockedSlots = 0;
-                for (i = 0; i < _slotsPerSection && counter < numSlots; ++i) {
-                        nSlot.push_back(slots[counter]);
-                        if (slots[counter].blocked) {
-                                blockedSlots++;
-                                totalBlocked++;
-                        }
-                        counter++;
+                endSlot = beginSlot + _slotsPerSection - 1;
+                if (endSlot > numSlots) {
+                        endSlot = numSlots;
                 }
-                Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
+                for (unsigned i = beginSlot; i < endSlot; ++i) {
+                        if (slots[i].blocked) {
+                                blockedSlots++;
+                        }
+                }
+                unsigned midPoint = (endSlot - beginSlot) / 2;
+                Section_t nSec = {slots.at(beginSlot + midPoint).pos};
                 if (_usagePerSection > 1.f) {
                         std::cout << "WARNING: section usage exeeded max\n";
                         _usagePerSection = 1.;
@@ -250,10 +250,17 @@ void IOPlacementKernel::createSections() {
                                 _slotsPerSection *= 1.1;
                         }
                 }
-                nSec.numSlots = nSec.sv.size() - blockedSlots;
+                nSec.numSlots = endSlot - beginSlot - blockedSlots;
+                if (nSec.numSlots < 0) {
+                        std::cout << "ERROR: negative number of slots\n";
+                        exit(-1);
+                }
+                nSec.beginSlot = beginSlot;
+                nSec.endSlot = endSlot;
                 nSec.maxSlots = nSec.numSlots * _usagePerSection;
                 nSec.curSlots = 0;
                 _sections.push_back(nSec);
+                beginSlot = ++endSlot;
         }
 }
 
@@ -410,7 +417,7 @@ void IOPlacementKernel::run() {
 
         for (unsigned idx = 0; idx < _sections.size(); idx++) {
                 if (_sections[idx].net.numIOPins() > 0) {
-                        HungarianMatching hg(_sections[idx]);
+                        HungarianMatching hg(_sections[idx], _slots);
                         hgVec.push_back(hg);
                 }
         }
@@ -421,7 +428,7 @@ void IOPlacementKernel::run() {
         }
 
         for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].getFinalAssignment(_assignment, _slots);
+                hgVec[idx].getFinalAssignment(_assignment);
         }
 
         /* TODO:  <28-05-19, for some reason the first 3 slots/rows always have

@@ -66,10 +66,11 @@ typedef std::vector<Slot_t> slotVector_t;
  *  Detailed description
  */
 typedef struct _Section_t {
-        slotVector_t sv;
         Coordinate pos;
         Netlist net;
         unsigned cost;
+        unsigned beginSlot;
+        unsigned endSlot;
         float maxSlots;
         unsigned int curSlots;
         unsigned int numSlots;
