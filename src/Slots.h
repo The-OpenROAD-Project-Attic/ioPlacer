@@ -53,7 +53,7 @@
  *  Detailed description
  */
 struct _Slot_t {
-	bool blocked;
+        bool blocked;
         bool used;
         Coordinate pos;
 } typedef Slot_t;
@@ -72,7 +72,7 @@ typedef struct _Section_t {
         unsigned cost;
         float maxSlots;
         unsigned int curSlots;
-	unsigned int numSlots;
+        unsigned int numSlots;
 } Section_t;
 
 typedef std::vector<Section_t> sectionVector_t;

@@ -62,8 +62,8 @@ class IOPlacementKernel {
         float _usageIncreaseFactor = 0.1f;
 
         bool _forcePinSpread = true;
-	std::string _blockagesFile;
-	std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
+        std::string _blockagesFile;
+        std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
 
        private:
         Parameters* _parms;
@@ -81,6 +81,7 @@ class IOPlacementKernel {
         DBU returnIONetsHPWL(Netlist&);
 
         inline void updateOrientation(IOPin&);
+        inline bool checkBlocked(DBU, DBU);
 
         int getKValue() { return 1; }
 

@@ -85,7 +85,7 @@ class Parser {
         DEFParser _defParser;
         DefDscp _defDscp;
 
-        point getInstPosition(std::string instName);
+        point getInstPosition(std::string);
         void readDieArea();
         void readConnections();
         void initNetlist();
@@ -96,7 +96,8 @@ class Parser {
        public:
         Parser(Parameters&, Netlist&, Core&);
         void run();
-	void getBlockages(std::string filename, std::vector<std::pair<Coordinate, Coordinate>>  &blockages);
+        void getBlockages(std::string,
+                          std::vector<std::pair<Coordinate, Coordinate>>&);
 };
 
 #endif /* __PARSER_H_ */

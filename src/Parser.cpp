@@ -196,30 +196,34 @@ void Parser::initMapInstToPosition() {
         }
 }
 
-void Parser::getBlockages(std::string filename, std::vector<std::pair<Coordinate, Coordinate>> & blockages) {
-	std::ifstream f;
-	f.open(filename);
-	DBU initialX;
-	DBU initialY;
-	DBU finalX;
-	DBU finalY;
-	Coordinate coreLowerBound = _core->getLowerBound();
-	Coordinate coreUpperBound = _core->getUpperBound();
-	if (f.is_open()){
-		while (f >> initialX >> initialY >> finalX >> finalY){
-			if (initialX != finalX && initialY != finalY){
-				std::cout << "ERROR: Blockage should begin and end on the same edge";
-				exit(-1);
-			}
-			initialX = std::max(initialX, coreLowerBound.getX());
-			initialY = std::max(initialY, coreLowerBound.getY());
-			finalX = std::min(finalX, coreUpperBound.getX());
-			finalY = std::min(finalY, coreUpperBound.getY());			
-			Coordinate initialCoord(initialX, initialY);
-			Coordinate finalCoord(finalX, finalY);
-			std::pair<Coordinate, Coordinate> block(initialCoord, finalCoord);
-			blockages.push_back(block);
-		}
-	}
-	f.close();
+void Parser::getBlockages(
+    std::string filename,
+    std::vector<std::pair<Coordinate, Coordinate>>& blockages) {
+        std::ifstream f;
+        f.open(filename);
+        DBU initialX;
+        DBU initialY;
+        DBU finalX;
+        DBU finalY;
+        Coordinate coreLowerBound = _core->getLowerBound();
+        Coordinate coreUpperBound = _core->getUpperBound();
+        if (f.is_open()) {
+                while (f >> initialX >> initialY >> finalX >> finalY) {
+                        if (initialX != finalX && initialY != finalY) {
+                                std::cout << "ERROR: Blockage should begin and "
+                                             "end on the same edge";
+                                exit(-1);
+                        }
+                        initialX = std::max(initialX, coreLowerBound.getX());
+                        initialY = std::max(initialY, coreLowerBound.getY());
+                        finalX = std::min(finalX, coreUpperBound.getX());
+                        finalY = std::min(finalY, coreUpperBound.getY());
+                        Coordinate initialCoord(initialX, initialY);
+                        Coordinate finalCoord(finalX, finalY);
+                        std::pair<Coordinate, Coordinate> block(initialCoord,
+                                                                finalCoord);
+                        blockages.push_back(block);
+                }
+        }
+        f.close();
 }

@@ -89,7 +89,7 @@ class Parameters {
         float returnUsage() const { return _usage; };
         float returnUsageFactor() const { return _usageFactor; };
         float returnForceSpread() const { return _forceSpread; };
-	std::string returnBlockagesFile() const { return _blockagesFile; };
+        std::string returnBlockagesFile() const { return _blockagesFile; };
 };
 
 #endif /* __PARAMETERS_H_ */
