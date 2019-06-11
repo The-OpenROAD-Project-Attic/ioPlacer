@@ -83,8 +83,6 @@ class IOPlacementKernel {
         inline void updateOrientation(IOPin&);
         inline bool checkBlocked(DBU, DBU);
 
-        int getKValue() { return 1; }
-
        public:
         IOPlacementKernel(Parameters&);
         IOPlacementKernel() = default;
