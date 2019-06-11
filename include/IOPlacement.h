@@ -83,6 +83,8 @@ class IOPlacement {
                                      float increaseFactor);
         void forcePinSpread(bool force);
 
+        void setRandomMode(int randomMode);
+
         // run IOPlacement, returns a vector with all a pin name, its new
         // position and its orientation
         std::vector<pinS> run(bool returnHPWL = false);

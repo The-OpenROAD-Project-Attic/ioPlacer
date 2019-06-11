@@ -173,6 +173,10 @@ void IOPlacement::forcePinSpread(bool force) {
         ioKernel._forcePinSpread = force;
 }
 
+void IOPlacement::setRandomMode(int randomMode) {
+        ioKernel._randomMode = (RandomMode) randomMode;
+}
+
 std::vector<pinS> IOPlacement::run(bool returnHPWL) {
         initNetlist();
         ioKernel._returnHPWL = returnHPWL;

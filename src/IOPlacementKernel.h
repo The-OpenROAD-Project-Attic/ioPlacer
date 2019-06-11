@@ -45,6 +45,8 @@
 #include "Parameters.h"
 #include "Slots.h"
 
+enum RandomMode { Full, Even, Group };
+
 class IOPlacementKernel {
        protected:
         friend class ioPlacer::IOPlacement;
@@ -71,9 +73,12 @@ class IOPlacementKernel {
         slotVector_t _slots;
         sectionVector_t _sections;
         std::vector<IOPin> _zeroSinkIOs;
+        RandomMode _randomMode = RandomMode::Full;
+        bool _cellsPlaced = true;
 
         void initNetlistAndCore();
         void initIOLists();
+        void randomPlacement(const RandomMode);
         void defineSlots();
         void createSections();
         void setupSections();

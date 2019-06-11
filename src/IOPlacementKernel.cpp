@@ -35,6 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <random>
+
 #include "IOPlacementKernel.h"
 #include "WriterIOPins.h"
 
@@ -76,8 +78,81 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         if (_parms->returnUsageFactor() > -1) {
                 _usageIncreaseFactor = _parms->returnUsageFactor();
         }
+        if (_parms->returnRandomMode() > -1) {
+                _randomMode = (RandomMode)_parms->returnRandomMode();
+        }
 }
 #endif  // STANDALONE_MODE
+
+void IOPlacementKernel::randomPlacement(const RandomMode mode) {
+        unsigned numIOs = _netlist.numIOPins();
+        unsigned numSlots = _slots.size();
+        unsigned shift = _slots.size() / numIOs;
+        unsigned mid1 = numSlots * 1 / 8 - numIOs / 8;
+        unsigned mid2 = numSlots * 3 / 8 - numIOs / 8;
+        unsigned mid3 = numSlots * 5 / 8 - numIOs / 8;
+        unsigned mid4 = numSlots * 7 / 8 - numIOs / 8;
+        unsigned idx = 0;
+        unsigned slotsPerEdge = numIOs / 4;
+        unsigned lastSlots = (numIOs - slotsPerEdge * 3);
+        std::vector<int> vSlots(_slots.size());
+        std::vector<int> vIOs(numIOs);
+        switch (mode) {
+                case RandomMode::Full:
+                        for (size_t i = 0; i < vSlots.size(); ++i) {
+                                vSlots[i] = i;
+                        }
+                        std::shuffle(vSlots.begin(), vSlots.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vSlots[0];
+                                ioPin.setPos(_slots.at(b).pos);
+                                _assignment.push_back(ioPin);
+                                vSlots.erase(vSlots.begin());
+                        });
+                        break;
+                case RandomMode::Even:
+                        for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
+                        std::shuffle(vIOs.begin(), vIOs.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vIOs[0];
+                                ioPin.setPos(_slots.at(b * shift).pos);
+                                _assignment.push_back(ioPin);
+                                vIOs.erase(vIOs.begin());
+                        });
+                        break;
+                case RandomMode::Group:
+                        for (size_t i = mid1; i < mid1 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid2; i < mid2 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid3; i < mid3 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid4; i < mid4 + lastSlots; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (auto i : vIOs) {
+                                std::cout << i << std::endl;
+                        }
+                        std::shuffle(vIOs.begin(), vIOs.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vIOs[0];
+                                ioPin.setPos(_slots.at(b).pos);
+                                _assignment.push_back(ioPin);
+                                vIOs.erase(vIOs.begin());
+                        });
+                        break;
+                default:
+                        std::cout << "ERROR: Random mode not found\n";
+                        exit(-1);
+                        break;
+        }
+}
 
 void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
@@ -414,36 +489,39 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
-
-        for (unsigned idx = 0; idx < _sections.size(); idx++) {
-                if (_sections[idx].net.numIOPins() > 0) {
-                        HungarianMatching hg(_sections[idx], _slots);
-                        hgVec.push_back(hg);
+        if (_cellsPlaced) {
+                for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                        if (_sections[idx].net.numIOPins() > 0) {
+                                HungarianMatching hg(_sections[idx], _slots);
+                                hgVec.push_back(hg);
+                        }
                 }
-        }
 
 #pragma omp parallel for
-        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].run();
-        }
-
-        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].getFinalAssignment(_assignment);
-        }
-
-        /* TODO:  <28-05-19, for some reason the first 3 slots/rows always have
-         * overlap violations if used > */
-        unsigned i = 3;
-        while (_zeroSinkIOs.size() > 0 && i < _slots.size()) {
-                if (not _slots[i].used && not!_slots[i].blocked) {
-                        _slots[i].used = true;
-                        _zeroSinkIOs[0].setPos(_slots[i].pos);
-                        _assignment.push_back(_zeroSinkIOs[0]);
-                        _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                        hgVec[idx].run();
                 }
-                i++;
-        }
 
+                for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                        hgVec[idx].getFinalAssignment(_assignment);
+                }
+
+                /* TODO:  <28-05-19, for some reason the first 3 slots/rows
+                 * always have overlap violations if used > */
+                unsigned i = 3;
+                while (_zeroSinkIOs.size() > 0 && i < _slots.size()) {
+                        if (not _slots[i].used && not!_slots[i].blocked) {
+                                _slots[i].used = true;
+                                _zeroSinkIOs[0].setPos(_slots[i].pos);
+                                _assignment.push_back(_zeroSinkIOs[0]);
+                                _zeroSinkIOs.erase(_zeroSinkIOs.begin());
+                        }
+                        i++;
+                }
+        } else {
+                std::cout << "WARNING: cells are not placed, running random\n";
+                randomPlacement(_randomMode);
+        }
 #pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);
