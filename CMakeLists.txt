@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
