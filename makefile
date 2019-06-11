@@ -4,7 +4,7 @@ OUTPUT_FILE = out.def
 BIN_NAME = ioPlacer
 BIN_ARGS = -i $(INPUT_FILE) -o $(OUTPUT_FILE) -h 5 -v 6 -w 1
 
-LIB_NAME = libioPlace.a
+LIB_NAME = libioPlacer.a
 
 PRE_CMD =
 POS_CMD = 2>&1 | tee $(INPUT_FILE).log

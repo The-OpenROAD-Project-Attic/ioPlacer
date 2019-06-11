@@ -23,7 +23,7 @@ cd ioPlacer/
 make release
 `````
 
-The binary file will be on IOPlacement's base folder.
+The binary file will be on ioPlacer's base folder.
 
 ##### Static library
 
@@ -32,7 +32,7 @@ cd ioPlacer/
 make lib
 `````
 
-The library file (libioPlace.a) will be on the 'ioPlacer/lib` folder
+The library file (libioPlacer.a) will be on the 'ioPlacer/lib` folder
 
 #### IO Placement Arguments
 
@@ -61,7 +61,7 @@ Your command line to run IO Placement should look like this.
 
 ````
 
-./ioPlacement -i ispd18_test2.input.def -o ispd18_test2.output.def -h 5 -v 6 -w 1
+./ioPlacer -i ispd18_test2.input.def -o ispd18_test2.output.def -h 5 -v 6 -w 1
 
 ````
 
@@ -69,24 +69,24 @@ You can also check the arguments and a brief description by running the followin
 
 ````
 
-./ioPlacement -h
+./ioPlacer -h
 
 ````
 
 ### Manual integration with RePlAce
 
-You can run IOPlacement with RePlAce, using the following script:
+You can run ioPlacer with RePlAce, using the following script:
 
 ````
 
 bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <N>
 
 ````
-This script implement a loop with RePlAce and IOPlacement, as shown bellow:
+This script implement a loop with RePlAce and ioPlacer, as shown bellow:
 
 <img src="doc/loop.png" alt="loop-ioplace-replace" width="50%" heigth="50%"/>
 
-To execute the script, you will need both RePlAce and IOPlacement repositories in the same directory:
+To execute the script, you will need both RePlAce and ioPlacer repositories in the same directory:
 
 ````
 
@@ -115,7 +115,7 @@ where N is the number of iterations of the loop.
 
 #### Initialize Data Structures
 
-Before running IOPlacement the data structures should be initialized.
+Before running ioPlacer the data structures should be initialized.
 
 `````
 void initCore(point lowerBounds, point upperBounds, DBU minSpacingX,
@@ -124,7 +124,7 @@ void initCore(point lowerBounds, point upperBounds, DBU minSpacingX,
 
 The function *initCore* initiliazes the circuit core. Six parameters should be passed to this function:
 
-- **lowerBounds** - the lower left core bound. 
+- **lowerBounds** - the lower left core bound.
 - **upperBounds** - the upper right core bound.
 - **minSpacingX** - the minimum distance between IO pins on the x-axis.
 - **minSpacingY** - the minimum distance between IO pins on the y-axis.
@@ -135,7 +135,7 @@ The function *initCore* initiliazes the circuit core. Six parameters should be p
 void setMetalLayers(int horizontalMetalLayer, int verticalMetalLayer);
 ``````
 
-The function *setMetalLayers* defines on which layers the pins should be placed. 
+The function *setMetalLayers* defines on which layers the pins should be placed.
 
 ````
 void addIOPin(std::string name, std::string netName, box bounds,
@@ -161,7 +161,7 @@ The function *addInstPin* adds a pin of an instance to the data structure. All p
 
 #### Optional Parameters
 
-A few parameters in IOPlacement are optional, they are set to a default value but can be changed if needed. 
+A few parameters in ioPlacer are optional, they are set to a default value but can be changed if needed.
 
 ``````
 void setSlotsPerSection(unsigned slotsPerSection, float increaseFactor);
@@ -181,14 +181,13 @@ The function *setSlotsUsagePerSection* sets the maximum slot usage per section.
 void forcePinSpread(bool force);
 ```````
 
-The function *forcePinSpread* defines if IOPlacement should try to force the spread of IO Pins if the algorithm can not assign each pin to a section or if it should immediately increase the section's usage.
+The function *forcePinSpread* defines if ioPlacer should try to force the spread of IO Pins if the algorithm can not assign each pin to a section or if it should immediately increase the section's usage.
 
-#### Running IOPlacement and Retrieving Results
+#### Running ioPlacer and Retrieving Results
 
 ````
 std::vector<pinS> run(bool returnHPWL = false);
 `````
 
-After everything is properly set, the *run* function should be called. If a *true* argument is passed, this function prints the IO Pins HPWL. 
+After everything is properly set, the *run* function should be called. If a *true* argument is passed, this function prints the IO Pins HPWL.
 This function returns a vector with pinS structs. This struct is defined in IOPlacement.h, it contains the name of the IO pin, its new position and its orientation (e.g., 'N', 'S', 'W' or 'E').
-

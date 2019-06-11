@@ -1,8 +1,8 @@
 cmake_minimum_required (VERSION 3.8)
 project (ioPlacement)
 
-set(BIN_NAME "ioPlacement")
-set(LIB_NAME "ioPlace")
+set(BIN_NAME "ioPlacer")
+set(LIB_NAME "ioPlacer")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")

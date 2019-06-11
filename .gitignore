@@ -2,7 +2,7 @@
 *.lef
 
 build
-ioPlacement
+ioPlacer
 
 **/nbproject/private/
 **/nbproject/Makefile-*.mk
