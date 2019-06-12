@@ -227,3 +227,13 @@ void Parser::getBlockages(
         }
         f.close();
 }
+
+bool Parser::isDesignPlaced() {
+        for (ComponentDscp compDscp : _defDscp._Comps) {
+                if (!compDscp._isPlaced) {
+                        return false;
+                }
+        }
+
+        return true;
+}
