@@ -54,6 +54,10 @@ void IOPlacementKernel::initNetlistAndCore() {
                 _blockagesFile = _parms->returnBlockagesFile();
                 parser.getBlockages(_blockagesFile, _blockagesArea);
         }
+
+        if (!parser.isDesignPlaced()) {
+                _cellsPlaced = false;
+        }
 }
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {

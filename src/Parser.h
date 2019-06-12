@@ -98,6 +98,7 @@ class Parser {
         void run();
         void getBlockages(std::string,
                           std::vector<std::pair<Coordinate, Coordinate>>&);
+        bool isDesignPlaced();
 };
 
 #endif /* __PARSER_H_ */
