@@ -42,10 +42,10 @@
 #include "Parser.h"
 
 Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
-    : _parms(&parms), _netlist(&netlist), _core(&core) {}
+    : _parms(parms), _netlist(netlist), _core(core) {}
 
 void Parser::run() {
-        _defParser.parseDEF(_parms->getInputDefFile(), _defDscp);
+        _defParser.parseDEF(_parms.getInputDefFile(), _defDscp);
         initMapIOtoNet();
         initMapInstToPosition();
         readDieArea();
@@ -56,10 +56,10 @@ void Parser::run() {
 
 Parser::point Parser::getInstPosition(std::string instName) {
         point position = point(-1, -1);
-        for (ComponentDscp comp : _defDscp.Comps) {
-                if (instName == comp.name) {
-                        DBU x = comp.position.getX();
-                        DBU y = comp.position.getY();
+        for (ComponentDscp comp : _defDscp._Comps) {
+                if (instName == comp._name) {
+                        DBU x = comp._position.getX();
+                        DBU y = comp._position.getY();
                         position = point(x, y);
                         break;
                 }
@@ -68,39 +68,39 @@ Parser::point Parser::getInstPosition(std::string instName) {
 }
 
 void Parser::readDieArea() {
-        point lower = point(_defDscp.clsDieBounds.getLowerBound().getX(),
-                            _defDscp.clsDieBounds.getLowerBound().getY());
-        point upper = point(_defDscp.clsDieBounds.getUpperBound().getX(),
-                            _defDscp.clsDieBounds.getUpperBound().getY());
+        point lower = point(_defDscp._clsDieBounds.getLowerBound().getX(),
+                            _defDscp._clsDieBounds.getLowerBound().getY());
+        point upper = point(_defDscp._clsDieBounds.getUpperBound().getX(),
+                            _defDscp._clsDieBounds.getUpperBound().getY());
 
         _dieArea = box(lower, upper);
 }  // end method
 
 void Parser::readConnections() {
         int ioCounter = -1;
-        for (IOPinDscp io : _defDscp.IOPins) {
+        for (IOPinDscp io : _defDscp._IOPins) {
                 ioPin pin;
-                pin.name = io.name;
-                pin.position = point(io.position.getX(), io.position.getY());
-                pin.netName = io.netName;
-                pin.bounds = box(point(io.layerBounds.getLowerBound().getX(),
-                                       io.layerBounds.getLowerBound().getY()),
-                                 point(io.layerBounds.getUpperBound().getX(),
-                                       io.layerBounds.getUpperBound().getY()));
-                pin.direction = io.direction;
+                pin.name = io._name;
+                pin.position = point(io._position.getX(), io._position.getY());
+                pin.netName = io._netName;
+                pin.bounds = box(point(io._layerBounds.getLowerBound().getX(),
+                                       io._layerBounds.getLowerBound().getY()),
+                                 point(io._layerBounds.getUpperBound().getX(),
+                                       io._layerBounds.getUpperBound().getY()));
+                pin.direction = io._direction;
                 _ioPins.push_back(pin);
                 ioCounter++;
 
-                NetDscp net = mapIOPinToNet[io.name];
-                for (NetConnection conn : net.connections) {
-                        if (conn.componentName == "PIN") {
+                NetDscp net = mapIOPinToNet[io._name];
+                for (NetConnection conn : net._connections) {
+                        if (conn._componentName == "PIN") {
                                 continue;
                         }
 
                         cellPin cPin;
-                        cPin.name = conn.componentName + ":" + conn.pinName;
+                        cPin.name = conn._componentName + ":" + conn._pinName;
 
-                        cPin.position = mapInstToPosition[conn.componentName];
+                        cPin.position = mapInstToPosition[conn._componentName];
                         _ioPins[ioCounter].connections.push_back(cPin);
                 }
         }
@@ -133,7 +133,7 @@ void Parser::initNetlist() {
                             cellPin.name, Coordinate(cellPin.position.x(),
                                                      cellPin.position.y())));
                 }
-                _netlist->addIONet(ioPin, instPins);
+                _netlist.addIONet(ioPin, instPins);
         }
 }
 
@@ -147,16 +147,16 @@ void Parser::initCore() {
         DBU initTrackX = 0;
         DBU initTrackY = 0;
 
-        for (TrackDscp track : _defDscp.clsTracks) {
-                if (track.layers[0] ==
+        for (TrackDscp track : _defDscp._clsTracks) {
+                if (track._layers[0] ==
                     "Metal" +
-                        std::to_string(_parms->getHorizontalMetalLayer())) {
-                        if (track.direction == "X") {
-                                minSpacingX = track.space;
-                                initTrackX = track.location;
-                        } else if (track.direction == "Y") {
-                                minSpacingY = track.space;
-                                initTrackY = track.location;
+                        std::to_string(_parms.getHorizontalMetalLayer())) {
+                        if (track._direction == "X") {
+                                minSpacingX = track._space;
+                                initTrackX = track._location;
+                        } else if (track._direction == "Y") {
+                                minSpacingY = track._space;
+                                initTrackY = track._location;
                         }
                 }
         }
@@ -175,24 +175,24 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
-        *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
+        _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY);
 }
 
 void Parser::initMapIOtoNet() {
-        for (NetDscp net : _defDscp.Nets) {
-                for (NetConnection conn : net.connections) {
-                        if (conn.componentName != "PIN") continue;
+        for (NetDscp net : _defDscp._Nets) {
+                for (NetConnection conn : net._connections) {
+                        if (conn._componentName != "PIN") continue;
 
-                        mapIOPinToNet[conn.pinName] = net;
+                        mapIOPinToNet[conn._pinName] = net;
                 }
         }
 }
 
 void Parser::initMapInstToPosition() {
-        for (ComponentDscp comp : _defDscp.Comps) {
-                point p = point(comp.position.getX(), comp.position.getY());
-                mapInstToPosition[comp.name] = p;
+        for (ComponentDscp comp : _defDscp._Comps) {
+                point p = point(comp._position.getX(), comp._position.getY());
+                mapInstToPosition[comp._name] = p;
         }
 }
 
@@ -205,8 +205,8 @@ void Parser::getBlockages(
         DBU initialY;
         DBU finalX;
         DBU finalY;
-        Coordinate coreLowerBound = _core->getLowerBound();
-        Coordinate coreUpperBound = _core->getUpperBound();
+        Coordinate coreLowerBound = _core.getLowerBound();
+        Coordinate coreUpperBound = _core.getUpperBound();
         if (f.is_open()) {
                 while (f >> initialX >> initialY >> finalX >> finalY) {
                         if (initialX != finalX && initialY != finalY) {

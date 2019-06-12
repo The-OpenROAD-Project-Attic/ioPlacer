@@ -77,9 +77,9 @@ class Parser {
         std::map<std::string, NetDscp> mapIOPinToNet;
         std::map<std::string, point> mapInstToPosition;
 
-        Parameters* _parms;
-        Netlist* _netlist;
-        Core* _core;
+        Parameters& _parms;
+        Netlist& _netlist;
+        Core& _core;
         box _dieArea;
         std::vector<ioPin> _ioPins;
         DEFParser _defParser;

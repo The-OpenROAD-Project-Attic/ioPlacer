@@ -45,8 +45,8 @@
 
 class WriterIOPins {
        private:
-        Netlist* _netlist;
-        std::vector<IOPin>* _assignment;
+        Netlist& _netlist;
+        std::vector<IOPin>& _assignment;
         std::string _inFileName;
         std::string _outFileName;
         std::string _horizontalMetalLayer;

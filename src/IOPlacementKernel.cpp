@@ -510,7 +510,7 @@ void IOPlacementKernel::run() {
                  * always have overlap violations if used > */
                 unsigned i = 3;
                 while (_zeroSinkIOs.size() > 0 && i < _slots.size()) {
-                        if (not _slots[i].used && not!_slots[i].blocked) {
+                        if (not _slots[i].used && not _slots[i].blocked) {
                                 _slots[i].used = true;
                                 _zeroSinkIOs[0].setPos(_slots[i].pos);
                                 _assignment.push_back(_zeroSinkIOs[0]);
