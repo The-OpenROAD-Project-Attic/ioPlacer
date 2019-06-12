@@ -40,6 +40,7 @@
 #include <fstream>
 #include <iostream>
 #include "Parser.h"
+#include <boost/algorithm/string.hpp>
 
 Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
     : _parms(parms), _netlist(netlist), _core(core) {}
@@ -148,22 +149,25 @@ void Parser::initCore() {
         DBU initTrackY = 0;
 
         for (TrackDscp track : _defDscp._clsTracks) {
-                if (track._layers[0] ==
+                if (boost::iequals(track._layers[0],
                     "Metal" +
-                        std::to_string(_parms.getHorizontalMetalLayer())) {
-                        if (track._direction == "X") {
-                                minSpacingX = track._space;
-                                initTrackX = track._location;
-                        } else if (track._direction == "Y") {
+                        std::to_string(_parms.getHorizontalMetalLayer()))) {
+                        if (boost::iequals(track._direction, "Y")) {
                                 minSpacingY = track._space;
                                 initTrackY = track._location;
+                        }
+                } else if (boost::iequals(track._layers[0],
+                            "Metal" + 
+                            std::to_string(_parms.getVerticalMetalLayer()))) {
+                        if (boost::iequals(track._direction, "X")) {
+                                minSpacingX = track._space;
+                                initTrackX = track._location;
                         }
                 }
         }
 
         DBU IOWidth = _ioPins[0].bounds.max_corner().x() -
                       _ioPins[0].bounds.min_corner().x();
-
         if (minSpacingX <= IOWidth) {
                 minSpacingX *= 2;
         }
@@ -230,10 +234,19 @@ void Parser::getBlockages(
 
 bool Parser::isDesignPlaced() {
         for (ComponentDscp compDscp : _defDscp._Comps) {
-                if (!compDscp._isPlaced) {
+                    if (!compDscp._isPlaced && !compDscp._isFixed) {
                         return false;
                 }
         }
 
         return true;
+}
+
+std::string Parser::getMetalWrittenStyle() {
+        std::string metal;
+        for (TrackDscp track : _defDscp._clsTracks) {
+                metal = track._layers[0].substr(0, 5);
+        }
+
+        return metal;
 }
