@@ -47,86 +47,86 @@ static const std::string INVALID = "INVALID_STRING*";
 
 class ComponentDscp {
        public:
-        std::string name = INVALID;
-        std::string macroName = INVALID;
-        std::string locationType =
+        std::string _name = INVALID;
+        std::string _macroName = INVALID;
+        std::string _locationType =
             INVALID;  // {FIXED | COVER | PLACED | UNPLACED }
-        Coordinate position = Coordinate(0, 0);
-        std::string orientation = INVALID;
-        bool isFixed = false;
-        bool isPlaced = false;
+        Coordinate _position = Coordinate(0, 0);
+        std::string _orientation = INVALID;
+        bool _isFixed = false;
+        bool _isPlaced = false;
         ComponentDscp() = default;
 };
 
 class IOPinDscp {
        public:
-        std::string name = INVALID;
-        std::string netName = INVALID;
-        std::string direction = INVALID;  // {INPUT | OUTPUT | INOUT | FEEDTHRU}
-        std::string locationType = INVALID;  // {FIXED | COVER | PLACED }
-        std::string orientation = INVALID;
-        std::string layerName = INVALID;
-        std::string use = INVALID;  // { SIGNAL | POWER | GROUND |
+        std::string _name = INVALID;
+        std::string _netName = INVALID;
+        std::string _direction = INVALID;  // {INPUT | OUTPUT | INOUT | FEEDTHRU}
+        std::string _locationType = INVALID;  // {FIXED | COVER | PLACED }
+        std::string _orientation = INVALID;
+        std::string _layerName = INVALID;
+        std::string _use = INVALID;  // { SIGNAL | POWER | GROUND |
         // CLOCK | TIEOFF | ANALOG}
-        Coordinate position = Coordinate(0, 0);
-        Box layerBounds;
+        Coordinate _position = Coordinate(0, 0);
+        Box _layerBounds;
         IOPinDscp() = default;
 };
 
 class NetConnection {
        public:
-        std::string pinName = INVALID;
-        std::string componentName = INVALID;
+        std::string _pinName = INVALID;
+        std::string _componentName = INVALID;
         NetConnection() = default;
 };
 
 class NetDscp {
        public:
-        std::string name = INVALID;
-        std::string use = INVALID;
-        std::vector<NetConnection> connections;
+        std::string _name = INVALID;
+        std::string _use = INVALID;
+        std::vector<NetConnection> _connections;
         NetDscp() = default;
 };
 
 class TrackDscp {
        public:
-        bool hasRect : 1;
-        bool hasPolygon : 1;
-        std::string direction = INVALID;
-        DBU location = 0;
-        int numTracks = 0;
-        std::vector<std::string> layers;
-        DBU space = 0;
+        bool _hasRect : 1;
+        bool _hasPolygon : 1;
+        std::string _direction = INVALID;
+        DBU _location = 0;
+        int _numTracks = 0;
+        std::vector<std::string> _layers;
+        DBU _space = 0;
 
         TrackDscp() {
-                hasRect = false;
-                hasPolygon = false;
+                _hasRect = false;
+                _hasPolygon = false;
         }
 };
 
 class DefDscp {
        public:
-        bool clsHasVersion : 1;
-        bool clsHasDevideChar : 1;
-        bool clsHasBusBitChar : 1;
-        bool clsHasDieBounds : 1;
-        bool clsHasDatabaseUnits : 1;
-        double clsVersion = 0.0;
-        std::string clsDeviderChar = INVALID;
-        std::string clsBusBitChars = INVALID;
-        std::string clsDesignName = INVALID;
-        Box clsDieBounds;
-        int clsDatabaseUnits = 0;
-        std::vector<ComponentDscp> Comps;
-        std::vector<IOPinDscp> IOPins;
-        std::vector<NetDscp> Nets;
-        std::vector<TrackDscp> clsTracks;
+        bool _clsHasVersion : 1;
+        bool _clsHasDevideChar : 1;
+        bool _clsHasBusBitChar : 1;
+        bool _clsHasDieBounds : 1;
+        bool _clsHasDatabaseUnits : 1;
+        double _clsVersion = 0.0;
+        std::string _clsDeviderChar = INVALID;
+        std::string _clsBusBitChars = INVALID;
+        std::string _clsDesignName = INVALID;
+        Box _clsDieBounds;
+        int _clsDatabaseUnits = 0;
+        std::vector<ComponentDscp> _Comps;
+        std::vector<IOPinDscp> _IOPins;
+        std::vector<NetDscp> _Nets;
+        std::vector<TrackDscp> _clsTracks;
         DefDscp() {
-                clsHasVersion = false;
-                clsHasDevideChar = false;
-                clsHasBusBitChar = false;
-                clsHasDieBounds = false;
-                clsHasDatabaseUnits = false;
+                _clsHasVersion = false;
+                _clsHasDevideChar = false;
+                _clsHasBusBitChar = false;
+                _clsHasDieBounds = false;
+                _clsHasDatabaseUnits = false;
         }
 };
 

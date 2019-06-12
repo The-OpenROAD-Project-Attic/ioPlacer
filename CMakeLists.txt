@@ -1,14 +1,15 @@
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 3.8)
 project (ioPlacement)
 
-set(BIN_NAME "ioPlacement")
-set(LIB_NAME "ioPlace")
+set(BIN_NAME "ioPlacer")
+set(LIB_NAME "ioPlacer")
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
 
 link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
+set(Boost_USE_STATIC_LIBS ON)
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)

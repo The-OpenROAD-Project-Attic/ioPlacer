@@ -35,6 +35,8 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <random>
+
 #include "IOPlacementKernel.h"
 #include "WriterIOPins.h"
 
@@ -48,6 +50,10 @@ void IOPlacementKernel::initNetlistAndCore() {
         _verticalMetalLayer =
             "Metal" + std::to_string(_parms->getVerticalMetalLayer());
         parser.run();
+        if (_parms->returnBlockagesFile().size() != 0) {
+                _blockagesFile = _parms->returnBlockagesFile();
+                parser.getBlockages(_blockagesFile, _blockagesArea);
+        }
 }
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
@@ -72,8 +78,81 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         if (_parms->returnUsageFactor() > -1) {
                 _usageIncreaseFactor = _parms->returnUsageFactor();
         }
+        if (_parms->returnRandomMode() > -1) {
+                _randomMode = (RandomMode)_parms->returnRandomMode();
+        }
 }
-#endif // STANDALONE_MODE
+#endif  // STANDALONE_MODE
+
+void IOPlacementKernel::randomPlacement(const RandomMode mode) {
+        unsigned numIOs = _netlist.numIOPins();
+        unsigned numSlots = _slots.size();
+        unsigned shift = _slots.size() / numIOs;
+        unsigned mid1 = numSlots * 1 / 8 - numIOs / 8;
+        unsigned mid2 = numSlots * 3 / 8 - numIOs / 8;
+        unsigned mid3 = numSlots * 5 / 8 - numIOs / 8;
+        unsigned mid4 = numSlots * 7 / 8 - numIOs / 8;
+        unsigned idx = 0;
+        unsigned slotsPerEdge = numIOs / 4;
+        unsigned lastSlots = (numIOs - slotsPerEdge * 3);
+        std::vector<int> vSlots(_slots.size());
+        std::vector<int> vIOs(numIOs);
+        switch (mode) {
+                case RandomMode::Full:
+                        for (size_t i = 0; i < vSlots.size(); ++i) {
+                                vSlots[i] = i;
+                        }
+                        std::shuffle(vSlots.begin(), vSlots.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vSlots[0];
+                                ioPin.setPos(_slots.at(b).pos);
+                                _assignment.push_back(ioPin);
+                                vSlots.erase(vSlots.begin());
+                        });
+                        break;
+                case RandomMode::Even:
+                        for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
+                        std::shuffle(vIOs.begin(), vIOs.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vIOs[0];
+                                ioPin.setPos(_slots.at(b * shift).pos);
+                                _assignment.push_back(ioPin);
+                                vIOs.erase(vIOs.begin());
+                        });
+                        break;
+                case RandomMode::Group:
+                        for (size_t i = mid1; i < mid1 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid2; i < mid2 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid3; i < mid3 + slotsPerEdge; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (size_t i = mid4; i < mid4 + lastSlots; i++) {
+                                vIOs[idx++] = i;
+                        }
+                        for (auto i : vIOs) {
+                                std::cout << i << std::endl;
+                        }
+                        std::shuffle(vIOs.begin(), vIOs.end(),
+                                     std::default_random_engine(42));
+                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+                                unsigned b = vIOs[0];
+                                ioPin.setPos(_slots.at(b).pos);
+                                _assignment.push_back(ioPin);
+                                vIOs.erase(vIOs.begin());
+                        });
+                        break;
+                default:
+                        std::cout << "ERROR: Random mode not found\n";
+                        exit(-1);
+                        break;
+        }
+}
 
 void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
@@ -88,6 +167,24 @@ void IOPlacementKernel::initIOLists() {
                         _zeroSinkIOs.push_back(ioPin);
                 }
         });
+}
+
+inline bool IOPlacementKernel::checkBlocked(DBU currX, DBU currY) {
+        DBU blockedBeginX;
+        DBU blockedBeginY;
+        DBU blockedEndX;
+        DBU blockedEndY;
+        for (std::pair<Coordinate, Coordinate> blockage : _blockagesArea) {
+                blockedBeginX = std::get<0>(blockage).getX();
+                blockedBeginY = std::get<0>(blockage).getY();
+                blockedEndX = std::get<0>(blockage).getX();
+                blockedEndY = std::get<0>(blockage).getY();
+                if (currX >= blockedBeginX)
+                        if (currY >= blockedBeginY)
+                                if (currX <= blockedEndX)
+                                        if (currY <= blockedEndY) return true;
+        }
+        return false;
 }
 
 void IOPlacementKernel::defineSlots() {
@@ -167,28 +264,32 @@ void IOPlacementKernel::defineSlots() {
         for (Coordinate pos : slotsEdge1) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+                bool blocked = checkBlocked(currX, currY);
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge2) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+                bool blocked = checkBlocked(currX, currY);
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge3) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+                bool blocked = checkBlocked(currX, currY);
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 
         for (Coordinate pos : slotsEdge4) {
                 currX = pos.getX();
                 currY = pos.getY();
-                _slots.push_back({false, Coordinate(currX, currY)});
+                bool blocked = checkBlocked(currX, currY);
+                _slots.push_back({blocked, false, Coordinate(currX, currY)});
                 i++;
         }
 }
@@ -196,15 +297,22 @@ void IOPlacementKernel::defineSlots() {
 void IOPlacementKernel::createSections() {
         slotVector_t& slots = _slots;
         _sections.clear();
-        unsigned counter = 0;
-        unsigned i = 0;
         unsigned numSlots = slots.size();
-        while (counter < numSlots) {
-                slotVector_t nSlot;
-                for (i = 0; i < _slotsPerSection && counter < numSlots; ++i) {
-                        nSlot.push_back(slots[counter++]);
+        unsigned beginSlot = 0;
+        unsigned endSlot = 0;
+        while (endSlot < numSlots) {
+                int blockedSlots = 0;
+                endSlot = beginSlot + _slotsPerSection - 1;
+                if (endSlot > numSlots) {
+                        endSlot = numSlots;
                 }
-                Section_t nSec = {nSlot, nSlot.at(nSlot.size() / 2).pos};
+                for (unsigned i = beginSlot; i < endSlot; ++i) {
+                        if (slots[i].blocked) {
+                                blockedSlots++;
+                        }
+                }
+                unsigned midPoint = (endSlot - beginSlot) / 2;
+                Section_t nSec = {slots.at(beginSlot + midPoint).pos};
                 if (_usagePerSection > 1.f) {
                         std::cout << "WARNING: section usage exeeded max\n";
                         _usagePerSection = 1.;
@@ -217,9 +325,17 @@ void IOPlacementKernel::createSections() {
                                 _slotsPerSection *= 1.1;
                         }
                 }
-                nSec.maxSlots = _slotsPerSection * _usagePerSection;
+                nSec.numSlots = endSlot - beginSlot - blockedSlots;
+                if (nSec.numSlots < 0) {
+                        std::cout << "ERROR: negative number of slots\n";
+                        exit(-1);
+                }
+                nSec.beginSlot = beginSlot;
+                nSec.endSlot = endSlot;
+                nSec.maxSlots = nSec.numSlots * _usagePerSection;
                 nSec.curSlots = 0;
                 _sections.push_back(nSec);
+                beginSlot = ++endSlot;
         }
 }
 
@@ -234,7 +350,7 @@ bool IOPlacementKernel::assignPinsSections() {
                 std::vector<InstancePin> instPinsVector;
 #pragma omp parallel for
                 for (unsigned i = 0; i < sections.size(); i++) {
-                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
+                        dst[i] = net.computeDstIOtoPins(idx, sections[i].pos);
                 }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);
@@ -262,7 +378,17 @@ bool IOPlacementKernel::assignPinsSections() {
         }
 }
 
+void IOPlacementKernel::printConfig() {
+        std::cout << "Slots Per Section     " << _slotsPerSection << "\n";
+        std::cout << "Slots Increase Factor " << _slotsIncreaseFactor << "\n";
+        std::cout << "Usage Per Section     " << _usagePerSection << "\n";
+        std::cout << "Usage Increase Factor " << _usageIncreaseFactor << "\n";
+        std::cout << "Force Pin Spread      " << _forcePinSpread << "\n\n";
+}
+
 void IOPlacementKernel::setupSections() {
+        bool allAssigned;
+        unsigned i = 0;
         if (!(_slotsPerSection > 1)) {
                 std::cout << "_slotsPerSection must be grater than one\n";
                 exit(1);
@@ -277,7 +403,12 @@ void IOPlacementKernel::setupSections() {
                              "_usageIncreaseFactor or _slotsIncreaseFactor "
                              "must be != 0\n";
         }
-        while (not assignPinsSections()) {
+        do {
+                std::cout << "Tentative " << i++ << " to setup sections\n";
+                printConfig();
+
+                allAssigned = assignPinsSections();
+
                 _usagePerSection *= (1 + _usageIncreaseFactor);
                 _slotsPerSection *= (1 + _slotsIncreaseFactor);
                 if (_sections.size() > MAX_SECTIONS_RECOMMENDED) {
@@ -296,7 +427,7 @@ void IOPlacementKernel::setupSections() {
                             << MAX_SLOTS_RECOMMENDED
                             << " this may negatively affect performance\n";
                 }
-        };
+        } while (not allAssigned);
 }
 
 inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
@@ -349,14 +480,6 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 void IOPlacementKernel::run() {
         std::vector<HungarianMatching> hgVec;
 
-        std::cout << "_slotsPerSection     " << _slotsPerSection << std::endl;
-        std::cout << "_slotsIncreaseFactor " << _slotsIncreaseFactor
-                  << std::endl;
-        std::cout << "_usagePerSection     " << _usagePerSection << std::endl;
-        std::cout << "_usageIncreaseFactor " << _usageIncreaseFactor
-                  << std::endl;
-        std::cout << "_forcePinSpread      " << _forcePinSpread << std::endl;
-
         initIOLists();
         defineSlots();
 
@@ -366,36 +489,39 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
-
-        for (unsigned idx = 0; idx < _sections.size(); idx++) {
-                if (_sections[idx].net.numIOPins() > 0) {
-                        HungarianMatching hg(_sections[idx]);
-                        hgVec.push_back(hg);
+        if (_cellsPlaced) {
+                for (unsigned idx = 0; idx < _sections.size(); idx++) {
+                        if (_sections[idx].net.numIOPins() > 0) {
+                                HungarianMatching hg(_sections[idx], _slots);
+                                hgVec.push_back(hg);
+                        }
                 }
-        }
 
 #pragma omp parallel for
-        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].run();
-        }
+                for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                        hgVec[idx].run();
+                }
 
-        for (unsigned idx = 0; idx < hgVec.size(); idx++) {
-                hgVec[idx].getFinalAssignment(_assignment, _slots);
-        }
+                for (unsigned idx = 0; idx < hgVec.size(); idx++) {
+                        hgVec[idx].getFinalAssignment(_assignment);
+                }
 
-        for (auto& i : _slots) {
-                if (_zeroSinkIOs.size() > 0) {
-                        if (not i.used) {
-                                i.used = true;
-                                _zeroSinkIOs[0].setPos(i.pos);
+                /* TODO:  <28-05-19, for some reason the first 3 slots/rows
+                 * always have overlap violations if used > */
+                unsigned i = 3;
+                while (_zeroSinkIOs.size() > 0 && i < _slots.size()) {
+                        if (not _slots[i].used && not _slots[i].blocked) {
+                                _slots[i].used = true;
+                                _zeroSinkIOs[0].setPos(_slots[i].pos);
                                 _assignment.push_back(_zeroSinkIOs[0]);
                                 _zeroSinkIOs.erase(_zeroSinkIOs.begin());
                         }
-                } else {
-                        break;
+                        i++;
                 }
+        } else {
+                std::cout << "WARNING: cells are not placed, running random\n";
+                randomPlacement(_randomMode);
         }
-
 #pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);

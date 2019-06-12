@@ -52,10 +52,12 @@ Parameters::Parameters(int argc, char** argv) {
                 ("vmetal,v"       , po::value<int>()         , "Vertical metal layer (int) (mandatory)")
                 ("wirelen,w"      , po::value<int>()         , "Return IO nets HPWL (bool) (optional)")
                 ("force-spread,f" , po::value<int>()         , "Force pins to be spread in core, i.e., try to respect number os slots (bool) (optional)")
+                ("random,r"       , po::value<int>()         , "Random mode number (int/enum) (opitional)")
                 ("nslots,n"       , po::value<int>()         , "Number of slots per section (int) (optional)")
                 ("slots-factor,s" , po::value<float>()       , "Increase factor (%) of slots per section (float) (optional)")
-                ("max-slots,m"        , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
+                ("max-slots,m"    , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
                 ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
+                ("block-area,b"   , po::value<std::string>() , "File containing areas to be blocked (optional)")
                 ;
         // clang-format on
 
@@ -85,6 +87,9 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("wirelen")) {
                         _returnHPWL = vm["wirelen"].as<int>();
                 }
+                if (vm.count("random")) {
+                        _randomMode = vm["random"].as<int>();
+                }
                 if (vm.count("nslots")) {
                         _nslots = vm["nslots"].as<int>();
                 }
@@ -99,6 +104,9 @@ Parameters::Parameters(int argc, char** argv) {
                 }
                 if (vm.count("force-spread")) {
                         _forceSpread = vm["force-spread"].as<int>();
+                }
+                if (vm.count("block-area")) {
+                        _blockagesFile = vm["block-area"].as<std::string>();
                 }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
@@ -125,6 +133,8 @@ void Parameters::printAll() const {
         std::cout << "Percentage of usage for each section: " << _usage << "\n";
         std::cout << "Increase factor of usage for each section: " << _usageFactor << "\n";
         std::cout << "Force pin spread: " << _forceSpread << "\n";
+        std::cout << "Blockage area file: " << _blockagesFile << "\n";
+        std::cout << "Random mode: " << _randomMode << "\n";
 
         std::cout << "\n";
         // clang-format on

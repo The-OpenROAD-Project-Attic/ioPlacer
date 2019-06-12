@@ -39,14 +39,17 @@
 #define __IOPLACEMENTKERNEL_H_
 
 #include "Core.h"
-#include "Parameters.h"
 #include "HungarianMatching.h"
+#include "IOPlacement.h"
 #include "Netlist.h"
+#include "Parameters.h"
 #include "Slots.h"
+
+enum RandomMode { Full, Even, Group };
 
 class IOPlacementKernel {
        protected:
-        friend class IOPlacement;
+        friend class ioPlacer::IOPlacement;
         Netlist _netlist;
         Core _core;
         std::string _horizontalMetalLayer;
@@ -54,13 +57,15 @@ class IOPlacementKernel {
         std::vector<IOPin> _assignment;
         bool _returnHPWL = false;
 
-        unsigned _slotsPerSection = 100;
-        float _slotsIncreaseFactor = 0.1f;
+        unsigned _slotsPerSection = 200;
+        float _slotsIncreaseFactor = 0.01f;
 
-        float _usagePerSection = .1f;
-        float _usageIncreaseFactor = 0.1f;
+        float _usagePerSection = .8f;
+        float _usageIncreaseFactor = 0.01f;
 
         bool _forcePinSpread = true;
+        std::string _blockagesFile;
+        std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
 
        private:
         Parameters* _parms;
@@ -68,9 +73,12 @@ class IOPlacementKernel {
         slotVector_t _slots;
         sectionVector_t _sections;
         std::vector<IOPin> _zeroSinkIOs;
+        RandomMode _randomMode = RandomMode::Full;
+        bool _cellsPlaced = true;
 
         void initNetlistAndCore();
         void initIOLists();
+        void randomPlacement(const RandomMode);
         void defineSlots();
         void createSections();
         void setupSections();
@@ -78,14 +86,14 @@ class IOPlacementKernel {
         DBU returnIONetsHPWL(Netlist&);
 
         inline void updateOrientation(IOPin&);
-
-        int getKValue() { return 1; }
+        inline bool checkBlocked(DBU, DBU);
 
        public:
         IOPlacementKernel(Parameters&);
         IOPlacementKernel() = default;
         void run();
         void getResults();
+        void printConfig();
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */

@@ -49,18 +49,21 @@ class HungarianMatching {
        private:
         Matrix<DBU> _hungarianMatrix;
         Munkres<DBU> _hungarianSolver;
-        Netlist* _netlist;
-        slotVector_t* _slots;
+        Netlist& _netlist;
+        slotVector_t& _slots;
+        unsigned _beginSlot;
+        unsigned _endSlot;
         unsigned _numSlots;
         unsigned _numIOPins;
+        unsigned _nonBlockedSlots;
 
         void createMatrix();
 
        public:
-        HungarianMatching(Section_t&);
+        HungarianMatching(Section_t&, slotVector_t&);
         virtual ~HungarianMatching() = default;
         void run();
-        void getFinalAssignment(std::vector<IOPin>&, slotVector_t&);
+        void getFinalAssignment(std::vector<IOPin>&);
 };
 
 #endif /* __HUNGARIANMATCHING_H_ */

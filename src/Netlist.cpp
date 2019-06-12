@@ -133,3 +133,19 @@ DBU Netlist::computeIONetHPWL(unsigned idx, Coordinate slotPos) {
 
         return netBBox.getHalfPerimeter();
 }
+
+DBU Netlist::computeDstIOtoPins(unsigned idx, Coordinate slotPos) {
+        unsigned netStart = _netPointer[idx];
+        unsigned netEnd = _netPointer[idx + 1];
+
+        DBU totalDistance = 0;
+
+#pragma omp parallel for reduction(+ : totalDistance)
+        for (unsigned idx = netStart; idx < netEnd; ++idx) {
+                Coordinate pinPos = _instPins[idx].getPos();
+                totalDistance += abs(pinPos.getX() - slotPos.getX()) +
+                                 abs(pinPos.getY() - slotPos.getY());
+        }
+
+        return totalDistance;
+}

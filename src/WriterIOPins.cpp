@@ -43,9 +43,8 @@
 WriterIOPins::WriterIOPins(Netlist& netlist, std::vector<IOPin>& av,
                            std::string horizontalMetalLayer,
                            std::string verticalMetalLayer,
-                           std::string inFileName, std::string outFileName) {
-        _netlist = &netlist;
-        _assignment = &av;
+                           std::string inFileName, std::string outFileName)
+    : _netlist(netlist), _assignment(av) {
         _horizontalMetalLayer = horizontalMetalLayer;
         _verticalMetalLayer = verticalMetalLayer;
         _inFileName = inFileName;
@@ -87,7 +86,7 @@ bool WriterIOPins::writeFile() {
                 }
 
                 if (pinsSection) {
-                        std::vector<IOPin> assignment = *_assignment;
+                        std::vector<IOPin>& assignment = _assignment;
 
                         if (!pinsFile.is_open()) {
                                 std::cout << "Could not open file pinsFile.\n";

@@ -47,30 +47,23 @@
 #include "Netlist.h"
 #include <numeric>
 
-/*! \struct _Slot_t
- *  \brief Brief struct description
- *
- *  Detailed description
- */
 struct _Slot_t {
+        bool blocked;
         bool used;
         Coordinate pos;
 } typedef Slot_t;
 
 typedef std::vector<Slot_t> slotVector_t;
 
-/*! \struct _Section_t
- *  \brief Brief struct description
- *
- *  Detailed description
- */
 typedef struct _Section_t {
-        slotVector_t sv;
         Coordinate pos;
         Netlist net;
         unsigned cost;
+        unsigned beginSlot;
+        unsigned endSlot;
         float maxSlots;
-        float curSlots;
+        unsigned int curSlots;
+        unsigned int numSlots;
 } Section_t;
 
 typedef std::vector<Section_t> sectionVector_t;

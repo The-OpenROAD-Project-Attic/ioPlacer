@@ -40,6 +40,8 @@
 #include "Coordinate.h"
 #include <vector>
 
+namespace ioPlacer {
+
 IOPlacementKernel ioKernel;
 
 void IOPlacement::initCore(point lowerBounds, point upperBounds,
@@ -83,6 +85,27 @@ void IOPlacement::addInstPin(std::string net, std::string pinName, point pos) {
         }
 }
 
+void IOPlacement::addBlockage(point initialPos, point finalPos) {
+        DBU initialX = initialPos.x();
+        DBU initialY = initialPos.y();
+        DBU finalX = finalPos.x();
+        DBU finalY = finalPos.y();
+        Coordinate coreLowerBound = ioKernel._core.getLowerBound();
+        Coordinate coreUpperBound = ioKernel._core.getUpperBound();
+        if (initialX != finalX && initialY != finalY) {
+                std::cout << "ERROR: Blockage should consider only one edge\n";
+                exit(-1);
+        }
+        initialX = std::max(initialX, coreLowerBound.getX());
+        initialY = std::max(initialY, coreLowerBound.getY());
+        finalX = std::min(finalX, coreUpperBound.getX());
+        finalY = std::min(finalY, coreUpperBound.getY());
+        Coordinate initialCoord(initialX, initialY);
+        Coordinate finalCoord(finalX, finalY);
+        std::pair<Coordinate, Coordinate> block(initialCoord, finalCoord);
+        ioKernel._blockagesArea.push_back(block);
+}
+
 void IOPlacement::initNetlist() {
         for (unsigned i = 0; i < _ioPins.size(); ++i) {
                 ioPin& io = _ioPins[i];
@@ -123,9 +146,9 @@ char IOPlacement::getOrientationString(int orient) {
         return 'W';
 }
 
-void IOPlacement::getResults(std::vector<pinS>& pinAssignment) {
+void IOPlacement::getResults(std::vector<Pin_t>& pinAssignment) {
         for (IOPin& io : ioKernel._assignment) {
-                pinS p;
+                Pin_t p;
                 p.name = io.getName();
                 p.pos = point(io.getX(), io.getY());
                 const Orientation& orient = io.getOrientation();
@@ -150,11 +173,17 @@ void IOPlacement::forcePinSpread(bool force) {
         ioKernel._forcePinSpread = force;
 }
 
-std::vector<pinS> IOPlacement::run(bool returnHPWL) {
+void IOPlacement::setRandomMode(int randomMode) {
+        ioKernel._randomMode = (RandomMode)randomMode;
+}
+
+std::vector<Pin_t> IOPlacement::run(bool returnHPWL) {
         initNetlist();
         ioKernel._returnHPWL = returnHPWL;
         ioKernel.run();
-        std::vector<pinS> pinAssignment;
+        std::vector<Pin_t> pinAssignment;
         getResults(pinAssignment);
         return pinAssignment;
 }
+
+}  // namespace ioPlacer

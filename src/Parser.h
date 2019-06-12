@@ -77,15 +77,15 @@ class Parser {
         std::map<std::string, NetDscp> mapIOPinToNet;
         std::map<std::string, point> mapInstToPosition;
 
-        Parameters* _parms;
-        Netlist* _netlist;
-        Core* _core;
+        Parameters& _parms;
+        Netlist& _netlist;
+        Core& _core;
         box _dieArea;
         std::vector<ioPin> _ioPins;
         DEFParser _defParser;
         DefDscp _defDscp;
 
-        point getInstPosition(std::string instName);
+        point getInstPosition(std::string);
         void readDieArea();
         void readConnections();
         void initNetlist();
@@ -96,6 +96,8 @@ class Parser {
        public:
         Parser(Parameters&, Netlist&, Core&);
         void run();
+        void getBlockages(std::string,
+                          std::vector<std::pair<Coordinate, Coordinate>>&);
 };
 
 #endif /* __PARSER_H_ */

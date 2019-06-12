@@ -44,12 +44,6 @@
 
 class Parameters {
        private:
-        //        std::string _floorplanFile;
-        //        std::string _netlistFile;
-        //        DBU _minimumSpacingX;
-        //        DBU _minimumSpacingY;
-        //        DBU _initTracksX;
-        //        DBU _initTracksY;
         int _horizontalMetalLayer;
         int _verticalMetalLayer;
         std::string _inputDefFile;
@@ -58,36 +52,29 @@ class Parameters {
 
         bool _forceSpread = true;
         int _nslots = -1;
+        int _randomMode = 0;
         float _slotsFactor = -1;
         float _usage = -1;
         float _usageFactor = -1;
+        std::string _blockagesFile;
 
         void printAll() const;
 
        public:
         Parameters(int, char**);
 
-        //        std::string getFloorplanFile() const { return _floorplanFile;
-        // }
-        //        std::string getNetlistFile() const { return _netlistFile; }
         std::string getInputDefFile() const { return _inputDefFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
-        //        DBU getMinimumSpacingX() const { return _minimumSpacingX; }
-        //        DBU getMinimumSpacingY() const { return _minimumSpacingY; }
-        //        DBU getInitTrackX() const {
-        //                return _initTracksX;
-        //        };
-        //        DBU getInitTrackY() const {
-        //                return _initTracksY;
-        //        };
         int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
         int getVerticalMetalLayer() const { return _verticalMetalLayer; };
         int returnHPWL() const { return _returnHPWL; };
         int returnNslots() const { return _nslots; };
+        int returnRandomMode() const { return _randomMode; };
         float returnSlotsFactor() const { return _slotsFactor; };
         float returnUsage() const { return _usage; };
         float returnUsageFactor() const { return _usageFactor; };
         float returnForceSpread() const { return _forceSpread; };
+        std::string returnBlockagesFile() const { return _blockagesFile; };
 };
 
 #endif /* __PARAMETERS_H_ */
