@@ -47,11 +47,6 @@
 #include "Netlist.h"
 #include <numeric>
 
-/*! \struct _Slot_t
- *  \brief Brief struct description
- *
- *  Detailed description
- */
 struct _Slot_t {
         bool blocked;
         bool used;
@@ -60,11 +55,6 @@ struct _Slot_t {
 
 typedef std::vector<Slot_t> slotVector_t;
 
-/*! \struct _Section_t
- *  \brief Brief struct description
- *
- *  Detailed description
- */
 typedef struct _Section_t {
         Coordinate pos;
         Netlist net;

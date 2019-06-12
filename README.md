@@ -186,8 +186,8 @@ The function *forcePinSpread* defines if ioPlacer should try to force the spread
 #### Running ioPlacer and Retrieving Results
 
 ````
-std::vector<pinS> run(bool returnHPWL = false);
+std::vector<Pin_t> run(bool returnHPWL = false);
 `````
 
 After everything is properly set, the *run* function should be called. If a *true* argument is passed, this function prints the IO Pins HPWL.
-This function returns a vector with pinS structs. This struct is defined in IOPlacement.h, it contains the name of the IO pin, its new position and its orientation (e.g., 'N', 'S', 'W' or 'E').
+This function returns a vector with Pin_t structs. This struct is defined in IOPlacement.h, it contains the name of the IO pin, its new position and its orientation (e.g., 'N', 'S', 'W' or 'E').

@@ -51,11 +51,11 @@ typedef long long int DBU;
 typedef boost::geometry::model::d2::point_xy<DBU> point;
 typedef boost::geometry::model::box<point> box;
 
-struct pinS {
+struct _Pin {
         std::string name;
         point pos;
         char orientation;
-};
+} typedef Pin_t;
 
 class IOPlacement {
        public:
@@ -75,7 +75,7 @@ class IOPlacement {
 
         // net connected to the pin, pin name, pin position
         void addInstPin(std::string net, std::string pinName, point pos);
-	void addBlockage(point initialPos, point finalPos);
+        void addBlockage(point initialPos, point finalPos);
 
         // optional
         void setSlotsPerSection(unsigned slotsPerSection, float increaseFactor);
@@ -87,7 +87,7 @@ class IOPlacement {
 
         // run IOPlacement, returns a vector with all a pin name, its new
         // position and its orientation
-        std::vector<pinS> run(bool returnHPWL = false);
+        std::vector<Pin_t> run(bool returnHPWL = false);
 
        private:
         struct cellPin {
@@ -108,7 +108,7 @@ class IOPlacement {
         std::map<std::string, std::vector<size_t>> _mapNetToIo;
 
         void initNetlist();
-        void getResults(std::vector<pinS>& pinAssignment);
+        void getResults(std::vector<Pin_t>& pinAssignment);
         char getOrientationString(int orient);
 };
 

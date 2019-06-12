@@ -146,9 +146,9 @@ char IOPlacement::getOrientationString(int orient) {
         return 'W';
 }
 
-void IOPlacement::getResults(std::vector<pinS>& pinAssignment) {
+void IOPlacement::getResults(std::vector<Pin_t>& pinAssignment) {
         for (IOPin& io : ioKernel._assignment) {
-                pinS p;
+                Pin_t p;
                 p.name = io.getName();
                 p.pos = point(io.getX(), io.getY());
                 const Orientation& orient = io.getOrientation();
@@ -177,11 +177,11 @@ void IOPlacement::setRandomMode(int randomMode) {
         ioKernel._randomMode = (RandomMode) randomMode;
 }
 
-std::vector<pinS> IOPlacement::run(bool returnHPWL) {
+std::vector<Pin_t> IOPlacement::run(bool returnHPWL) {
         initNetlist();
         ioKernel._returnHPWL = returnHPWL;
         ioKernel.run();
-        std::vector<pinS> pinAssignment;
+        std::vector<Pin_t> pinAssignment;
         getResults(pinAssignment);
         return pinAssignment;
 }
