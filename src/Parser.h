@@ -100,6 +100,7 @@ class Parser {
                           std::vector<std::pair<Coordinate, Coordinate>>&);
         bool isDesignPlaced();
         std::string getMetalWrittenStyle();
+        bool verifyRequiredData();
 };
 
 #endif /* __PARSER_H_ */

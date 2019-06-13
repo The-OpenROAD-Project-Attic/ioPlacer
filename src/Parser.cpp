@@ -149,17 +149,15 @@ void Parser::initCore() {
         DBU initTrackY = 0;
 
         for (TrackDscp track : _defDscp._clsTracks) {
-                if (boost::iequals(track._layers[0],
-                    "Metal" +
-                        std::to_string(_parms.getHorizontalMetalLayer()))) {
+                if ((track._layers[0].back() - '0') ==
+                    _parms.getHorizontalMetalLayer()) {
                         if (boost::iequals(track._direction, "Y")) {
                                 minSpacingY = track._space;
                                 initTrackY = track._location;
                         }
                 }
-                if (boost::iequals(track._layers[0],
-                            "Metal" + 
-                            std::to_string(_parms.getVerticalMetalLayer()))) {
+                if ((track._layers[0].back() - '0') ==
+                    _parms.getVerticalMetalLayer()) {
                         if (boost::iequals(track._direction, "X")) {
                                 minSpacingX = track._space;
                                 initTrackX = track._location;
@@ -239,15 +237,33 @@ bool Parser::isDesignPlaced() {
                         return false;
                 }
         }
-
         return true;
 }
 
 std::string Parser::getMetalWrittenStyle() {
         std::string metal;
         for (TrackDscp track : _defDscp._clsTracks) {
-                metal = track._layers[0].substr(0, 5);
+                metal = track._layers[0];
         }
-
+        metal.pop_back();
         return metal;
+}
+
+bool Parser::verifyRequiredData() {
+        int trackCount = 0;
+        int compCount = 0;
+        
+        for (TrackDscp track : _defDscp._clsTracks) {
+                trackCount++;
+        }
+        
+        for (ComponentDscp comp : _defDscp._Comps) {
+                compCount++;
+        }
+        
+        if (trackCount <= 0 || compCount <= 0) {
+                return false;
+        }
+        
+        return true;
 }

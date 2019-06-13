@@ -47,8 +47,15 @@ void IOPlacementKernel::initNetlistAndCore() {
         Parser parser(*_parms, _netlist, _core);
         parser.run();
 
+        std::cout << "Verifying required data\n";
+        if (!parser.verifyRequiredData()) {
+                std::cout << "*****\nRequired data is not provided by current DEF!\n";
+                std::cout << "Check if DEF have tracks and components\n*****\n";
+                std::exit(0);
+        }
+        
         std::string metal = parser.getMetalWrittenStyle();
-
+        
         _horizontalMetalLayer =
             metal + std::to_string(_parms->getHorizontalMetalLayer());
         _verticalMetalLayer =
