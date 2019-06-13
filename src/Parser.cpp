@@ -156,7 +156,8 @@ void Parser::initCore() {
                                 minSpacingY = track._space;
                                 initTrackY = track._location;
                         }
-                } else if (boost::iequals(track._layers[0],
+                }
+                if (boost::iequals(track._layers[0],
                             "Metal" + 
                             std::to_string(_parms.getVerticalMetalLayer()))) {
                         if (boost::iequals(track._direction, "X")) {
