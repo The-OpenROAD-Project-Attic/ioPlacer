@@ -71,16 +71,19 @@ class IOPin : public InstancePin {
         Coordinate _lowerBound;
         Coordinate _upperBound;
         std::string _netName;
+        std::string _locationType;
 
        public:
         IOPin(const std::string& name, const Coordinate& pos, Direction dir,
-              Coordinate lowerBound, Coordinate upperBound, std::string netName)
+              Coordinate lowerBound, Coordinate upperBound, std::string netName,
+              std::string locationType)
             : InstancePin(name, pos),
               _orientation(NORTH),
               _direction(dir),
               _lowerBound(lowerBound),
               _upperBound(upperBound),
-              _netName(netName) {}
+              _netName(netName),
+              _locationType(locationType) {}
 
         void setOrientation(const Orientation o) { _orientation = o; }
         Orientation getOrientation() const { return _orientation; }
@@ -93,6 +96,7 @@ class IOPin : public InstancePin {
         Coordinate getLowerBound() const { return _lowerBound; };
         Coordinate getUpperBound() const { return _upperBound; };
         std::string getNetName() const { return _netName; }
+        std::string getLocationType() const { return _locationType; };
 };
 
 class Netlist {

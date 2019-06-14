@@ -72,6 +72,7 @@ class Parser {
                 box bounds;
                 std::string direction;
                 std::vector<cellPin> connections;
+                std::string locationType;
         };
 
         std::map<std::string, NetDscp> mapIOPinToNet;

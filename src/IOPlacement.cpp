@@ -125,7 +125,8 @@ void IOPlacement::initNetlist() {
                 Coordinate pos(_ioPins[i].position.x(),
                                _ioPins[i].position.y());
 
-                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName);
+                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName,
+                            io.locationType);
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];

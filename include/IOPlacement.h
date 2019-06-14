@@ -102,6 +102,7 @@ class IOPlacement {
                 box bounds;
                 std::string direction;
                 std::vector<cellPin> connections;
+                std::string locationType;
         };
 
         std::vector<ioPin> _ioPins;

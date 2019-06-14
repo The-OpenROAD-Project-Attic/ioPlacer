@@ -124,6 +124,13 @@ bool WriterIOPins::writeFile() {
                                                 orient = "S";
                                                 break;
                                 }
+                                
+                                std::string locationType;
+                                if (ioPin.getLocationType() != "INVALID_STRING*") {
+                                        locationType = ioPin.getLocationType();
+                                } else  {
+                                        locationType = "FIXED";
+                                }
 
                                 if (orientation == Orientation::EAST ||
                                     orientation == Orientation::WEST) {
@@ -141,7 +148,8 @@ bool WriterIOPins::writeFile() {
                                          << upperBound.getX() << " "
                                          << upperBound.getY() << " )"
                                          << std::endl;
-                                pinsFile << "  + PLACED ( " << position.getX()
+                                pinsFile << "  + " << locationType 
+                                         << " ( " << position.getX()
                                          << " " << position.getY() << " ) "
                                          << orient << " ;" << std::endl;
                         }
