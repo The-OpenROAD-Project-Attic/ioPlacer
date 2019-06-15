@@ -53,9 +53,9 @@ void IOPlacementKernel::initNetlistAndCore() {
                 std::cout << "Check if DEF have tracks and components\n*****\n";
                 std::exit(0);
         }
-        
+
         std::string metal = parser.getMetalWrittenStyle();
-        
+
         _horizontalMetalLayer =
             metal + std::to_string(_parms->getHorizontalMetalLayer());
         _verticalMetalLayer =
@@ -482,6 +482,44 @@ inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
         }
 }
 
+inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
+        const DBU x = pin.getX();
+        const DBU y = pin.getY();
+        DBU lowerXBound = _core.getLowerBound().getX();
+        DBU lowerYBound = _core.getLowerBound().getY();
+        DBU upperXBound = _core.getUpperBound().getX();
+        DBU upperYBound = _core.getUpperBound().getY();
+
+        if (x == lowerXBound || x == upperXBound) {
+//                int halfWidth = int( ceil((curLayer->width() * env.defDbu)/2.0) + 0.5f);
+//                int height = (curLayer->hasArea())?
+//                int( ceil((curLayer->area() * env.defDbu * env.defDbu)/(2.0*halfWidth)) + 0.5f) :
+//                        2 * halfWidth;
+//                curPin.addLayerPts( -1*halfWidth, 0, halfWidth, height );
+                DBU halfWidth = DBU (ceil(_core.getMinWidthX()/2.0));
+                DBU height = _core.getMinAreaX() != 0.0 ?
+                        DBU (ceil(_core.getMinAreaX() / (2.0*halfWidth))) :
+                        2 * halfWidth;
+                pin.setLowerBound(-1*halfWidth, 0);
+                pin.setUpperBound(halfWidth, height);
+        }
+
+
+        if (y == lowerYBound || y == upperYBound) {
+//                int halfWidth = int( ceil((curLayer->width() * env.defDbu)/2.0) + 0.5f);
+//                int height = (curLayer->hasArea())?
+//                int( ceil((curLayer->area() * env.defDbu * env.defDbu)/(2.0*halfWidth)) + 0.5f) :
+//                        2 * halfWidth;
+//                curPin.addLayerPts( -1*halfWidth, 0, halfWidth, height );
+                DBU halfWidth = DBU (ceil(_core.getMinWidthY()/2.0));
+                DBU height = _core.getMinAreaY() != 0.0 ?
+                        DBU (ceil(_core.getMinAreaY() / (2.0*halfWidth))) :
+                        2 * halfWidth;
+                pin.setLowerBound(-1*halfWidth, 0);
+                pin.setUpperBound(halfWidth, height);
+        }
+}
+
 DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
         unsigned pinIndex = 0;
         DBU hpwl = 0;
@@ -541,6 +579,7 @@ void IOPlacementKernel::run() {
 #pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);
+                updatePinArea(_assignment[i]);
         }
 
         if (_returnHPWL) {

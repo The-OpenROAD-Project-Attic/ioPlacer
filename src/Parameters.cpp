@@ -46,7 +46,8 @@ Parameters::Parameters(int argc, char** argv) {
         po::options_description dscp("Usage");
         // clang-format off
         dscp.add_options()
-                ("input,i"        , po::value<std::string>() , "Input DEF file (mandatory)")
+                ("input-lef,l"        , po::value<std::string>() , "Input LEF file (mandatory)")
+                ("input-def,d"        , po::value<std::string>() , "Input DEF file (mandatory)")
                 ("output,o"       , po::value<std::string>() , "Output DEF file (mandatory)")
                 ("hmetal,h"       , po::value<int>()         , "Horizontal metal layer (int) (mandatory)")
                 ("vmetal,v"       , po::value<int>()         , "Vertical metal layer (int) (mandatory)")
@@ -74,12 +75,14 @@ Parameters::Parameters(int argc, char** argv) {
 
                 if (vm.count("help") || !vm.count("hmetal") ||
                     !vm.count("vmetal") || !vm.count("output") ||
-                    !vm.count("input")) {
+                    !vm.count("input-lef") || !vm.count("input-def")) {
                         std::cout << "\n" << dscp;
                         std::exit(1);
                 }
 
-                _inputDefFile = vm["input"].as<std::string>();
+                
+                _inputLefFile = vm["input-lef"].as<std::string>();
+                _inputDefFile = vm["input-def"].as<std::string>();
                 _outputDefFile = vm["output"].as<std::string>();
                 _horizontalMetalLayer = vm["hmetal"].as<int>();
                 _verticalMetalLayer = vm["vmetal"].as<int>();
@@ -118,6 +121,8 @@ Parameters::Parameters(int argc, char** argv) {
 void Parameters::printAll() const {
         // clang-format off
         std::cout << "\nOptions: \n";
+        std::cout << std::setw(20) << std::left << "Input LEF file: ";
+        std::cout << _inputLefFile << "\n";
         std::cout << std::setw(20) << std::left << "Input DEF file: ";
         std::cout << _inputDefFile << "\n";
         std::cout << std::setw(20) << std::left << "Output DEF file: ";

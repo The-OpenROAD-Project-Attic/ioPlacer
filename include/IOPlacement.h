@@ -64,7 +64,8 @@ class IOPlacement {
         // the lower left and the upper right corners, minimum spacing between
         // IO pins, first track's position
         void initCore(point lowerBounds, point upperBounds, DBU minSpacingX,
-                      DBU minSpacingY, DBU initTrackX, DBU initTrackY);
+                      DBU minSpacingY, DBU initTrackX, DBU initTrackY, 
+                      DBU minAreaX, DBU minAreaY, DBU minWidthX, DBU minWidthY);
 
         void setMetalLayers(int horizontalMetalLayer, int verticalMetalLayer);
 

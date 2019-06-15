@@ -46,6 +46,7 @@ class Parameters {
        private:
         int _horizontalMetalLayer;
         int _verticalMetalLayer;
+        std::string _inputLefFile;
         std::string _inputDefFile;
         std::string _outputDefFile;
         bool _returnHPWL = false;
@@ -64,6 +65,7 @@ class Parameters {
         Parameters(int, char**);
 
         std::string getInputDefFile() const { return _inputDefFile; }
+        std::string getInputLefFile() const { return _inputLefFile; }
         std::string getOutputDefFile() const { return _outputDefFile; }
         int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
         int getVerticalMetalLayer() const { return _verticalMetalLayer; };

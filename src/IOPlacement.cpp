@@ -46,11 +46,13 @@ IOPlacementKernel ioKernel;
 
 void IOPlacement::initCore(point lowerBounds, point upperBounds,
                            DBU minSpacingX, DBU minSpacingY, DBU initTrackX,
-                           DBU initTrackY) {
+                           DBU initTrackY, DBU minAreaX, DBU minAreaY, 
+                           DBU minWidthX, DBU minWidthY) {
         Coordinate lowerBound(lowerBounds.x(), lowerBounds.y());
         Coordinate upperBound(upperBounds.x(), upperBounds.y());
         ioKernel._core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
-                              initTrackX, initTrackY);
+                              initTrackX, initTrackY, minAreaX, minAreaY,
+                              minWidthX, minWidthY);
 }
 
 void IOPlacement::setMetalLayers(int horizontalMetalLayer,

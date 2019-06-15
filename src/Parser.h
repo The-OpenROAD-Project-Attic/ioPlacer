@@ -54,6 +54,8 @@
 #include "Coordinate.h"
 #include "DEFDescriptor.h"
 #include "DEFParser.h"
+#include "LEFDescriptor.h"
+#include "LEFParser.h"
 
 class Parser {
         typedef boost::geometry::model::d2::point_xy<DBU> point;
@@ -83,7 +85,9 @@ class Parser {
         Core& _core;
         box _dieArea;
         std::vector<ioPin> _ioPins;
+        LEFParser _lefParser;
         DEFParser _defParser;
+        LefDscp _lefDscp;
         DefDscp _defDscp;
 
         point getInstPosition(std::string);

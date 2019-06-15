@@ -48,6 +48,10 @@ class Core {
         unsigned _minDstPinsY;
         unsigned _initTracksX;
         unsigned _initTracksY;
+        unsigned _minAreaX;
+        unsigned _minAreaY;
+        unsigned _minWidthX;
+        unsigned _minWidthY;
 
        public:
         Core()
@@ -57,13 +61,19 @@ class Core {
               _minDstPinsY(20){};
         Core(const Coordinate& lowerBound, const Coordinate& upperBound,
              const DBU& minDstPinsX, const DBU& minDstPinsY,
-             const DBU& initTracksX, const DBU& initTracksY)
+             const DBU& initTracksX, const DBU& initTracksY,
+             const DBU& minAreaX, const DBU& minAreaY,
+             const DBU& minWidthX, const DBU& minWidthY)
             : _lowerBound(lowerBound),
               _upperBound(upperBound),
               _minDstPinsX(minDstPinsX),
               _minDstPinsY(minDstPinsY),
               _initTracksX(initTracksX),
-              _initTracksY(initTracksY) {}
+              _initTracksY(initTracksY),
+              _minAreaX(minAreaX),
+              _minAreaY(minAreaY),
+              _minWidthX(minWidthX),
+              _minWidthY(minWidthY){}
 
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }
@@ -71,7 +81,11 @@ class Core {
         unsigned getMinDstPinsY() const { return _minDstPinsY; }
         unsigned getInitTracksX() const { return _initTracksX; }
         unsigned getInitTracksY() const { return _initTracksY; }
-
+        unsigned getMinAreaX() const { return _minAreaX; }
+        unsigned getMinAreaY() const { return _minAreaY; }
+        unsigned getMinWidthX() const { return _minWidthX; }
+        unsigned getMinWidthY() const { return _minWidthY; }
+        
         DBU getPerimeter();
 };
 

@@ -46,6 +46,7 @@ Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
     : _parms(parms), _netlist(netlist), _core(core) {}
 
 void Parser::run() {
+        _lefParser.parseLEF(_parms.getInputLefFile(), _lefDscp);
         _defParser.parseDEF(_parms.getInputDefFile(), _defDscp);
         initMapIOtoNet();
         initMapInstToPosition();
@@ -149,6 +150,10 @@ void Parser::initCore() {
         DBU minSpacingY = 0;
         DBU initTrackX = 0;
         DBU initTrackY = 0;
+        DBU minAreaX = 0;
+        DBU minAreaY = 0;
+        DBU minWidthX = 0;
+        DBU minWidthY = 0;
 
         for (TrackDscp track : _defDscp._clsTracks) {
                 if ((track._layers[0].back() - '0') ==
@@ -167,6 +172,24 @@ void Parser::initCore() {
                 }
         }
 
+        for (LefLayerDscp layer : _lefDscp.clsLefLayerDscps) {
+                if ((layer.clsName.back() - '0') ==
+                    _parms.getHorizontalMetalLayer()
+                        && boost::iequals(layer.clsType, "ROUTING")) {
+                        minAreaY = layer.clsArea*_lefDscp.clsLefUnitsDscp.clsDatabase
+                                   *_lefDscp.clsLefUnitsDscp.clsDatabase;
+                        minWidthY = layer.clsWidth*_lefDscp.clsLefUnitsDscp.clsDatabase;
+                }
+                if ((layer.clsName.back() - '0') ==
+                    _parms.getVerticalMetalLayer()
+                        && boost::iequals(layer.clsType, "ROUTING")) {
+                        minAreaX = layer.clsArea*_lefDscp.clsLefUnitsDscp.clsDatabase
+                                   *_lefDscp.clsLefUnitsDscp.clsDatabase;
+                        minWidthX = layer.clsWidth*_lefDscp.clsLefUnitsDscp.clsDatabase;
+                }
+        }
+
+
         DBU IOWidth = _ioPins[0].bounds.max_corner().x() -
                       _ioPins[0].bounds.min_corner().x();
         if (minSpacingX <= IOWidth) {
@@ -180,8 +203,10 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
+        
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
-                      initTrackX, initTrackY);
+                      initTrackX, initTrackY, minAreaX, minAreaY,
+                      minWidthX, minWidthY);
 }
 
 void Parser::initMapIOtoNet() {
@@ -254,18 +279,18 @@ std::string Parser::getMetalWrittenStyle() {
 bool Parser::verifyRequiredData() {
         int trackCount = 0;
         int compCount = 0;
-        
+
         for (TrackDscp track : _defDscp._clsTracks) {
                 trackCount++;
         }
-        
+
         for (ComponentDscp comp : _defDscp._Comps) {
                 compCount++;
         }
-        
+
         if (trackCount <= 0 || compCount <= 0) {
                 return false;
         }
-        
+
         return true;
 }
