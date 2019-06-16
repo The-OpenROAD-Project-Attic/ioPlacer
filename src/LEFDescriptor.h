@@ -42,40 +42,37 @@
 #include <deque>
 #include <vector>
 
-//#include "util/DoubleRectangle.h"
-//#include "util/Double2.h"
-
 static const std::string INVALID_LEF_NAME = "*<INVALID_LEF_NAME>*";
 static const std::string DEFAULT_PIN_DIRECTION = "INPUT";
 
 class LefUnitsDscp {
        public:
-        bool clsHasTime = false;
-        bool clsHasCapacitance = false;
-        bool clsHasResitance = false;
-        bool clsHasPower = false;
-        bool clsHasCurrent = false;
-        bool clsHasVoltage = false;
-        bool clsHasDatabase = false;
-        bool clsHasFrequency = false;
+        bool _clsHasTime = false;
+        bool _clsHasCapacitance = false;
+        bool _clsHasResitance = false;
+        bool _clsHasPower = false;
+        bool _clsHasCurrent = false;
+        bool _clsHasVoltage = false;
+        bool _clsHasDatabase = false;
+        bool _clsHasFrequency = false;
 
-        int clsTime = 0;
-        int clsCapacitance = 0;
-        int clsResitance = 0;
-        int clsPower = 0;
-        int clsCurrent = 0;
-        int clsVoltage = 0;
-        int clsDatabase = 100;  // default value at LEF/DEF reference
-        int clsFrequency = 0;
+        int _clsTime = 0;
+        int _clsCapacitance = 0;
+        int _clsResitance = 0;
+        int _clsPower = 0;
+        int _clsCurrent = 0;
+        int _clsVoltage = 0;
+        int _clsDatabase = 100;  // default value at LEF/DEF reference
+        int _clsFrequency = 0;
 
         LefUnitsDscp() = default;
 };  // end class
 
 class LefSpacingRuleDscp {
        public:
-        double clsSpacing = 0.0;
-        double clsEOL = 0.0;  // End of line
-        double clsEOLWithin = 0.0;
+        double _clsSpacing = 0.0;
+        double _clsEOL = 0.0;  // End of line
+        double _clsEOLWithin = 0.0;
         LefSpacingRuleDscp() = default;
 };  // end class
 
@@ -83,15 +80,15 @@ class LefSpacingRuleDscp {
 
 class LefLayerDscp {
        public:
-        std::string clsName = INVALID_LEF_NAME;
-        std::string clsType = INVALID_LEF_NAME;
-        std::string clsDirection = INVALID_LEF_NAME;
-        double clsPitch[2] = {0.0, 0.0};
-        double clsOffset = 0.0;
-        double clsWidth = 0.0;
-        double clsMinWidth = 0.0;
-        double clsArea = 0.0;
-        std::vector<LefSpacingRuleDscp> clsSpacingRules;
+        std::string _clsName = INVALID_LEF_NAME;
+        std::string _clsType = INVALID_LEF_NAME;
+        std::string _clsDirection = INVALID_LEF_NAME;
+        double _clsPitch[2] = {0.0, 0.0};
+        double _clsOffset = 0.0;
+        double _clsWidth = 0.0;
+        double _clsMinWidth = 0.0;
+        double _clsArea = 0.0;
+        std::vector<LefSpacingRuleDscp> _clsSpacingRules;
         LefLayerDscp() = default;
 };  // end class
 
@@ -99,23 +96,23 @@ class LefLayerDscp {
 
 class LefSpacingDscp {
        public:
-        std::string clsLayer1 = INVALID_LEF_NAME;
-        std::string clsLayer2 = INVALID_LEF_NAME;
-        double clsDistance = 0.0;
+        std::string _clsLayer1 = INVALID_LEF_NAME;
+        std::string _clsLayer2 = INVALID_LEF_NAME;
+        double _clsDistance = 0.0;
         LefSpacingDscp() = default;
 };  // end class
 
 class LefDscp {
        public:
-        int clsMajorVersion = 0;
-        int clsMinorVersion = 0;
-        std::string clsCaseSensitive = INVALID_LEF_NAME;
-        std::string clsBusBitChars = INVALID_LEF_NAME;
-        std::string clsDivideChar = INVALID_LEF_NAME;
-        double clsManufactGrid = 0.0;
-        LefUnitsDscp clsLefUnitsDscp;
-        std::vector<LefLayerDscp> clsLefLayerDscps;
-        std::vector<LefSpacingDscp> clsLefSpacingDscps;
+        int _clsMajorVersion = 0;
+        int _clsMinorVersion = 0;
+        std::string _clsCaseSensitive = INVALID_LEF_NAME;
+        std::string _clsBusBitChars = INVALID_LEF_NAME;
+        std::string _clsDivideChar = INVALID_LEF_NAME;
+        double _clsManufactGrid = 0.0;
+        LefUnitsDscp _clsLefUnitsDscp;
+        std::vector<LefLayerDscp> _clsLefLayerDscps;
+        std::vector<LefSpacingDscp> _clsLefSpacingDscps;
         LefDscp() = default;
 };  // end class
 

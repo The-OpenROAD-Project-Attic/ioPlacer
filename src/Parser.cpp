@@ -172,20 +172,20 @@ void Parser::initCore() {
                 }
         }
 
-        for (LefLayerDscp layer : _lefDscp.clsLefLayerDscps) {
-                if ((layer.clsName.back() - '0') ==
+        for (LefLayerDscp layer : _lefDscp._clsLefLayerDscps) {
+                if ((layer._clsName.back() - '0') ==
                     _parms.getHorizontalMetalLayer()
-                        && boost::iequals(layer.clsType, "ROUTING")) {
-                        minAreaY = layer.clsArea*_lefDscp.clsLefUnitsDscp.clsDatabase
-                                   *_lefDscp.clsLefUnitsDscp.clsDatabase;
-                        minWidthY = layer.clsWidth*_lefDscp.clsLefUnitsDscp.clsDatabase;
+                        && boost::iequals(layer._clsType, "ROUTING")) {
+                        minAreaY = layer._clsArea*_lefDscp._clsLefUnitsDscp._clsDatabase
+                                   *_lefDscp._clsLefUnitsDscp._clsDatabase;
+                        minWidthY = layer._clsWidth*_lefDscp._clsLefUnitsDscp._clsDatabase;
                 }
-                if ((layer.clsName.back() - '0') ==
+                if ((layer._clsName.back() - '0') ==
                     _parms.getVerticalMetalLayer()
-                        && boost::iequals(layer.clsType, "ROUTING")) {
-                        minAreaX = layer.clsArea*_lefDscp.clsLefUnitsDscp.clsDatabase
-                                   *_lefDscp.clsLefUnitsDscp.clsDatabase;
-                        minWidthX = layer.clsWidth*_lefDscp.clsLefUnitsDscp.clsDatabase;
+                        && boost::iequals(layer._clsType, "ROUTING")) {
+                        minAreaX = layer._clsArea*_lefDscp._clsLefUnitsDscp._clsDatabase
+                                   *_lefDscp._clsLefUnitsDscp._clsDatabase;
+                        minWidthX = layer._clsWidth*_lefDscp._clsLefUnitsDscp._clsDatabase;
                 }
         }
 

@@ -42,8 +42,6 @@
 
 #include "LEFDescriptor.h"
 
-//! LEF file must be parsed first than DEF file
-
 class LEFParser {           
        public:
         LEFParser() {}

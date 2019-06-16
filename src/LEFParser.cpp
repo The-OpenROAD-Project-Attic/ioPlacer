@@ -43,9 +43,6 @@
 #include <map>
 #include <iostream>
 
-//#include "util/DoubleRectangle.h"
-//#include "util/Double2.h"
-
 // LEF headers
 #include "lef/lefrReader.hpp"
 #include "lef/lefwWriter.hpp"
@@ -157,11 +154,11 @@ void LEFParser::parseLEF(const std::string& filename, LefDscp& dscp) {
 
 int lefUnits(lefrCallbackType_e c, lefiUnits* units, lefiUserData ud) {
         LefDscp& dscp = getLibraryFromUserData(ud);
-        LefUnitsDscp& lefUnits = dscp.clsLefUnitsDscp;
+        LefUnitsDscp& lefUnits = dscp._clsLefUnitsDscp;
 
         if (units->hasDatabase()) {
-                lefUnits.clsDatabase = (int)units->databaseNumber();
-                lefUnits.clsHasDatabase = true;
+                lefUnits._clsDatabase = (int)units->databaseNumber();
+                lefUnits._clsHasDatabase = true;
         }
 
         return 0;
@@ -180,46 +177,46 @@ int lefLayerCB(lefrCallbackType_e c, lefiLayer* layer, lefiUserData ud) {
         static const int Y = 0;
 
         LefDscp& dscp = getLibraryFromUserData(ud);
-        dscp.clsLefLayerDscps.resize(dscp.clsLefLayerDscps.size() + 1);
-        LefLayerDscp& lefLayer = dscp.clsLefLayerDscps.back();
-        lefLayer.clsName = layer->lefiLayer::name();
+        dscp._clsLefLayerDscps.resize(dscp._clsLefLayerDscps.size() + 1);
+        LefLayerDscp& lefLayer = dscp._clsLefLayerDscps.back();
+        lefLayer._clsName = layer->lefiLayer::name();
         if (layer->lefiLayer::hasType())
-                lefLayer.clsType = layer->lefiLayer::type();
+                lefLayer._clsType = layer->lefiLayer::type();
         if (layer->lefiLayer::hasPitch()) {
-                lefLayer.clsPitch[X] = layer->lefiLayer::pitch();
-                lefLayer.clsPitch[Y] = layer->lefiLayer::pitch();
+                lefLayer._clsPitch[X] = layer->lefiLayer::pitch();
+                lefLayer._clsPitch[Y] = layer->lefiLayer::pitch();
         }
         if (layer->lefiLayer::hasXYPitch()) {
-                lefLayer.clsPitch[X] = layer->lefiLayer::pitchX();
-                lefLayer.clsPitch[Y] = layer->lefiLayer::pitchY();
+                lefLayer._clsPitch[X] = layer->lefiLayer::pitchX();
+                lefLayer._clsPitch[Y] = layer->lefiLayer::pitchY();
         }
         if (layer->lefiLayer::hasWidth())
-                lefLayer.clsWidth = layer->lefiLayer::width();
+                lefLayer._clsWidth = layer->lefiLayer::width();
         if (layer->lefiLayer::hasDirection())
-                lefLayer.clsDirection = layer->lefiLayer::direction();
+                lefLayer._clsDirection = layer->lefiLayer::direction();
         if (layer->lefiLayer::hasSpacingNumber()) {
                 int numSpacing = layer->lefiLayer::numSpacing();
-                lefLayer.clsSpacingRules.resize(numSpacing);
+                lefLayer._clsSpacingRules.resize(numSpacing);
                 for (int i = 0; i < numSpacing; ++i) {
                         LefSpacingRuleDscp& spcRule =
-                            lefLayer.clsSpacingRules[i];
-                        spcRule.clsSpacing = layer->lefiLayer::spacing(i);
-                        spcRule.clsEOL = layer->lefiLayer::spacingEolWidth(i);
-                        spcRule.clsEOLWithin =
+                            lefLayer._clsSpacingRules[i];
+                        spcRule._clsSpacing = layer->lefiLayer::spacing(i);
+                        spcRule._clsEOL = layer->lefiLayer::spacingEolWidth(i);
+                        spcRule._clsEOLWithin =
                             layer->lefiLayer::spacingEolWithin(i);
                 }  // end for
         }          // end if
         if (layer->lefiLayer::hasArea())
-                lefLayer.clsArea = layer->lefiLayer::area();
+                lefLayer._clsArea = layer->lefiLayer::area();
         return 0;
 }  // end method
 
 int lefSpacingCB(lefrCallbackType_e c, lefiSpacing* spacing, lefiUserData ud) {
         LefDscp& dscp = getLibraryFromUserData(ud);
-        dscp.clsLefSpacingDscps.resize(dscp.clsLefSpacingDscps.size() + 1);
-        LefSpacingDscp& lefSpacing = dscp.clsLefSpacingDscps.back();
-        lefSpacing.clsLayer1 = spacing->lefiSpacing::name1();
-        lefSpacing.clsLayer2 = spacing->lefiSpacing::name2();
-        lefSpacing.clsDistance = spacing->lefiSpacing::distance();
+        dscp._clsLefSpacingDscps.resize(dscp._clsLefSpacingDscps.size() + 1);
+        LefSpacingDscp& lefSpacing = dscp._clsLefSpacingDscps.back();
+        lefSpacing._clsLayer1 = spacing->lefiSpacing::name1();
+        lefSpacing._clsLayer2 = spacing->lefiSpacing::name2();
+        lefSpacing._clsDistance = spacing->lefiSpacing::distance();
         return 0;
 }  // end method
