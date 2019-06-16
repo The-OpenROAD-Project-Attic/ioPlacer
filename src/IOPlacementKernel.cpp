@@ -528,7 +528,7 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
                 pinIndex++;
         });
 
-        return hpwl / 2000;
+        return hpwl;
 }
 
 void IOPlacementKernel::run() {
