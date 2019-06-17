@@ -1,6 +1,6 @@
 # IO Placement
 
-IO Placement finds an optimal placement for IO pins through the use of a Hungarian Algorithm.
+IO Placement finds an near-optimal placement for IO pins through the use of a Hungarian Algorithm.
 
 ## Getting Started
 #### Pre-Requisite
@@ -38,20 +38,22 @@ The library file (libioPlacer.a) will be on the 'ioPlacer/lib` folder
 
 To properly run IO Placement there are a few mandatory arguments that must be defined.
 
-- **-i** : Input DEF file, the DEF file that will be evaluated (e.g.: -i ispd18_test2.input.def)
+- **-l** : Input LEF file, the LEF file that contains information for IO pins boundaries and database unity (e.g.: -l ispd18_test2.input.lef)
+- **-d** : Input DEF file, the DEF file that will be evaluated (e.g.: -d ispd18_test2.input.def)
 - **-o** : Output DEF file, the name of the output file, where the new placement will be saved (e.g.: -o ispd18_test2.output.def)
 - **-h** : Horizontal metal layer, this should be an integer number indicating the metal layer (e.g.: -h 5)
 - **-v** : Vertical metal layer, the usage is the same as horizontal metal layer
 
 There are optional flags that can be used.
 
-- **-w** : Indicates whether or not the IO nets HPWL is returned, by default this flag is set to false
-- **-f** : Force pins to be spread in core, i.e., try to respect number os slots
-- **-n** : Number of slots per section
-- **-s** : Increase factor (%) of slots per section
-- **-m** : Percentage of usage for each section
-- **-x** : Increase factor (%) of usage for each section
-- **-b** : Name of the file containing the blocked areas. One blocked area per line, format: initialX initialY finalX finalY (e.g.: 0 1000 0 902900)
+- **-w** : Indicates whether or not the IO nets HPWL is returned; by default this flag is set to false (e.g.: -w 1)
+- **-f** : Force pins to be spread in core, i.e., try to respect number os slots (e.g.: -f 0)
+- **-r** : Performs a random IO placement; set false by default (eg.: -r 1)
+- **-n** : Number of slots per section (e.g.: -n 300)
+- **-s** : Increase factor (%) of slots per section (e.g.: -s 0.8)
+- **-m** : Percentage of usage for each section (e.g.: -m 1.0)
+- **-x** : Increase factor (%) of usage for each section (e.g.: -x 0.05)
+- **-b** : Name of the file containing the blocked areas. One blocked area per line. Line format: initialX initialY finalX finalY (e.g.: 0 1000 0 902900)
 
 ## Basic Usage
 
@@ -69,7 +71,7 @@ You can also check the arguments and a brief description by running the followin
 
 ````
 
-./ioPlacer -h
+./ioPlacer
 
 ````
 
@@ -119,7 +121,8 @@ Before running ioPlacer the data structures should be initialized.
 
 `````
 void initCore(point lowerBounds, point upperBounds, DBU minSpacingX,
-                      DBU minSpacingY, DBU initTrackX, DBU initTrackY);
+                      DBU minSpacingY, DBU initTrackX, DBU initTrackY, 
+                      DBU minAreaX, DBU minAreaY, DBU minWidthX, DBU minWidthY);
 ``````
 
 The function *initCore* initiliazes the circuit core. Six parameters should be passed to this function:
@@ -128,8 +131,12 @@ The function *initCore* initiliazes the circuit core. Six parameters should be p
 - **upperBounds** - the upper right core bound.
 - **minSpacingX** - the minimum distance between IO pins on the x-axis.
 - **minSpacingY** - the minimum distance between IO pins on the y-axis.
-- **iniTrackX** - position of the first track in X.
+- **initTrackX** - position of the first track in X.
 - **initTrackY** - position of the first track in Y.
+- **minAreaX** - minimum area of the layer choosed to place the pins on the x-axis
+- **minAreaY** - minimum area of the layer choosed to place the pins on the y-axis
+- **minWidthX** - minimum width of the layer choosed to place the pins on the x-axis
+- **minWidthY** - minimum width of the layer choosed to place the pins on the y-axis
 
 ````
 void setMetalLayers(int horizontalMetalLayer, int verticalMetalLayer);
