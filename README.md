@@ -11,7 +11,7 @@ IO Placement finds an near-optimal placement for IO pins through the use of a Hu
 #### Clone Repository
 
 ```
-https://github.com/abk-openroad/ioPlacer.git
+https://github.com/The-OpenROAD-Project/ioPlacer.git
 ```
 
 #### How to Compile
@@ -198,3 +198,11 @@ std::vector<Pin_t> run(bool returnHPWL = false);
 
 After everything is properly set, the *run* function should be called. If a *true* argument is passed, this function prints the IO Pins HPWL.
 This function returns a vector with Pin_t structs. This struct is defined in IOPlacement.h, it contains the name of the IO pin, its new position and its orientation (e.g., 'N', 'S', 'W' or 'E').
+
+## Authors
+
+- Vitor Bandeira
+- Mateus Fogaça
+- Eder Monteiro
+- Jiajia Li
+- Isadora Oliveira
