@@ -54,6 +54,8 @@
 #include "Coordinate.h"
 #include "DEFDescriptor.h"
 #include "DEFParser.h"
+#include "LEFDescriptor.h"
+#include "LEFParser.h"
 
 class Parser {
         typedef boost::geometry::model::d2::point_xy<DBU> point;
@@ -72,6 +74,7 @@ class Parser {
                 box bounds;
                 std::string direction;
                 std::vector<cellPin> connections;
+                std::string locationType;
         };
 
         std::map<std::string, NetDscp> mapIOPinToNet;
@@ -82,7 +85,9 @@ class Parser {
         Core& _core;
         box _dieArea;
         std::vector<ioPin> _ioPins;
+        LEFParser _lefParser;
         DEFParser _defParser;
+        LefDscp _lefDscp;
         DefDscp _defDscp;
 
         point getInstPosition(std::string);
@@ -99,6 +104,8 @@ class Parser {
         void getBlockages(std::string,
                           std::vector<std::pair<Coordinate, Coordinate>>&);
         bool isDesignPlaced();
+        std::string getMetalWrittenStyle();
+        bool verifyRequiredData();
 };
 
 #endif /* __PARSER_H_ */

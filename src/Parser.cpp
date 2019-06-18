@@ -40,11 +40,13 @@
 #include <fstream>
 #include <iostream>
 #include "Parser.h"
+#include <boost/algorithm/string.hpp>
 
 Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
     : _parms(parms), _netlist(netlist), _core(core) {}
 
 void Parser::run() {
+        _lefParser.parseLEF(_parms.getInputLefFile(), _lefDscp);
         _defParser.parseDEF(_parms.getInputDefFile(), _defDscp);
         initMapIOtoNet();
         initMapInstToPosition();
@@ -88,6 +90,7 @@ void Parser::readConnections() {
                                  point(io._layerBounds.getUpperBound().getX(),
                                        io._layerBounds.getUpperBound().getY()));
                 pin.direction = io._direction;
+                pin.locationType = io._locationType;
                 _ioPins.push_back(pin);
                 ioCounter++;
 
@@ -125,7 +128,8 @@ void Parser::initNetlist() {
                 Coordinate pos(_ioPins[i].position.x(),
                                _ioPins[i].position.y());
 
-                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName);
+                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName,
+                        io.locationType);
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];
@@ -146,24 +150,48 @@ void Parser::initCore() {
         DBU minSpacingY = 0;
         DBU initTrackX = 0;
         DBU initTrackY = 0;
+        DBU minAreaX = 0;
+        DBU minAreaY = 0;
+        DBU minWidthX = 0;
+        DBU minWidthY = 0;
 
         for (TrackDscp track : _defDscp._clsTracks) {
-                if (track._layers[0] ==
-                    "Metal" +
-                        std::to_string(_parms.getHorizontalMetalLayer())) {
-                        if (track._direction == "X") {
-                                minSpacingX = track._space;
-                                initTrackX = track._location;
-                        } else if (track._direction == "Y") {
+                if ((track._layers[0].back() - '0') ==
+                    _parms.getHorizontalMetalLayer()) {
+                        if (boost::iequals(track._direction, "Y")) {
                                 minSpacingY = track._space;
                                 initTrackY = track._location;
                         }
                 }
+                if ((track._layers[0].back() - '0') ==
+                    _parms.getVerticalMetalLayer()) {
+                        if (boost::iequals(track._direction, "X")) {
+                                minSpacingX = track._space;
+                                initTrackX = track._location;
+                        }
+                }
         }
+
+        for (LefLayerDscp layer : _lefDscp._clsLefLayerDscps) {
+                if ((layer._clsName.back() - '0') ==
+                    _parms.getHorizontalMetalLayer()
+                        && boost::iequals(layer._clsType, "ROUTING")) {
+                        minAreaY = layer._clsArea*_lefDscp._clsLefUnitsDscp._clsDatabase
+                                   *_lefDscp._clsLefUnitsDscp._clsDatabase;
+                        minWidthY = layer._clsWidth*_lefDscp._clsLefUnitsDscp._clsDatabase;
+                }
+                if ((layer._clsName.back() - '0') ==
+                    _parms.getVerticalMetalLayer()
+                        && boost::iequals(layer._clsType, "ROUTING")) {
+                        minAreaX = layer._clsArea*_lefDscp._clsLefUnitsDscp._clsDatabase
+                                   *_lefDscp._clsLefUnitsDscp._clsDatabase;
+                        minWidthX = layer._clsWidth*_lefDscp._clsLefUnitsDscp._clsDatabase;
+                }
+        }
+
 
         DBU IOWidth = _ioPins[0].bounds.max_corner().x() -
                       _ioPins[0].bounds.min_corner().x();
-
         if (minSpacingX <= IOWidth) {
                 minSpacingX *= 2;
         }
@@ -175,8 +203,10 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
+        
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
-                      initTrackX, initTrackY);
+                      initTrackX, initTrackY, minAreaX, minAreaY,
+                      minWidthX, minWidthY);
 }
 
 void Parser::initMapIOtoNet() {
@@ -230,9 +260,36 @@ void Parser::getBlockages(
 
 bool Parser::isDesignPlaced() {
         for (ComponentDscp compDscp : _defDscp._Comps) {
-                if (!compDscp._isPlaced) {
+                    if (!compDscp._isPlaced && !compDscp._isFixed) {
                         return false;
                 }
+        }
+        return true;
+}
+
+std::string Parser::getMetalWrittenStyle() {
+        std::string metal;
+        for (TrackDscp track : _defDscp._clsTracks) {
+                metal = track._layers[0];
+        }
+        metal.pop_back();
+        return metal;
+}
+
+bool Parser::verifyRequiredData() {
+        int trackCount = 0;
+        int compCount = 0;
+
+        for (TrackDscp track : _defDscp._clsTracks) {
+                trackCount++;
+        }
+
+        for (ComponentDscp comp : _defDscp._Comps) {
+                compCount++;
+        }
+
+        if (trackCount <= 0 || compCount <= 0) {
+                return false;
         }
 
         return true;

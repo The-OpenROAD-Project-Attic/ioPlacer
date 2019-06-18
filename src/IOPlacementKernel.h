@@ -86,6 +86,7 @@ class IOPlacementKernel {
         DBU returnIONetsHPWL(Netlist&);
 
         inline void updateOrientation(IOPin&);
+        inline void updatePinArea(IOPin&);
         inline bool checkBlocked(DBU, DBU);
         
        public:

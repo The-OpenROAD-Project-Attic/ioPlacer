@@ -46,11 +46,13 @@ IOPlacementKernel ioKernel;
 
 void IOPlacement::initCore(point lowerBounds, point upperBounds,
                            DBU minSpacingX, DBU minSpacingY, DBU initTrackX,
-                           DBU initTrackY) {
+                           DBU initTrackY, DBU minAreaX, DBU minAreaY, 
+                           DBU minWidthX, DBU minWidthY) {
         Coordinate lowerBound(lowerBounds.x(), lowerBounds.y());
         Coordinate upperBound(upperBounds.x(), upperBounds.y());
         ioKernel._core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
-                              initTrackX, initTrackY);
+                              initTrackX, initTrackY, minAreaX, minAreaY,
+                              minWidthX, minWidthY);
 }
 
 void IOPlacement::setMetalLayers(int horizontalMetalLayer,
@@ -125,7 +127,8 @@ void IOPlacement::initNetlist() {
                 Coordinate pos(_ioPins[i].position.x(),
                                _ioPins[i].position.y());
 
-                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName);
+                IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName,
+                            io.locationType);
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];

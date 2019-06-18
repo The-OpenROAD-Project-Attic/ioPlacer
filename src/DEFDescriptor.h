@@ -69,7 +69,7 @@ class IOPinDscp {
         std::string _use = INVALID;  // { SIGNAL | POWER | GROUND |
         // CLOCK | TIEOFF | ANALOG}
         Coordinate _position = Coordinate(0, 0);
-        Box _layerBounds;
+        Box _layerBounds = Box();
         IOPinDscp() = default;
 };
 
