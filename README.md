@@ -1,6 +1,6 @@
-# IO Placement
+# ioPlacer
 
-IO Placement finds an near-optimal placement for IO pins through the use of a Hungarian Algorithm.
+ioPlacer finds an near-optimal placement for IO pins through the use of a Hungarian Matching Algorithm.
 
 ## Getting Started
 #### Pre-Requisite
@@ -59,7 +59,7 @@ There are optional flags that can be used.
 
 ### Run a single placement
 
-Your command line to run IO Placement should look like this.
+Your command line to run ioPlacer should look like this.
 
 ````
 
@@ -81,32 +81,33 @@ You can run ioPlacer with RePlAce, using the following script:
 
 ````
 
-bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <N>
+bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <ioPlacerBin> <ioplacerArgs> <RePlAceBin> <replaceArgs> <iterations> <lefFile> <defFile> <output> <defName>
 
 ````
+
+Each parameter of the script is described below
+
+- **ioPlacerBin** : Path to the binary of ioPlacer
+- **ioplacerArgs** : Arguments for ioPlacer. Except LEF file, DEF file and output DEF, any other parameter can be passed through this argument
+- **-RePlAceBin** : Path to the binary of RePlAce
+- **replaceArgs** : Argments for RePlAce. Except LEF file, DEF file, output directory and bmflag, any other parameter can be passed through this argument
+- **iterations** : The number of iterations of the loop. If this number is 0, the script will only run RePlAce with -fast flag + ioPlacer
+- **lefFile** : Path to the LEF file
+- **defFile** : Path to the DEF file
+- **output** : Directory where all the logs, RePlAce files and final DEFs will be stored
+- **defName** : Name of the DEF file, without .def extension. It is used to correctly handle with RePlAce output directories.
+
 This script implement a loop with RePlAce and ioPlacer, as shown bellow:
 
 <img src="doc/loop.png" alt="loop-ioplace-replace" width="50%" heigth="50%"/>
 
-To execute the script, you will need both RePlAce and ioPlacer repositories in the same directory:
+An example with a benchmark from ISPD18 contest is shown below:
 
 ````
 
---root_dir
-------RePlAce
-------RePlAce-pin
+bash ioPlacer/scripts/replace_ioplace_loop.sh ioPlacer/build/ioPlacer '-h 3 -v 4' RePlAce/build/replace '-den 0.8 -plot' 5 ispd18_test2/ispd18_test2.input.lef ispd18_test2/ispd18_test2.input.def output ispd18_test2.input
 
 ````
-
-In the root directory, just run the following command line:
-
-````
-
-bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <N>
-
-````
-
-where N is the number of iterations of the loop.
 
 ## API
 
