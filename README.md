@@ -81,7 +81,7 @@ You can run ioPlacer with RePlAce, using the following script:
 
 ````
 
-bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <ioPlacerBin> <ioplacerArgs> <RePlAceBin> <replaceArgs> <iterations> <lefFile> <defFile> <output> <defName>
+bash ./RePlAce-pin/scripts/replace_ioplace_loop.sh <ioPlacerBin> <ioplacerArgs> <RePlAceBin> <replaceArgs> <iterations> <lefFile> <defFile> <output> <defName> <hasIoPlace>
 
 ````
 
@@ -96,6 +96,7 @@ Each parameter of the script is described below
 - **defFile** : Path to the DEF file
 - **output** : Directory where all the logs, RePlAce files and final DEFs will be stored
 - **defName** : Name of the DEF file, without .def extension. It is used to correctly handle with RePlAce output directories.
+- **hasIoPlace** : Boolean to indicate if DEF have previous pin placement
 
 This script implement a loop with RePlAce and ioPlacer, as shown bellow:
 
@@ -105,7 +106,7 @@ An example with a benchmark from ISPD18 contest is shown below:
 
 ````
 
-bash ioPlacer/scripts/replace_ioplace_loop.sh ioPlacer/build/ioPlacer '-h 3 -v 4' RePlAce/build/replace '-den 0.8 -plot' 5 ispd18_test2/ispd18_test2.input.lef ispd18_test2/ispd18_test2.input.def output ispd18_test2.input
+bash ioPlacer/scripts/replace_ioplace_loop.sh ioPlacer/build/ioPlacer '-h 3 -v 4' RePlAce/build/replace '-den 0.8 -plot' 5 ispd18_test2/ispd18_test2.input.lef ispd18_test2/ispd18_test2.input.def output ispd18_test2.input 1
 
 ````
 
