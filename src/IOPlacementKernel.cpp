@@ -502,6 +502,10 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                         2 * halfWidth;
                 pin.setLowerBound(-1*halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
+		if (_parms->returnVerticalLength() != -1) {
+			height = _parms->returnVerticalLength();
+			pin.setUpperBound(halfWidth, height);
+		}
         }
 
 
@@ -517,6 +521,10 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                         2 * halfWidth;
                 pin.setLowerBound(-1*halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
+		if (_parms->returnHorizontalLength() != -1) {
+			height = _parms->returnHorizontalLength();
+			pin.setUpperBound(halfWidth, height);
+		}
         }
 }
 

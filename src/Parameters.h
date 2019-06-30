@@ -58,6 +58,8 @@ class Parameters {
         float _usage = -1;
         float _usageFactor = -1;
         std::string _blockagesFile;
+	DBU _horizontalLength = -1;
+	DBU _verticalLength = -1;
 
         void printAll() const;
 
@@ -77,6 +79,8 @@ class Parameters {
         float returnUsageFactor() const { return _usageFactor; };
         float returnForceSpread() const { return _forceSpread; };
         std::string returnBlockagesFile() const { return _blockagesFile; };
+	DBU returnHorizontalLength() const { return _horizontalLength; };
+	DBU returnVerticalLength() const { return _verticalLength; };
 };
 
 #endif /* __PARAMETERS_H_ */

@@ -59,7 +59,9 @@ Parameters::Parameters(int argc, char** argv) {
                 ("max-slots,m"    , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
                 ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
                 ("block-area,b"   , po::value<std::string>() , "File containing areas to be blocked (optional)")
-                ;
+		("_length-horizontal,e", po::value<DBU>()         , "Length of the horizontal pins (optional)")
+                ("_length-vertical,q"  , po::value<DBU>()         , "Length of the vertical pins (optional)")
+		;
         // clang-format on
 
         po::variables_map vm;
@@ -111,6 +113,12 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("block-area")) {
                         _blockagesFile = vm["block-area"].as<std::string>();
                 }
+		if (vm.count("_length-horizontal")) {
+			_horizontalLength = vm["_length-horizontal"].as<DBU>();
+		}
+		if (vm.count("_length-vertical")) {
+			_verticalLength = vm["_length-vertical"].as<DBU>();
+		}
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
@@ -140,6 +148,8 @@ void Parameters::printAll() const {
         std::cout << "Force pin spread: " << _forceSpread << "\n";
         std::cout << "Blockage area file: " << _blockagesFile << "\n";
         std::cout << "Random mode: " << _randomMode << "\n";
+	std::cout << "Horizontal pin length: " << _horizontalLength << "\n";
+	std::cout << "Vertical pin length: " << _verticalLength << "\n";
 
         std::cout << "\n";
         // clang-format on
