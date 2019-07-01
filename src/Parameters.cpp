@@ -59,8 +59,8 @@ Parameters::Parameters(int argc, char** argv) {
                 ("max-slots,m"    , po::value<float>()       , "Percentage of usage for each section (float) (optional)")
                 ("usage-factor,x" , po::value<float>()       , "Increase factor (%) of usage for each section (float) (optional)")
                 ("block-area,b"   , po::value<std::string>() , "File containing areas to be blocked (optional)")
-		("_length-horizontal,e", po::value<DBU>()         , "Length of the horizontal pins (optional)")
-                ("_length-vertical,q"  , po::value<DBU>()         , "Length of the vertical pins (optional)")
+		("_length-horizontal,e", po::value<float>()         , "Length of the horizontal pins in microns (optional)")
+                ("_length-vertical,q"  , po::value<float>()         , "Length of the vertical pins in microns (optional)")
 		;
         // clang-format on
 
@@ -114,10 +114,10 @@ Parameters::Parameters(int argc, char** argv) {
                         _blockagesFile = vm["block-area"].as<std::string>();
                 }
 		if (vm.count("_length-horizontal")) {
-			_horizontalLength = vm["_length-horizontal"].as<DBU>();
+			_horizontalLength = vm["_length-horizontal"].as<float>();
 		}
 		if (vm.count("_length-vertical")) {
-			_verticalLength = vm["_length-vertical"].as<DBU>();
+			_verticalLength = vm["_length-vertical"].as<float>();
 		}
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';

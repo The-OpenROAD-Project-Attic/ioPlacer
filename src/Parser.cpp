@@ -203,10 +203,11 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
-        
+       
+        DBU databaseUnit = _lefDscp._clsLefUnitsDscp._clsDatabase;	
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,
-                      minWidthX, minWidthY);
+                      minWidthX, minWidthY, databaseUnit);
 }
 
 void Parser::initMapIOtoNet() {

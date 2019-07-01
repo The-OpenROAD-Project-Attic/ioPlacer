@@ -491,11 +491,6 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
         DBU upperYBound = _core.getUpperBound().getY();
 
         if (x == lowerXBound || x == upperXBound) {
-//                int halfWidth = int( ceil((curLayer->width() * env.defDbu)/2.0) + 0.5f);
-//                int height = (curLayer->hasArea())?
-//                int( ceil((curLayer->area() * env.defDbu * env.defDbu)/(2.0*halfWidth)) + 0.5f) :
-//                        2 * halfWidth;
-//                curPin.addLayerPts( -1*halfWidth, 0, halfWidth, height );
                 DBU halfWidth = DBU (ceil(_core.getMinWidthX()/2.0));
                 DBU height = _core.getMinAreaX() != 0.0 ?
                         DBU (ceil(_core.getMinAreaX() / (2.0*halfWidth))) :
@@ -503,18 +498,13 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 pin.setLowerBound(-1*halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
 		if (_parms->returnVerticalLength() != -1) {
-			height = _parms->returnVerticalLength();
+			height = _parms->returnVerticalLength() * _core.getDatabaseUnit();
 			pin.setUpperBound(halfWidth, height);
 		}
         }
 
 
         if (y == lowerYBound || y == upperYBound) {
-//                int halfWidth = int( ceil((curLayer->width() * env.defDbu)/2.0) + 0.5f);
-//                int height = (curLayer->hasArea())?
-//                int( ceil((curLayer->area() * env.defDbu * env.defDbu)/(2.0*halfWidth)) + 0.5f) :
-//                        2 * halfWidth;
-//                curPin.addLayerPts( -1*halfWidth, 0, halfWidth, height );
                 DBU halfWidth = DBU (ceil(_core.getMinWidthY()/2.0));
                 DBU height = _core.getMinAreaY() != 0.0 ?
                         DBU (ceil(_core.getMinAreaY() / (2.0*halfWidth))) :
@@ -522,7 +512,7 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 pin.setLowerBound(-1*halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
 		if (_parms->returnHorizontalLength() != -1) {
-			height = _parms->returnHorizontalLength();
+			height = _parms->returnHorizontalLength() * _core.getDatabaseUnit();
 			pin.setUpperBound(halfWidth, height);
 		}
         }
