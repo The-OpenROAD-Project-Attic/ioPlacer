@@ -270,10 +270,17 @@ bool Parser::isDesignPlaced() {
 
 std::string Parser::getMetalWrittenStyle() {
         std::string metal;
+	int hLayer = _parms.getHorizontalMetalLayer();
+	std::string horizontalLayer = std::to_string(hLayer);
         for (TrackDscp track : _defDscp._clsTracks) {
                 metal = track._layers[0];
+		if (metal.back() == horizontalLayer.back() &&
+		   (metal[0] == 'm' || metal[0] == 'M')) {
+			break;
+		}
         }
-        metal.pop_back();
+        
+	metal.pop_back();
         return metal;
 }
 
