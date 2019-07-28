@@ -63,7 +63,7 @@ Your command line to run ioPlacer should look like this.
 
 ````
 
-./ioPlacer -i ispd18_test2.input.def -o ispd18_test2.output.def -h 5 -v 6 -w 1
+./ioPlacer -l input.lef -d input.def -o output.def -h 5 -v 6
 
 ````
 
@@ -206,5 +206,4 @@ This function returns a vector with Pin_t structs. This struct is defined in IOP
 - Vitor Bandeira
 - Mateus Fogaça
 - Eder Monteiro
-- Jiajia Li
 - Isadora Oliveira
