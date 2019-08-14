@@ -1,5 +1,8 @@
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.1)
 project (ioPlacement)
+
+add_subdirectory(third_party/lef)
+add_subdirectory(third_party/def)
 
 set(BIN_NAME "ioPlacer")
 set(LIB_NAME "ioPlacer")
@@ -26,25 +29,28 @@ if(DEFINED ENV{TYPE_CALL})
         add_definitions(-DLIBRARY_MODE)
         add_LIBRARY(${LIB_NAME} STATIC ${SRC_FILES})
 
-        target_include_directories(${LIB_NAME} PUBLIC ${Boost_INCLUDE_DIR})
-        target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
-        target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-        target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/def)
-        target_include_directories(${LIB_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/lef)
+        target_include_directories(${LIB_NAME} PUBLIC
+                ${Boost_INCLUDE_DIR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/include
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
+                )
 
-        target_link_libraries(${LIB_NAME} def lef)
-        target_link_libraries(${LIB_NAME} ${Boost_LIBRARIES})
+        target_link_libraries(${LIB_NAME} def lef ${LIB_NAME} ${Boost_LIBRARIES})
 else()
         message("-- Will generate binary")
 
         add_definitions(-DSTANDALONE_MODE)
         add_executable(${BIN_NAME} ${SRC_FILES})
 
-        target_include_directories(${BIN_NAME} PUBLIC ${Boost_INCLUDE_DIR})
-        target_include_directories(${BIN_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty)
-        target_include_directories(${BIN_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/)
-        target_include_directories(${BIN_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/def)
-        target_include_directories(${BIN_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include/lef)
+        target_include_directories(${BIN_NAME} PUBLIC
+                ${Boost_INCLUDE_DIR}
+                ${CMAKE_CURRENT_SOURCE_DIR}/include
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
+                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
+                )
 
         target_link_libraries(${BIN_NAME} def lef)
         target_link_libraries(${BIN_NAME} ${Boost_LIBRARIES})

@@ -29,7 +29,7 @@ lib: dirs cmake_lib call_make_lib
 
 call_make:
 	@echo Call make
-	@make -C $(BUILD_DIR) $(MK_OPT) -j$(PARALLEL) --no-print-directory
+	@$(MAKE) -C $(BUILD_DIR) $(MK_OPT) -j$(PARALLEL) --no-print-directory
 	@echo Remove old binary
 	@rm -f $(BIN_NAME)
 	@echo Copy binary
@@ -37,7 +37,7 @@ call_make:
 
 call_make_lib:
 	@echo Call make
-	@make -C $(BUILD_DIR) $(MK_OPT) -j$(PARALLEL) --no-print-directory
+	@$(MAKE) -C $(BUILD_DIR) $(MK_OPT) -j$(PARALLEL) --no-print-directory
 	@echo Remove old binary
 	@rm -f lib/$(LIB_NAME)
 	@echo Copy binary
@@ -48,7 +48,7 @@ cmake_normal:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		cmake $(CM_OPT) .. ;\
+		$(CMAKE) $(CM_OPT) .. ;\
 		)
 
 
@@ -58,7 +58,7 @@ cmake_lib:
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
 		export TYPE_CALL=1 ;\
-		cmake $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
+		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
 		)
 
 
@@ -67,7 +67,7 @@ cmake_release:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		cmake $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
+		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
 		)
 
 cmake_debug:
@@ -75,7 +75,7 @@ cmake_debug:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		cmake $(CM_OPT) -DCMAKE_BUILD_TYPE=Debug .. ;\
+		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Debug .. ;\
 		)
 
 dirs:
