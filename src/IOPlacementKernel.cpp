@@ -49,8 +49,10 @@ void IOPlacementKernel::initNetlistAndCore() {
 
         std::cout << "Verifying required data\n";
         if (!parser.verifyRequiredData()) {
-                std::cout << "*****\nRequired data is not provided by current DEF!\n";
-                std::cout << "Check if DEF have tracks and components\n*****\n";
+                std::cout << "*********************************************\n";
+                std::cout << "Required data is not provided by current DEF!\n";
+                std::cout << " Check if DEF have tracks and components\n";
+                std::cout << "*********************************************\n";
                 std::exit(0);
         }
 
@@ -60,7 +62,6 @@ void IOPlacementKernel::initNetlistAndCore() {
             metal + std::to_string(_parms->getHorizontalMetalLayer());
         _verticalMetalLayer =
             metal + std::to_string(_parms->getVerticalMetalLayer());
-
 
         if (_parms->returnBlockagesFile().size() != 0) {
                 _blockagesFile = _parms->returnBlockagesFile();
@@ -103,7 +104,7 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
-        unsigned shift = _slots.size() / numIOs;
+        double shift = numSlots / double(numIOs);
         unsigned mid1 = numSlots * 1 / 8 - numIOs / 8;
         unsigned mid2 = numSlots * 3 / 8 - numIOs / 8;
         unsigned mid3 = numSlots * 5 / 8 - numIOs / 8;
@@ -111,10 +112,11 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
         unsigned idx = 0;
         unsigned slotsPerEdge = numIOs / 4;
         unsigned lastSlots = (numIOs - slotsPerEdge * 3);
-        std::vector<int> vSlots(_slots.size());
+        std::vector<int> vSlots(numSlots);
         std::vector<int> vIOs(numIOs);
         switch (mode) {
                 case RandomMode::Full:
+                        std::cout << "RandomMode Full\n";
                         for (size_t i = 0; i < vSlots.size(); ++i) {
                                 vSlots[i] = i;
                         }
@@ -128,17 +130,19 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         });
                         break;
                 case RandomMode::Even:
+                        std::cout << "RandomMode Even\n";
                         for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
                         std::shuffle(vIOs.begin(), vIOs.end(),
                                      std::default_random_engine(42));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
-                                ioPin.setPos(_slots.at(b * shift).pos);
+                                ioPin.setPos(_slots.at(floor(b * shift)).pos);
                                 _assignment.push_back(ioPin);
                                 vIOs.erase(vIOs.begin());
                         });
                         break;
                 case RandomMode::Group:
+                        std::cout << "RandomMode Group\n";
                         for (size_t i = mid1; i < mid1 + slotsPerEdge; i++) {
                                 vIOs[idx++] = i;
                         }
@@ -150,9 +154,6 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         }
                         for (size_t i = mid4; i < mid4 + lastSlots; i++) {
                                 vIOs[idx++] = i;
-                        }
-                        for (auto i : vIOs) {
-                                std::cout << i << std::endl;
                         }
                         std::shuffle(vIOs.begin(), vIOs.end(),
                                      std::default_random_engine(42));
@@ -174,10 +175,10 @@ void IOPlacementKernel::initIOLists() {
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                 std::vector<InstancePin> instPinsVector;
                 if (_netlist.numSinksOfIO(idx) != 0) {
-                        _netlist.forEachSinkOfIO(
-                            idx, [&](InstancePin& instPin) {
-                                    instPinsVector.push_back(instPin);
-                            });
+                        _netlist.forEachSinkOfIO(idx,
+                                                 [&](InstancePin& instPin) {
+                                instPinsVector.push_back(instPin);
+                        });
                         _netlistIOPins.addIONet(ioPin, instPinsVector);
                 } else {
                         _zeroSinkIOs.push_back(ioPin);
@@ -491,30 +492,35 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
         DBU upperYBound = _core.getUpperBound().getY();
 
         if (x == lowerXBound || x == upperXBound) {
-                DBU halfWidth = DBU (ceil(_core.getMinWidthX()/2.0));
-                DBU height = _core.getMinAreaX() != 0.0 ?
-                        DBU (ceil(_core.getMinAreaX() / (2.0*halfWidth))) :
-                        2 * halfWidth;
-                pin.setLowerBound(-1*halfWidth, 0);
+                DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0));
+                DBU height =
+                    _core.getMinAreaX() != 0.0
+                        ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
+                        : 2 * halfWidth;
+                pin.setLowerBound(-1 * halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
-		if (_parms->returnVerticalLength() != -1) {
-			height = _parms->returnVerticalLength() * _core.getDatabaseUnit();
-			pin.setUpperBound(halfWidth, height);
-		}
+                if (_parms->returnVerticalLength() != -1) {
+                        height = _parms->returnVerticalLength() *
+                                 _core.getDatabaseUnit();
+                        pin.setUpperBound(halfWidth, height);
+                }
         }
 
-
         if (y == lowerYBound || y == upperYBound) {
-                DBU halfWidth = DBU (ceil(_core.getMinWidthY()/2.0));
-                DBU height = _core.getMinAreaY() != 0.0 ?
-                        DBU (ceil(_core.getMinAreaY() / (2.0*halfWidth))) :
-                        2 * halfWidth;
-                pin.setLowerBound(-1*halfWidth, 0);
+                DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0));
+                DBU height = 0;
+                if (_core.getMinAreaY() != 0.0) {
+                        height = ceil(_core.getMinAreaY() / (2.0 * halfWidth));
+                } else {
+                        height = 2.0 * halfWidth;
+                }
+                pin.setLowerBound(-1 * halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
-		if (_parms->returnHorizontalLength() != -1) {
-			height = _parms->returnHorizontalLength() * _core.getDatabaseUnit();
-			pin.setUpperBound(halfWidth, height);
-		}
+                if (_parms->returnHorizontalLength() != -1) {
+                        height = _parms->returnHorizontalLength() *
+                                 _core.getDatabaseUnit();
+                        pin.setUpperBound(halfWidth, height);
+                }
         }
 }
 
@@ -541,7 +547,11 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL before IOPlacement: "
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
-        if (_cellsPlaced) {
+
+        if (not _cellsPlaced || (_randomMode > 0) ) {
+                std::cout << "WARNING: running random pin placement\n";
+                randomPlacement(_randomMode);
+        } else {
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
                                 HungarianMatching hg(_sections[idx], _slots);
@@ -570,9 +580,6 @@ void IOPlacementKernel::run() {
                         }
                         i++;
                 }
-        } else {
-                std::cout << "WARNING: cells are not placed, running random\n";
-                randomPlacement(_randomMode);
         }
 #pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {

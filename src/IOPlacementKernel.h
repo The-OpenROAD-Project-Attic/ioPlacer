@@ -45,7 +45,7 @@
 #include "Parameters.h"
 #include "Slots.h"
 
-enum RandomMode { Full, Even, Group };
+enum RandomMode { None, Full, Even, Group };
 
 class IOPlacementKernel {
        protected:
