@@ -11,7 +11,7 @@ ioPlacer finds an near-optimal placement for IO pins through the use of a Hungar
 #### Clone Repository
 
 ```
-https://github.com/The-OpenROAD-Project/ioPlacer.git
+git clone --recursive https://github.com/The-OpenROAD-Project/ioPlacer.git
 ```
 
 #### How to Compile
@@ -48,7 +48,7 @@ There are optional flags that can be used.
 
 - **-w** : Indicates whether or not the IO nets HPWL is returned; by default this flag is set to false (e.g.: -w 1)
 - **-f** : Force pins to be spread in core, i.e., try to respect number os slots (e.g.: -f 0)
-- **-r** : Performs a random IO placement; set false by default (eg.: -r 1)
+- **-r** : Performs a random IO placement; 0 (default, disabled) 1 fully random, 2 envenly distributed, 3 group on the middle of core edge
 - **-n** : Number of slots per section (e.g.: -n 300)
 - **-s** : Increase factor (%) of slots per section (e.g.: -s 0.8)
 - **-m** : Percentage of usage for each section (e.g.: -m 1.0)
