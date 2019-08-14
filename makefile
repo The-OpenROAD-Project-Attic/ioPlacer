@@ -15,6 +15,10 @@ PARALLEL = 1
 
 TYPE = normal
 
+CMAKE = cmake
+MAKE = make
+CMAKE_OPT =
+
 default: $(TYPE)
 
 all: clean release
@@ -22,10 +26,10 @@ all: clean release
 run:
 	$(PRE_CMD) ./$(BIN_NAME) $(BIN_ARGS) $(POS_CMD)
 
-debug: dirs cmake_debug call_make
-normal: dirs cmake_normal call_make
-release: dirs cmake_release call_make
-lib: dirs cmake_lib call_make_lib
+debug: setup cmake_debug call_make
+normal: setup cmake_normal call_make
+release: setup cmake_release call_make
+lib: setup cmake_lib call_make_lib
 
 call_make:
 	@echo Call make
@@ -48,7 +52,7 @@ cmake_normal:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		$(CMAKE) $(CM_OPT) .. ;\
+		$(CMAKE) $(CMAKE_OPT) .. ;\
 		)
 
 
@@ -58,7 +62,7 @@ cmake_lib:
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
 		export TYPE_CALL=1 ;\
-		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
+		$(CMAKE) $(CMAKE_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
 		)
 
 
@@ -67,7 +71,7 @@ cmake_release:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
+		$(CMAKE) $(CMAKE_OPT) -DCMAKE_BUILD_TYPE=Release .. ;\
 		)
 
 cmake_debug:
@@ -75,8 +79,18 @@ cmake_debug:
 		echo Change to $(BUILD_DIR) ;\
 		cd $(BUILD_DIR) ;\
 		echo Call cmake ;\
-		$(CMAKE) $(CM_OPT) -DCMAKE_BUILD_TYPE=Debug .. ;\
+		$(CMAKE) $(CMAKE_OPT) -DCMAKE_BUILD_TYPE=Debug .. ;\
 		)
+
+setup: check_submodules dirs
+
+check_submodules:
+	@( \
+		echo "Initialize submodules" ;\
+		git submodule init ;\
+		echo "Update submodules" ;\
+		git submodule update ;\
+	)
 
 dirs:
 	@( \
