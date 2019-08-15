@@ -541,6 +541,9 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 
 void IOPlacementKernel::run() {
         std::vector<HungarianMatching> hgVec;
+        DBU initHPWL = 0;
+        DBU totalHPWL = 0;
+        DBU deltaHPWL = 0;
 
         initIOLists();
         defineSlots();
@@ -548,8 +551,7 @@ void IOPlacementKernel::run() {
         setupSections();
 
         if (_returnHPWL) {
-                std::cout << "***HPWL before IOPlacement: "
-                          << returnIONetsHPWL(_netlist) << "***\n";
+                initHPWL = returnIONetsHPWL(_netlist);
         }
 
         if (not _cellsPlaced || (_randomMode > 0)) {
@@ -592,13 +594,14 @@ void IOPlacementKernel::run() {
         }
 
         if (_returnHPWL) {
-                DBU totalHPWL = 0;
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         totalHPWL += returnIONetsHPWL(_sections[idx].net);
                 }
-                std::cout << "***HPWL after IOPlacement: " << totalHPWL
-                          << "***\n";
+                deltaHPWL = initHPWL - totalHPWL;
+                std::cout << "***HPWL before ioPlacer: " << initHPWL << "\n";
+                std::cout << "***HPWL after  ioPlacer: " << totalHPWL << "\n";
+                std::cout << "***HPWL delta  ioPlacer: " << deltaHPWL << "\n";
         }
 }
 
