@@ -102,6 +102,8 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
+        const double seed = time(NULL);
+
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
         double shift = numSlots / double(numIOs);
@@ -121,7 +123,7 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vSlots[i] = i;
                         }
                         std::shuffle(vSlots.begin(), vSlots.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vSlots[0];
                                 ioPin.setPos(_slots.at(b).pos);
@@ -133,7 +135,7 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         std::cout << "RandomMode Even\n";
                         for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(floor(b * shift)).pos);
@@ -156,7 +158,7 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vIOs[idx++] = i;
                         }
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(b).pos);
