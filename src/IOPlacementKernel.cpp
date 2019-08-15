@@ -215,7 +215,7 @@ void IOPlacementKernel::defineSlots() {
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
-
+        
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
@@ -239,7 +239,7 @@ void IOPlacementKernel::defineSlots() {
          *******************************************/
 
         std::vector<Coordinate> slotsEdge1;
-        DBU currX = lb.getX() + initTracksX;
+        DBU currX = initTracksX;
         DBU currY = lb.getY();
 
         while (currX < ub.getX()) {
@@ -249,7 +249,7 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge2;
-        currY = lb.getY() + initTracksY;
+        currY = initTracksY;
         currX = ub.getX();
         while (currY < ub.getY()) {
                 Coordinate pos(currX, currY);
@@ -258,7 +258,7 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge3;
-        currX = lb.getX() + initTracksX;
+        currX = initTracksX;
         currY = ub.getY();
         while (currX < ub.getX()) {
                 Coordinate pos(currX, currY);
@@ -268,7 +268,7 @@ void IOPlacementKernel::defineSlots() {
         std::reverse(slotsEdge3.begin(), slotsEdge3.end());
 
         std::vector<Coordinate> slotsEdge4;
-        currY = lb.getY() + initTracksY;
+        currY = initTracksY;
         currX = lb.getX();
         while (currY < ub.getY()) {
                 Coordinate pos(currX, currY);
