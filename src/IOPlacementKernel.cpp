@@ -106,6 +106,8 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
+        const double seed = time(NULL);
+
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
         double shift = numSlots / double(numIOs);
@@ -118,6 +120,15 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
         unsigned lastSlots = (numIOs - slotsPerEdge * 3);
         std::vector<int> vSlots(numSlots);
         std::vector<int> vIOs(numIOs);
+
+        std::vector<InstancePin> instPins;
+        _netlist.forEachSinkOfIO(
+            idx, [&](InstancePin& instPin) { instPins.push_back(instPin); });
+        if (_sections.size() < 1) {
+                Section_t s = {Coordinate(0, 0)};
+                _sections.push_back(s);
+        }
+
         switch (mode) {
                 case RandomMode::Full:
                         std::cout << "RandomMode Full\n";
@@ -125,11 +136,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vSlots[i] = i;
                         }
                         std::shuffle(vSlots.begin(), vSlots.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vSlots[0];
                                 ioPin.setPos(_slots.at(b).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vSlots.erase(vSlots.begin());
                         });
                         break;
@@ -137,11 +149,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         std::cout << "RandomMode Even\n";
                         for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(floor(b * shift)).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vIOs.erase(vIOs.begin());
                         });
                         break;
@@ -160,11 +173,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vIOs[idx++] = i;
                         }
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(b).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vIOs.erase(vIOs.begin());
                         });
                         break;
@@ -548,7 +562,6 @@ void IOPlacementKernel::run() {
         initIOLists();
         defineSlots();
 
-        setupSections();
 
         if (_returnHPWL) {
                 initHPWL = returnIONetsHPWL(_netlist);
@@ -558,6 +571,8 @@ void IOPlacementKernel::run() {
                 std::cout << "WARNING: running random pin placement\n";
                 randomPlacement(_randomMode);
         } else {
+                setupSections();
+
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
                                 HungarianMatching hg(_sections[idx], _slots);
