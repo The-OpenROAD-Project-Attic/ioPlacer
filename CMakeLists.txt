@@ -1,57 +1,99 @@
-cmake_minimum_required (VERSION 3.1)
-project (ioPlacement)
+################################################################################
+## Authors: Vitor Bandeira, Mateus Fogaça, Eder Matheus Monteiro e Isadora
+## Oliveira
+##          (Advisor: Ricardo Reis)
+##
+## BSD 3-Clause License
+##
+## Copyright (c) 2019, Federal University of Rio Grande do Sul (UFRGS)
+## All rights reserved.
+##
+## Redistribution and use in source and binary forms, with or without
+## modification, are permitted provided that the following conditions are met:
+##
+## * Redistributions of source code must retain the above copyright notice, this
+##   list of conditions and the following disclaimer.
+##
+## * Redistributions in binary form must reproduce the above copyright notice,
+##   this list of conditions and the following disclaimer in the documentation
+##   and#or other materials provided with the distribution.
+##
+## * Neither the name of the copyright holder nor the names of its
+##   contributors may be used to endorse or promote products derived from
+##   this software without specific prior written permission.
+##
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+## AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+## IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+## ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+## LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+## CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+## SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+## INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+## CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+## ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+## POSSIBILITY OF SUCH DAMAGE.
+################################################################################
 
-add_subdirectory(third_party/lef)
-add_subdirectory(third_party/def)
+cmake_minimum_required(VERSION 3.1)
 
+project(ioPlacement)
 set(BIN_NAME "ioPlacer")
-set(LIB_NAME "ioPlacer")
+message(STATUS "ioPlacer")
+message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+# Print info on build
+if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
+        message( "INFO: DEBUG BUILD" )
+        # for debug type builds, turn on verbose makefiles
+        set(CMAKE_VERBOSE_MAKEFILE ON)
 
-link_directories(${CMAKE_CURRENT_SOURCE_DIR}/lib)
+        # Tell other CMake files that we're doing a debug build
+        set(DEBUG_BUILD 1)
 
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
-
-file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+        # Tell C/C++ that we're doing a debug build
+        add_definitions(-DDEBUG)
+endif()
+if( CMAKE_BUILD_TYPE MATCHES "[Rr][Ee][Ll][Ee][Aa][Ss][Ee]" )
+        message( "INFO: RELEASE BUILD" )
+endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
+add_subdirectory(third_party/lef)
+add_subdirectory(third_party/def)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+set(Boost_USE_STATIC_LIBS ON)
+
+find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+
+file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+
 if(DEFINED ENV{TYPE_CALL})
         message("-- Will generate lib")
-
         list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp)
         list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/DEFParser.cpp)
-
         add_definitions(-DLIBRARY_MODE)
-        add_LIBRARY(${LIB_NAME} STATIC ${SRC_FILES})
-
-        target_include_directories(${LIB_NAME} PUBLIC
-                ${Boost_INCLUDE_DIR}
-                ${CMAKE_CURRENT_SOURCE_DIR}/include
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
-                )
-
-        target_link_libraries(${LIB_NAME} def lef ${LIB_NAME} ${Boost_LIBRARIES})
+        add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES})
 else()
         message("-- Will generate binary")
-
         add_definitions(-DSTANDALONE_MODE)
         add_executable(${BIN_NAME} ${SRC_FILES})
-
-        target_include_directories(${BIN_NAME} PUBLIC
-                ${Boost_INCLUDE_DIR}
-                ${CMAKE_CURRENT_SOURCE_DIR}/include
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
-                ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
-                )
-
-        target_link_libraries(${BIN_NAME} def lef)
-        target_link_libraries(${BIN_NAME} ${Boost_LIBRARIES})
 endif()
+
+target_include_directories(${BIN_NAME} PUBLIC
+        ${Boost_INCLUDE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
+        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
+        )
+
+target_link_libraries(${BIN_NAME}
+        def
+        lef
+        ${Boost_LIBRARIES}
+        )
