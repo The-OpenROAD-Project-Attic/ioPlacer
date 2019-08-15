@@ -42,10 +42,10 @@
 
 #include "LEFDescriptor.h"
 
-class LEFParser {           
+class LEFParser {
        public:
         LEFParser() {}
-        
+
         virtual ~LEFParser() = default;
         void parseLEF(const std::string &filename, LefDscp &dscp);
 };  // end class

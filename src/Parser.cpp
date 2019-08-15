@@ -203,8 +203,8 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
-       
-        DBU databaseUnit = _lefDscp._clsLefUnitsDscp._clsDatabase;	
+
+        DBU databaseUnit = _lefDscp._clsLefUnitsDscp._clsDatabase;
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
@@ -270,17 +270,17 @@ bool Parser::isDesignPlaced() {
 
 std::string Parser::getMetalWrittenStyle() {
         std::string metal;
-	int hLayer = _parms.getHorizontalMetalLayer();
-	std::string horizontalLayer = std::to_string(hLayer);
+        int hLayer = _parms.getHorizontalMetalLayer();
+        std::string horizontalLayer = std::to_string(hLayer);
         for (TrackDscp track : _defDscp._clsTracks) {
                 metal = track._layers[0];
-		if (metal.back() == horizontalLayer.back() &&
-		   (metal[0] == 'm' || metal[0] == 'M')) {
-			break;
-		}
+                if (metal.back() == horizontalLayer.back() &&
+                   (metal[0] == 'm' || metal[0] == 'M')) {
+                        break;
+                }
         }
-        
-	metal.pop_back();
+
+        metal.pop_back();
         return metal;
 }
 

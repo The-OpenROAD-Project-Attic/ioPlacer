@@ -548,7 +548,7 @@ void IOPlacementKernel::run() {
                           << returnIONetsHPWL(_netlist) << "***\n";
         }
 
-        if (not _cellsPlaced || (_randomMode > 0) ) {
+        if (not _cellsPlaced || (_randomMode > 0)) {
                 std::cout << "WARNING: running random pin placement\n";
                 randomPlacement(_randomMode);
         } else {

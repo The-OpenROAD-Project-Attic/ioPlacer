@@ -155,8 +155,8 @@ int defPin(defrCallbackType_e, defiPin* pin, defiUserData userData) {
                 defPin._locationType = "FIXED";
         }
 
-	if (pin->use())
-        	defPin._use = pin->use();
+        if (pin->use())
+                defPin._use = pin->use();
 
         return 0;
 }
