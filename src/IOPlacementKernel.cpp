@@ -98,6 +98,10 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         if (_parms->returnRandomMode() > -1) {
                 _randomMode = (RandomMode)_parms->returnRandomMode();
         }
+        if (_forcePinSpread && (_randomMode > 0)) {
+                std::cout << "WARNING: force pin spread option has no effect"
+                          << " when using random pin placement\n";
+        }
 }
 #endif  // STANDALONE_MODE
 
