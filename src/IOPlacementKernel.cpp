@@ -562,6 +562,14 @@ void IOPlacementKernel::run() {
         initIOLists();
         defineSlots();
 
+        if (int(_slots.size()) < _netlist.numIOPins()) {
+                std::cout << "ERROR: number of pins (";
+                std::cout << _netlist.numIOPins();
+                std::cout << ") exceed max possible (";
+                std::cout << _slots.size();
+                std::cout << ")\n";
+                exit(1);
+        }
 
         if (_returnHPWL) {
                 initHPWL = returnIONetsHPWL(_netlist);
