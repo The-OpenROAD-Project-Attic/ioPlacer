@@ -58,8 +58,8 @@ class Parameters {
         float _usage = -1;
         float _usageFactor = -1;
         std::string _blockagesFile;
-	float _horizontalLength = -1;
-	float _verticalLength = -1;
+        float _horizontalLength = -1;
+        float _verticalLength = -1;
 
         void printAll() const;
 
@@ -79,8 +79,8 @@ class Parameters {
         float returnUsageFactor() const { return _usageFactor; };
         float returnForceSpread() const { return _forceSpread; };
         std::string returnBlockagesFile() const { return _blockagesFile; };
-	float returnHorizontalLength() const { return _horizontalLength; };
-	float returnVerticalLength() const { return _verticalLength; };
+        float returnHorizontalLength() const { return _horizontalLength; };
+        float returnVerticalLength() const { return _verticalLength; };
 };
 
 #endif /* __PARAMETERS_H_ */

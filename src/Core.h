@@ -52,7 +52,7 @@ class Core {
         unsigned _minAreaY;
         unsigned _minWidthX;
         unsigned _minWidthY;
-	DBU _databaseUnit;
+        DBU _databaseUnit;
 
        public:
         Core()
@@ -65,7 +65,7 @@ class Core {
              const DBU& initTracksX, const DBU& initTracksY,
              const DBU& minAreaX, const DBU& minAreaY,
              const DBU& minWidthX, const DBU& minWidthY,
-	     const DBU& databaseUnit)
+             const DBU& databaseUnit)
             : _lowerBound(lowerBound),
               _upperBound(upperBound),
               _minDstPinsX(minDstPinsX),
@@ -76,7 +76,7 @@ class Core {
               _minAreaY(minAreaY),
               _minWidthX(minWidthX),
               _minWidthY(minWidthY),
-	      _databaseUnit(databaseUnit){}
+              _databaseUnit(databaseUnit){}
 
         Coordinate getLowerBound() const { return _lowerBound; }
         Coordinate getUpperBound() const { return _upperBound; }

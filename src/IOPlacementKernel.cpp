@@ -98,10 +98,16 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
         if (_parms->returnRandomMode() > -1) {
                 _randomMode = (RandomMode)_parms->returnRandomMode();
         }
+        if (_forcePinSpread && (_randomMode > 0)) {
+                std::cout << "WARNING: force pin spread option has no effect"
+                          << " when using random pin placement\n";
+        }
 }
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
+        const double seed = time(NULL);
+
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
         double shift = numSlots / double(numIOs);
@@ -114,6 +120,15 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
         unsigned lastSlots = (numIOs - slotsPerEdge * 3);
         std::vector<int> vSlots(numSlots);
         std::vector<int> vIOs(numIOs);
+
+        std::vector<InstancePin> instPins;
+        _netlist.forEachSinkOfIO(
+            idx, [&](InstancePin& instPin) { instPins.push_back(instPin); });
+        if (_sections.size() < 1) {
+                Section_t s = {Coordinate(0, 0)};
+                _sections.push_back(s);
+        }
+
         switch (mode) {
                 case RandomMode::Full:
                         std::cout << "RandomMode Full\n";
@@ -121,11 +136,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vSlots[i] = i;
                         }
                         std::shuffle(vSlots.begin(), vSlots.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vSlots[0];
                                 ioPin.setPos(_slots.at(b).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vSlots.erase(vSlots.begin());
                         });
                         break;
@@ -133,11 +149,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         std::cout << "RandomMode Even\n";
                         for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(floor(b * shift)).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vIOs.erase(vIOs.begin());
                         });
                         break;
@@ -156,11 +173,12 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                                 vIOs[idx++] = i;
                         }
                         std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(42));
+                                     std::default_random_engine(seed));
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(b).pos);
                                 _assignment.push_back(ioPin);
+                                _sections[0].net.addIONet(ioPin, instPins);
                                 vIOs.erase(vIOs.begin());
                         });
                         break;
@@ -215,7 +233,7 @@ void IOPlacementKernel::defineSlots() {
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
-
+        
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
@@ -239,7 +257,7 @@ void IOPlacementKernel::defineSlots() {
          *******************************************/
 
         std::vector<Coordinate> slotsEdge1;
-        DBU currX = lb.getX() + initTracksX;
+        DBU currX = initTracksX;
         DBU currY = lb.getY();
 
         while (currX < ub.getX()) {
@@ -249,7 +267,7 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge2;
-        currY = lb.getY() + initTracksY;
+        currY = initTracksY;
         currX = ub.getX();
         while (currY < ub.getY()) {
                 Coordinate pos(currX, currY);
@@ -258,7 +276,7 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge3;
-        currX = lb.getX() + initTracksX;
+        currX = initTracksX;
         currY = ub.getY();
         while (currX < ub.getX()) {
                 Coordinate pos(currX, currY);
@@ -268,7 +286,7 @@ void IOPlacementKernel::defineSlots() {
         std::reverse(slotsEdge3.begin(), slotsEdge3.end());
 
         std::vector<Coordinate> slotsEdge4;
-        currY = lb.getY() + initTracksY;
+        currY = initTracksY;
         currX = lb.getX();
         while (currY < ub.getY()) {
                 Coordinate pos(currX, currY);
@@ -537,21 +555,32 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 
 void IOPlacementKernel::run() {
         std::vector<HungarianMatching> hgVec;
+        DBU initHPWL = 0;
+        DBU totalHPWL = 0;
+        DBU deltaHPWL = 0;
 
         initIOLists();
         defineSlots();
 
-        setupSections();
-
-        if (_returnHPWL) {
-                std::cout << "***HPWL before IOPlacement: "
-                          << returnIONetsHPWL(_netlist) << "***\n";
+        if (int(_slots.size()) < _netlist.numIOPins()) {
+                std::cout << "ERROR: number of pins (";
+                std::cout << _netlist.numIOPins();
+                std::cout << ") exceed max possible (";
+                std::cout << _slots.size();
+                std::cout << ")\n";
+                exit(1);
         }
 
-        if (not _cellsPlaced || (_randomMode > 0) ) {
+        if (_returnHPWL) {
+                initHPWL = returnIONetsHPWL(_netlist);
+        }
+
+        if (not _cellsPlaced || (_randomMode > 0)) {
                 std::cout << "WARNING: running random pin placement\n";
                 randomPlacement(_randomMode);
         } else {
+                setupSections();
+
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         if (_sections[idx].net.numIOPins() > 0) {
                                 HungarianMatching hg(_sections[idx], _slots);
@@ -568,9 +597,7 @@ void IOPlacementKernel::run() {
                         hgVec[idx].getFinalAssignment(_assignment);
                 }
 
-                /* TODO:  <28-05-19, for some reason the first 3 slots/rows
-                 * always have overlap violations if used > */
-                unsigned i = 3;
+                unsigned i = 0;
                 while (_zeroSinkIOs.size() > 0 && i < _slots.size()) {
                         if (not _slots[i].used && not _slots[i].blocked) {
                                 _slots[i].used = true;
@@ -588,13 +615,14 @@ void IOPlacementKernel::run() {
         }
 
         if (_returnHPWL) {
-                DBU totalHPWL = 0;
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         totalHPWL += returnIONetsHPWL(_sections[idx].net);
                 }
-                std::cout << "***HPWL after IOPlacement: " << totalHPWL
-                          << "***\n";
+                deltaHPWL = initHPWL - totalHPWL;
+                std::cout << "***HPWL before ioPlacer: " << initHPWL << "\n";
+                std::cout << "***HPWL after  ioPlacer: " << totalHPWL << "\n";
+                std::cout << "***HPWL delta  ioPlacer: " << deltaHPWL << "\n";
         }
 }
 

@@ -46,7 +46,7 @@ IOPlacementKernel ioKernel;
 
 void IOPlacement::initCore(point lowerBounds, point upperBounds,
                            DBU minSpacingX, DBU minSpacingY, DBU initTrackX,
-                           DBU initTrackY, DBU minAreaX, DBU minAreaY, 
+                           DBU initTrackY, DBU minAreaX, DBU minAreaY,
                            DBU minWidthX, DBU minWidthY, DBU databaseUnit) {
         Coordinate lowerBound(lowerBounds.x(), lowerBounds.y());
         Coordinate upperBound(upperBounds.x(), upperBounds.y());
