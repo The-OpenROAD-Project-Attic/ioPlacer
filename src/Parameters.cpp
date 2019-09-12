@@ -62,6 +62,7 @@ Parameters::Parameters(int argc, char** argv) {
                 ("block-area,b"         , po::value<std::string>()     , "File containing areas to be blocked (optional)")
                 ("_length-horizontal,e" , po::value<float>()           , "Length of the horizontal pins in microns (optional)")
                 ("_length-vertical,q"   , po::value<float>()           , "Length of the vertical pins in microns (optional)")
+                ("num-threads,t"        , po::value<int>()             , "Number of threads (optional)")
                 ;
         // clang-format on
 
@@ -131,6 +132,9 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("interactive")) {
                         _interactiveMode = vm.count("interactive");
                 }
+                if (vm.count("num-threads")) {
+                        _interactiveMode = vm.count("num-threads");
+                }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
@@ -166,6 +170,7 @@ void Parameters::printAll() const {
         std::cout << "Horizontal pin length: " << _horizontalLength << "\n";
         std::cout << "Vertical pin length: " << _verticalLength << "\n";
         std::cout << "Interactive mode: " << _interactiveMode << "\n";
+        std::cout << "Num threads: " << _numThreads << "\n";
 
         std::cout << "\n";
         // clang-format on

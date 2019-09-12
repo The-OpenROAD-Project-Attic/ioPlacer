@@ -71,6 +71,8 @@ bool  get_report_hpwl();
 void  set_interactive_mode(bool enable);
 bool  is_interactive_mode();
 void  print_all_parms();
+void  set_num_threads(int numThreads);
+int   get_num_threads();
 
 // flow
 void run_io_placement();

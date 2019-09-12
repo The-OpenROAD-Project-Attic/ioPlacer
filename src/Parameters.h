@@ -61,11 +61,12 @@ class Parameters {
         float _horizontalLength = -1;
         float _verticalLength = -1;
         bool  _interactiveMode = false;
+        int _numThreads = -1;
 
        public:
         Parameters() = default;
         Parameters(int, char**);
-
+        
         void setInputDefFile(const std::string& file) { _inputDefFile = file; }
         std::string getInputDefFile() const { return _inputDefFile; }
         std::string getInputLefFile() const { return _inputLefFile; }
@@ -97,7 +98,9 @@ class Parameters {
         float getVerticalLength() const { return _verticalLength; }
         void setInteractiveMode(bool enable) { _interactiveMode = enable; }
         bool isInteractiveMode() const { return _interactiveMode; }
-        
+        void setNumThreads(int numThreads) { _numThreads = numThreads; }
+        int  getNumThreads() const { return _numThreads; }
+
         void printAll() const;
 };
 

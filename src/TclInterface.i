@@ -71,4 +71,6 @@ extern void print_all_parms();
 extern void run_io_placement();
 extern int compute_io_nets_hpwl();
 extern void export_def(const char*);
+extern void  set_num_threads(int numThreads);
+extern int   get_num_threads();
 

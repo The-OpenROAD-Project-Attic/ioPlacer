@@ -36,6 +36,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <random>
+#include <omp.h>
 
 #include "IOPlacementKernel.h"
 #include "WriterIOPins.h"
@@ -579,6 +580,14 @@ void IOPlacementKernel::run() {
         initParms();
 
         std::cout << " > Running IO placement\n";
+
+        if (_parms->getNumThreads() > 0){
+                omp_set_dynamic(0); 
+                omp_set_num_threads(_parms->getNumThreads());
+                std::cout << " * User defines number of threads\n"; 
+        }
+        std::cout << " * IOPlacer is using " << omp_get_max_threads() << " threads.\n";
+
         initNetlistAndCore();
         
         std::vector<HungarianMatching> hgVec;
