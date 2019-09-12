@@ -70,7 +70,20 @@ set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
+# Finds tcl
+include(FindTCL.cmake)
+
+# Loads swig and generates the tcl wrapper file
+find_package(SWIG REQUIRED)
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp
+        COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating swig wrapper"
+)
+add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
+
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
 
 if(DEFINED ENV{TYPE_CALL})
         message("-- Will generate lib")
@@ -84,6 +97,8 @@ else()
         add_executable(${BIN_NAME} ${SRC_FILES})
 endif()
 
+add_dependencies(${BIN_NAME} tclInterfaceWrapper)
+
 target_include_directories(${BIN_NAME} PUBLIC
         ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
@@ -96,4 +111,5 @@ target_link_libraries(${BIN_NAME}
         def
         lef
         ${Boost_LIBRARIES}
+        ${TCL_LIB}
         )

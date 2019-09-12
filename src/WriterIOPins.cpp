@@ -72,7 +72,7 @@ bool WriterIOPins::writeFile() {
         defFile.open(_inFileName);
 
         if (!defFile.is_open()) {
-                std::cout << "DEF file could not been open\n";
+                std::cout << "DEF file \"" << _inFileName << "\" could not been open\n";
                 std::exit(-1);
         }
 

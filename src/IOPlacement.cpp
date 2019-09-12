@@ -180,9 +180,9 @@ void IOPlacement::setRandomMode(int randomMode) {
         ioKernel._randomMode = (RandomMode)randomMode;
 }
 
-std::vector<Pin_t> IOPlacement::run(bool returnHPWL) {
+std::vector<Pin_t> IOPlacement::run(bool reportHPWL) {
         initNetlist();
-        ioKernel._returnHPWL = returnHPWL;
+        ioKernel._reportHPWL = reportHPWL;
         ioKernel.run();
         std::vector<Pin_t> pinAssignment;
         getResults(pinAssignment);

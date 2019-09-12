@@ -45,15 +45,35 @@
 Parser::Parser(Parameters& parms, Netlist& netlist, Core& core)
     : _parms(parms), _netlist(netlist), _core(core) {}
 
-void Parser::run() {
-        _lefParser.parseLEF(_parms.getInputLefFile(), _lefDscp);
-        _defParser.parseDEF(_parms.getInputDefFile(), _defDscp);
+void Parser::parseLef(const std::string& file){
+        _lefParser.parseLEF(file, _lefDscp);
+        _hasLef = true;
+}
+
+void Parser::parseDef(const std::string& file){
+        if(_hasDef) {
+                std::cout << "Error! We only support 1 def file per design.\n";
+                return;
+        }
+        _defParser.parseDEF(file, _defDscp);
+        _hasDef = true;
+}
+
+void Parser::initData() {
+        std::cout << " > Initing ioPlacer data:\n";
+        std::cout << " * Map IO to nets\n";
         initMapIOtoNet();
+        std::cout << " * Map inst to pin\n";
         initMapInstToPosition();
+        std::cout << " * Read die area\n";
         readDieArea();
+        std::cout << " * Read connections\n";
         readConnections();
+        std::cout << " * Init netlist\n";
         initNetlist();
+        std::cout << " * Init core\n";
         initCore();
+        std::cout << " > Finished data initialization.\n";
 }
 
 Parser::point Parser::getInstPosition(std::string instName) {
@@ -203,7 +223,6 @@ void Parser::initCore() {
          * minimum spacing in the same metal layer, to position two pins in
          * neighbour track one need to consider changing metal layers between
          * them > */
-
         DBU databaseUnit = _lefDscp._clsLefUnitsDscp._clsDatabase;
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,

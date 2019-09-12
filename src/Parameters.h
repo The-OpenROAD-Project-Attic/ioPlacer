@@ -44,15 +44,15 @@
 
 class Parameters {
        private:
-        int _horizontalMetalLayer;
-        int _verticalMetalLayer;
+        int _horizontalMetalLayer = 1;
+        int _verticalMetalLayer = 2;
         std::string _inputLefFile;
         std::string _inputDefFile;
         std::string _outputDefFile;
-        bool _returnHPWL = false;
-
+        
+        bool _reportHPWL = false;
         bool _forceSpread = true;
-        int _nslots = -1;
+        int _numSlots = -1;
         int _randomMode = 0;
         float _slotsFactor = -1;
         float _usage = -1;
@@ -60,27 +60,45 @@ class Parameters {
         std::string _blockagesFile;
         float _horizontalLength = -1;
         float _verticalLength = -1;
-
-        void printAll() const;
+        bool  _interactiveMode = false;
 
        public:
+        Parameters() = default;
         Parameters(int, char**);
 
+        void setInputDefFile(const std::string& file) { _inputDefFile = file; }
         std::string getInputDefFile() const { return _inputDefFile; }
         std::string getInputLefFile() const { return _inputLefFile; }
+        void setOutputDefFile(const std::string& file) { _outputDefFile = file; }
         std::string getOutputDefFile() const { return _outputDefFile; }
-        int getHorizontalMetalLayer() const { return _horizontalMetalLayer; };
-        int getVerticalMetalLayer() const { return _verticalMetalLayer; };
-        int returnHPWL() const { return _returnHPWL; };
-        int returnNslots() const { return _nslots; };
-        int returnRandomMode() const { return _randomMode; };
-        float returnSlotsFactor() const { return _slotsFactor; };
-        float returnUsage() const { return _usage; };
-        float returnUsageFactor() const { return _usageFactor; };
-        float returnForceSpread() const { return _forceSpread; };
-        std::string returnBlockagesFile() const { return _blockagesFile; };
-        float returnHorizontalLength() const { return _horizontalLength; };
-        float returnVerticalLength() const { return _verticalLength; };
+        void setHorizontalMetalLayer(int layer) { _horizontalMetalLayer = layer; }
+        int getHorizontalMetalLayer() const { return _horizontalMetalLayer; }
+        void setVerticalMetalLayer(int layer) { _verticalMetalLayer = layer; }
+        int getVerticalMetalLayer() const { return _verticalMetalLayer; }
+        void setReportHPWL(bool report) { _reportHPWL = report; }
+        bool getReportHPWL() const { return _reportHPWL; }
+        void setNumSlots(int numSlots) { _numSlots = numSlots; }
+        int getNumSlots() const { return _numSlots; }
+        void setRandomMode(int mode) { _randomMode = mode; }
+        int getRandomMode() const { return _randomMode; }
+        void setSlotsFactor(float factor) { _slotsFactor = factor; } 
+        float getSlotsFactor() const { return _slotsFactor; }
+        void setUsage(float usage) { _usage = usage; }
+        float getUsage() const { return _usage; }
+        void setUsageFactor(float factor) { _usageFactor = factor; }
+        float getUsageFactor() const { return _usageFactor; }
+        void setForceSpread(bool forceSpread) { _forceSpread = forceSpread; } 
+        bool getForceSpread() const { return _forceSpread; }
+        void setBlockagesFile(const std::string& file) { _blockagesFile = file; }
+        std::string getBlockagesFile() const { return _blockagesFile; }
+        void setHorizontalLength(float length) { _horizontalLength = length; }
+        float getHorizontalLength() const { return _horizontalLength; }
+        void setVerticalLength(float length) { _verticalLength = length; }
+        float getVerticalLength() const { return _verticalLength; }
+        void setInteractiveMode(bool enable) { _interactiveMode = enable; }
+        bool isInteractiveMode() const { return _interactiveMode; }
+        
+        void printAll() const;
 };
 
 #endif /* __PARAMETERS_H_ */

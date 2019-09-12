@@ -44,6 +44,7 @@
 #include "Netlist.h"
 #include "Parameters.h"
 #include "Slots.h"
+#include "Parser.h"
 
 enum RandomMode { None, Full, Even, Group };
 
@@ -55,7 +56,7 @@ class IOPlacementKernel {
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
         std::vector<IOPin> _assignment;
-        bool _returnHPWL = false;
+        bool _reportHPWL = false;
 
         unsigned _slotsPerSection = 200;
         float _slotsIncreaseFactor = 0.01f;
@@ -72,12 +73,14 @@ class IOPlacementKernel {
         Netlist _netlistIOPins;
         slotVector_t _slots;
         sectionVector_t _sections;
+        Parser* _parser = nullptr;
         std::vector<IOPin> _zeroSinkIOs;
         RandomMode _randomMode = RandomMode::Full;
         bool _cellsPlaced = true;
 
         void initNetlistAndCore();
         void initIOLists();
+        void initParms();
         void randomPlacement(const RandomMode);
         void defineSlots();
         void createSections();
@@ -95,6 +98,9 @@ class IOPlacementKernel {
         void run();
         void getResults();
         void printConfig();
+        void parseLef(const std::string& file) { _parser->parseLef(file); }
+        void parseDef(const std::string& file) { _parser->parseDef(file); }
+        DBU returnIONetsHPWL();
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */

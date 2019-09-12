@@ -41,67 +41,83 @@
 #include "WriterIOPins.h"
 
 #ifdef STANDALONE_MODE
-#include "Parser.h"
 
 void IOPlacementKernel::initNetlistAndCore() {
-        Parser parser(*_parms, _netlist, _core);
-        parser.run();
+        if (!_parms->isInteractiveMode()) {
+                _parser->parseLef(_parms->getInputLefFile());
+                _parser->parseDef(_parms->getInputDefFile());
+        }
+       
+        if( !_parser->hasDb() ) {
+                std::cout << " > Error! There is no DB in ioPlacer.\n";
+                std::cout << "   Have you imported lef and def using\n";
+                std::cout << "   import_lef and import_def commands?\n";
+                std::exit(1);
+        }
 
-        std::cout << "Verifying required data\n";
-        if (!parser.verifyRequiredData()) {
+        _parser->initData();
+
+        std::cout << " > Verifying required data\n";
+        if (!_parser->verifyRequiredData()) {
                 std::cout << "*********************************************\n";
                 std::cout << "Required data is not provided by current DEF!\n";
                 std::cout << " Check if DEF have tracks and components\n";
                 std::cout << "*********************************************\n";
-                std::exit(0);
+                std::exit(1);
         }
 
-        std::string metal = parser.getMetalWrittenStyle();
+        std::string metal = _parser->getMetalWrittenStyle();
 
         _horizontalMetalLayer =
             metal + std::to_string(_parms->getHorizontalMetalLayer());
         _verticalMetalLayer =
             metal + std::to_string(_parms->getVerticalMetalLayer());
 
-        if (_parms->returnBlockagesFile().size() != 0) {
-                _blockagesFile = _parms->returnBlockagesFile();
-                parser.getBlockages(_blockagesFile, _blockagesArea);
+        if (_parms->getBlockagesFile().size() != 0) {
+                _blockagesFile = _parms->getBlockagesFile();
+                _parser->getBlockages(_blockagesFile, _blockagesArea);
         }
 
-        if (!parser.isDesignPlaced()) {
+        if (!_parser->isDesignPlaced()) {
                 _cellsPlaced = false;
         }
+        
+        delete _parser; // parser is not necessary anymore
 }
 
-IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
-        initNetlistAndCore();
-        if (_parms->returnHPWL()) {
-                _returnHPWL = true;
+void IOPlacementKernel::initParms() {
+        if (_parms->getReportHPWL()) {
+                _reportHPWL = true;
         }
-        if (_parms->returnForceSpread()) {
+        if (_parms->getForceSpread()) {
                 _forcePinSpread = true;
         } else {
                 _forcePinSpread = false;
         }
-        if (_parms->returnNslots() > -1) {
-                _slotsPerSection = _parms->returnNslots();
+        if (_parms->getNumSlots() > -1) {
+                _slotsPerSection = _parms->getNumSlots();
         }
-        if (_parms->returnSlotsFactor() > -1) {
-                _slotsIncreaseFactor = _parms->returnSlotsFactor();
+
+        if (_parms->getSlotsFactor() > -1) {
+                _slotsIncreaseFactor = _parms->getSlotsFactor();
         }
-        if (_parms->returnUsage() > -1) {
-                _usagePerSection = _parms->returnUsage();
+        if (_parms->getUsage() > -1) {
+                _usagePerSection = _parms->getUsage();
         }
-        if (_parms->returnUsageFactor() > -1) {
-                _usageIncreaseFactor = _parms->returnUsageFactor();
+        if (_parms->getUsageFactor() > -1) {
+                _usageIncreaseFactor = _parms->getUsageFactor();
         }
-        if (_parms->returnRandomMode() > -1) {
-                _randomMode = (RandomMode)_parms->returnRandomMode();
+        if (_parms->getRandomMode() > -1) {
+                _randomMode = (RandomMode)_parms->getRandomMode();
         }
         if (_forcePinSpread && (_randomMode > 0)) {
                 std::cout << "WARNING: force pin spread option has no effect"
                           << " when using random pin placement\n";
         }
+}
+
+IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms), 
+                _parser( new Parser(*_parms, _netlist, _core) ) {
 }
 #endif  // STANDALONE_MODE
 
@@ -414,11 +430,11 @@ bool IOPlacementKernel::assignPinsSections() {
 }
 
 void IOPlacementKernel::printConfig() {
-        std::cout << "Slots Per Section     " << _slotsPerSection << "\n";
-        std::cout << "Slots Increase Factor " << _slotsIncreaseFactor << "\n";
-        std::cout << "Usage Per Section     " << _usagePerSection << "\n";
-        std::cout << "Usage Increase Factor " << _usageIncreaseFactor << "\n";
-        std::cout << "Force Pin Spread      " << _forcePinSpread << "\n\n";
+        std::cout << " * Slots Per Section     " << _slotsPerSection << "\n";
+        std::cout << " * Slots Increase Factor " << _slotsIncreaseFactor << "\n";
+        std::cout << " * Usage Per Section     " << _usagePerSection << "\n";
+        std::cout << " * Usage Increase Factor " << _usageIncreaseFactor << "\n";
+        std::cout << " * Force Pin Spread      " << _forcePinSpread << "\n\n";
 }
 
 void IOPlacementKernel::setupSections() {
@@ -517,8 +533,8 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                         : 2 * halfWidth;
                 pin.setLowerBound(-1 * halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
-                if (_parms->returnVerticalLength() != -1) {
-                        height = _parms->returnVerticalLength() *
+                if (_parms->getVerticalLength() != -1) {
+                        height = _parms->getVerticalLength() *
                                  _core.getDatabaseUnit();
                         pin.setUpperBound(halfWidth, height);
                 }
@@ -534,8 +550,8 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 }
                 pin.setLowerBound(-1 * halfWidth, 0);
                 pin.setUpperBound(halfWidth, height);
-                if (_parms->returnHorizontalLength() != -1) {
-                        height = _parms->returnHorizontalLength() *
+                if (_parms->getHorizontalLength() != -1) {
+                        height = _parms->getHorizontalLength() *
                                  _core.getDatabaseUnit();
                         pin.setUpperBound(halfWidth, height);
                 }
@@ -553,7 +569,18 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
         return hpwl;
 }
 
+
+DBU IOPlacementKernel::returnIONetsHPWL() {
+        return returnIONetsHPWL(_netlist);
+}
+
+
 void IOPlacementKernel::run() {
+        initParms();
+
+        std::cout << " > Running IO placement\n";
+        initNetlistAndCore();
+        
         std::vector<HungarianMatching> hgVec;
         DBU initHPWL = 0;
         DBU totalHPWL = 0;
@@ -570,8 +597,8 @@ void IOPlacementKernel::run() {
                 std::cout << ")\n";
                 exit(1);
         }
-
-        if (_returnHPWL) {
+        
+        if (_reportHPWL) {
                 initHPWL = returnIONetsHPWL(_netlist);
         }
 
@@ -614,7 +641,7 @@ void IOPlacementKernel::run() {
                 updatePinArea(_assignment[i]);
         }
 
-        if (_returnHPWL) {
+        if (_reportHPWL) {
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         totalHPWL += returnIONetsHPWL(_sections[idx].net);
@@ -624,6 +651,7 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL after  ioPlacer: " << totalHPWL << "\n";
                 std::cout << "***HPWL delta  ioPlacer: " << deltaHPWL << "\n";
         }
+        std::cout << " > IO placement done.\n";
 }
 
 void IOPlacementKernel::getResults() {

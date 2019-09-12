@@ -35,58 +35,48 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include <chrono>
-#include <ctime>
-#include <tcl.h>
+#ifndef _TCL_INTERFACE_
+#define _TCL_INTERFACE_
 
-#include "Parameters.h"
-#include "IOPlacementKernel.h"
+// LEF/DEF interface
+void import_lef(const char* file);
+void import_def(const char* file);
+void export_def(const char* file);
 
-extern "C" {
-        extern int Ioplacer_Init(Tcl_Interp *interp);
-}
+// Parms interface
+void  set_hor_metal_layer(int layer);
+int   get_hor_metal_layer();
+void  set_ver_metal_layer(int layer);
+int   get_ver_metal_layer();
+void  set_num_slots(int numSlots);
+int   get_num_slots();
+void  set_random_mode(int mode);
+int   get_random_mode();
+void  set_slots_factor(float factor);
+float get_slots_factor();
+void  set_force_spread(bool force);
+bool  get_force_spread();
+void  set_usage(float usage);
+float get_usage();
+void  set_usage_factor(float factor);
+float get_usage_factor();
+void  set_blockages_file(const char* file);
+const char* get_blockages_file();
+void  set_hor_length(float length);
+float get_hor_length();
+void  set_ver_length(float length);
+float get_ver_length();
+void  set_report_hpwl(bool report);
+bool  get_report_hpwl();
+void  set_interactive_mode(bool enable);
+bool  is_interactive_mode();
+void  print_all_parms();
 
-int tclAppInit(Tcl_Interp *interp) {
-        std::cout << " > Running ioPlacer in interactive mode.\n";
+// flow
+void run_io_placement();
 
-        Tcl_Init(interp);
-        Ioplacer_Init(interp);        
+// Reports
+int  compute_io_nets_hpwl();
 
-        return TCL_OK;
-}
+#endif
 
-Parameters* parmsToIOPlacer = nullptr;
-IOPlacementKernel* ioPlacerKernel = nullptr;
-
-int main(int argc, char** argv) {
-        std::cout << " ######################################\n";
-        std::cout << " #      OpenROAD IO placement tool    #\n";
-        std::cout << " #                                    #\n";
-        std::cout << " # Authors:                           #\n";
-        std::cout << " #    Vitor Bandeira (UFRGS)          #\n";
-        std::cout << " #    Mateus Fogaca (UFRGS)           #\n";
-        std::cout << " #    Eder Matheus Monteiro (UFRGS)   #\n";
-        std::cout << " #    Isadora Oliveira (UFRGS)        #\n";
-        std::cout << " #                                    #\n";
-        std::cout << " #  Advisor:                          #\n";
-        std::cout << " #    Ricardo Reis (UFRGS)            #\n";
-        std::cout << " ######################################\n";
-        std::cout << "\n";
-
-        std::time_t date = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-        std::cout << " > Current time: " << std::ctime(&date);
-
-        parmsToIOPlacer = new Parameters(argc, argv);
-        ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
-        
-        if (parmsToIOPlacer->isInteractiveMode()) {
-                Tcl_Main(argc, argv, tclAppInit);
-        } else {
-                ioPlacerKernel->run();
-                ioPlacerKernel->getResults();
-        }
-        
-        return 0;
-}

@@ -89,6 +89,8 @@ class Parser {
         DEFParser _defParser;
         LefDscp _lefDscp;
         DefDscp _defDscp;
+        bool _hasLef = false;
+        bool _hasDef = false;
 
         point getInstPosition(std::string);
         void readDieArea();
@@ -100,7 +102,12 @@ class Parser {
 
        public:
         Parser(Parameters&, Netlist&, Core&);
-        void run();
+        void parseLef(const std::string& file);
+        void parseDef(const std::string& file);
+
+        bool hasDb() { return _hasLef && _hasDef; }  
+
+        void initData();
         void getBlockages(std::string,
                           std::vector<std::pair<Coordinate, Coordinate>>&);
         bool isDesignPlaced();
