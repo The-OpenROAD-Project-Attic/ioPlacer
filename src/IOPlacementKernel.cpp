@@ -123,7 +123,7 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms),
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
-        const double seed = time(NULL);
+        const double seed = 42;
 
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
@@ -402,7 +402,7 @@ bool IOPlacementKernel::assignPinsSections() {
                 std::vector<InstancePin> instPinsVector;
 #pragma omp parallel for
                 for (unsigned i = 0; i < sections.size(); i++) {
-                        dst[i] = net.computeDstIOtoPins(idx, sections[i].pos);
+                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
                 }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);

@@ -62,7 +62,7 @@ void HungarianMatching::createMatrix() {
                         continue;
                 }
                 _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
-                        DBU hpwl = _netlist.computeIONetHPWL(idx, newPos);
+                        DBU hpwl = _netlist.computeDstIOtoPins(idx, newPos);
                         _hungarianMatrix(slotIndex, pinIndex) = hpwl;
                         pinIndex++;
                 });
