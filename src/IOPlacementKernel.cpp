@@ -123,7 +123,7 @@ IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms),
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
-        const double seed = 42;
+        const double seed = _parms->getRandSeed();
 
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();

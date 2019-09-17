@@ -62,6 +62,7 @@ class Parameters {
         float _verticalLength = -1;
         bool  _interactiveMode = false;
         int _numThreads = -1;
+        double _randSeed = 42.0;
 
        public:
         Parameters() = default;
@@ -100,6 +101,8 @@ class Parameters {
         bool isInteractiveMode() const { return _interactiveMode; }
         void setNumThreads(int numThreads) { _numThreads = numThreads; }
         int  getNumThreads() const { return _numThreads; }
+        void setRandSeed(double seed) { _randSeed = seed; }
+        double getRandSeed() const { return _randSeed; }
 
         void printAll() const;
 };

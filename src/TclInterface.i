@@ -73,4 +73,5 @@ extern int compute_io_nets_hpwl();
 extern void export_def(const char*);
 extern void  set_num_threads(int numThreads);
 extern int   get_num_threads();
-
+extern void   set_rand_seed(double seed);
+extern double get_rand_seed();

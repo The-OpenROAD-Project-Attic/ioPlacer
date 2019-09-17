@@ -181,4 +181,12 @@ void set_num_threads(int numThreads){;
 
 int get_num_threads(){
         return parmsToIOPlacer->getNumThreads();
-};
+}
+
+void   set_rand_seed(double seed){
+        parmsToIOPlacer->setRandSeed(seed);
+}
+
+double get_rand_seed(){
+        return parmsToIOPlacer->getRandSeed();
+}

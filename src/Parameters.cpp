@@ -63,6 +63,7 @@ Parameters::Parameters(int argc, char** argv) {
                 ("_length-horizontal,e" , po::value<float>()           , "Length of the horizontal pins in microns (optional)")
                 ("_length-vertical,q"   , po::value<float>()           , "Length of the vertical pins in microns (optional)")
                 ("num-threads,t"        , po::value<int>()             , "Number of threads (optional)")
+                ("rand-seed,i"          , po::value<double>()          , "Seed for the random number generator engine (optional)")
                 ;
         // clang-format on
 
@@ -135,6 +136,9 @@ Parameters::Parameters(int argc, char** argv) {
                 if (vm.count("num-threads")) {
                         _interactiveMode = vm.count("num-threads");
                 }
+                if (vm.count("rand-seed")) {
+                        _randSeed = vm.count("rand-seed");
+                }
         } catch (const po::error& ex) {
                 std::cerr << ex.what() << '\n';
         }
@@ -171,6 +175,7 @@ void Parameters::printAll() const {
         std::cout << "Vertical pin length: " << _verticalLength << "\n";
         std::cout << "Interactive mode: " << _interactiveMode << "\n";
         std::cout << "Num threads: " << _numThreads << "\n";
+        std::cout << "Rand seed: " << _randSeed << "\n";
 
         std::cout << "\n";
         // clang-format on
