@@ -51,7 +51,7 @@ int tclAppInit(Tcl_Interp *interp) {
         std::cout << " > Running ioPlacer in interactive mode.\n";
 
         Tcl_Init(interp);
-        Ioplacer_Init(interp);        
+        Ioplacer_Init(interp);
 
         return TCL_OK;
 }
@@ -80,13 +80,13 @@ int main(int argc, char** argv) {
 
         parmsToIOPlacer = new Parameters(argc, argv);
         ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
-        
+
         if (parmsToIOPlacer->isInteractiveMode()) {
                 Tcl_Main(argc, argv, tclAppInit);
         } else {
                 ioPlacerKernel->run();
                 ioPlacerKernel->getResults();
         }
-        
+
         return 0;
 }
