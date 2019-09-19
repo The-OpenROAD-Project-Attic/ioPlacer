@@ -1,0 +1,41 @@
+ispd18_test2.input.def
+ispd18_test2.input.guide
+ispd18_test2.input.lef
+Final HPWL 834091550
+ ######################################
+ #      OpenROAD IO placement tool    #
+ #                                    #
+ # Authors:                           #
+ #    Vitor Bandeira (UFRGS)          #
+ #    Mateus Fogaca (UFRGS)           #
+ #    Eder Matheus Monteiro (UFRGS)   #
+ #    Isadora Oliveira (UFRGS)        #
+ #                                    #
+ #  Advisor:                          #
+ #    Ricardo Reis (UFRGS)            #
+ ######################################
+
+ > Current time: Thu Sep 19 12:56:53 2019
+ > Running ioPlacer in interactive mode.
+ > Importing LEF file "ispd18_test2.input.lef"
+ > Importing DEF file "ispd18_test2.input.def"
+ > Running IO placement
+ * User defines number of threads
+ * IOPlacer is using 5 threads.
+ > Initing ioPlacer data:
+ * Map IO to nets
+ * Map inst to pin
+ * Read die area
+ * Read connections
+ * Init netlist
+ * Init core
+ > Finished data initialization.
+ > Verifying required data
+Tentative 0 to setup sections
+ * Slots Per Section     200
+ * Slots Increase Factor 0.01
+ * Usage Per Section     0.8
+ * Usage Increase Factor 0.01
+ * Force Pin Spread      1
+
+ > IO placement done.
