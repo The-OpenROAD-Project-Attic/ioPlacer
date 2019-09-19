@@ -159,6 +159,11 @@ void Parser::initNetlist() {
                 }
                 _netlist.addIONet(ioPin, instPins);
         }
+
+        if (_netlist.numIOPins() < 1 ) {
+                std::cout << " > Design without pins. IOPlacer will exit...\n";
+                std::exit(0);
+        }
 }
 
 void Parser::initCore() {
