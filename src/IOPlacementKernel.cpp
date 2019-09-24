@@ -48,7 +48,7 @@ void IOPlacementKernel::initNetlistAndCore() {
                 _parser->parseLef(_parms->getInputLefFile());
                 _parser->parseDef(_parms->getInputDefFile());
         }
-       
+
         if( !_parser->hasDb() ) {
                 std::cout << " > Error! There is no DB in ioPlacer.\n";
                 std::cout << "   Have you imported lef and def using\n";
@@ -82,7 +82,7 @@ void IOPlacementKernel::initNetlistAndCore() {
         if (!_parser->isDesignPlaced()) {
                 _cellsPlaced = false;
         }
-        
+
         delete _parser; // parser is not necessary anymore
 }
 
@@ -117,7 +117,7 @@ void IOPlacementKernel::initParms() {
         }
 }
 
-IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms), 
+IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms),
                 _parser( new Parser(*_parms, _netlist, _core) ) {
 }
 #endif  // STANDALONE_MODE
@@ -250,7 +250,7 @@ void IOPlacementKernel::defineSlots() {
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
-        
+
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
@@ -431,6 +431,10 @@ bool IOPlacementKernel::assignPinsSections() {
 }
 
 void IOPlacementKernel::printConfig() {
+        std::cout << " * Num of slots          " << _slots.size() << "\n";
+        std::cout << " * Num of I/O            " << _netlist.numIOPins() << "\n";
+        std::cout << " * Num of I/O w/sink     " << _netlistIOPins.numIOPins() << "\n";
+        std::cout << " * Num of I/O w/o sink   " << _zeroSinkIOs.size() << "\n";
         std::cout << " * Slots Per Section     " << _slotsPerSection << "\n";
         std::cout << " * Slots Increase Factor " << _slotsIncreaseFactor << "\n";
         std::cout << " * Usage Per Section     " << _usagePerSection << "\n";
@@ -582,14 +586,14 @@ void IOPlacementKernel::run() {
         std::cout << " > Running IO placement\n";
 
         if (_parms->getNumThreads() > 0){
-                omp_set_dynamic(0); 
+                omp_set_dynamic(0);
                 omp_set_num_threads(_parms->getNumThreads());
-                std::cout << " * User defines number of threads\n"; 
+                std::cout << " * User defines number of threads\n";
         }
         std::cout << " * IOPlacer is using " << omp_get_max_threads() << " threads.\n";
 
         initNetlistAndCore();
-        
+
         std::vector<HungarianMatching> hgVec;
         DBU initHPWL = 0;
         DBU totalHPWL = 0;
@@ -597,6 +601,8 @@ void IOPlacementKernel::run() {
 
         initIOLists();
         defineSlots();
+
+        printConfig();
 
         if (int(_slots.size()) < _netlist.numIOPins()) {
                 std::cout << "ERROR: number of pins (";
@@ -606,7 +612,7 @@ void IOPlacementKernel::run() {
                 std::cout << ")\n";
                 exit(1);
         }
-        
+
         if (_reportHPWL) {
                 initHPWL = returnIONetsHPWL(_netlist);
         }
