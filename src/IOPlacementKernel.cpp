@@ -49,7 +49,7 @@ void IOPlacementKernel::initNetlistAndCore() {
                 _parser->parseDef(_parms->getInputDefFile());
         }
 
-        if( !_parser->hasDb() ) {
+        if (!_parser->hasDb()) {
                 std::cout << " > Error! There is no DB in ioPlacer.\n";
                 std::cout << "   Have you imported lef and def using\n";
                 std::cout << "   import_lef and import_def commands?\n";
@@ -83,7 +83,7 @@ void IOPlacementKernel::initNetlistAndCore() {
                 _cellsPlaced = false;
         }
 
-        delete _parser; // parser is not necessary anymore
+        delete _parser;  // parser is not necessary anymore
 }
 
 void IOPlacementKernel::initParms() {
@@ -117,9 +117,8 @@ void IOPlacementKernel::initParms() {
         }
 }
 
-IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms),
-                _parser( new Parser(*_parms, _netlist, _core) ) {
-}
+IOPlacementKernel::IOPlacementKernel(Parameters& parms)
+    : _parms(&parms), _parser(new Parser(*_parms, _netlist, _core)) {}
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
@@ -424,8 +423,10 @@ bool IOPlacementKernel::assignPinsSections() {
         });
         // if forEachIOPin ends or returns/breaks goes here
         if (totalPinsAssigned == net.numIOPins()) {
+                std::cout << " > Successfully assigned I/O pins\n";
                 return true;
         } else {
+                std::cout << " > Unsuccessfully assigned I/O pins\n";
                 return false;
         }
 }
@@ -574,23 +575,20 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
         return hpwl;
 }
 
-
-DBU IOPlacementKernel::returnIONetsHPWL() {
-        return returnIONetsHPWL(_netlist);
-}
-
+DBU IOPlacementKernel::returnIONetsHPWL() { return returnIONetsHPWL(_netlist); }
 
 void IOPlacementKernel::run() {
         initParms();
 
         std::cout << " > Running IO placement\n";
 
-        if (_parms->getNumThreads() > 0){
+        if (_parms->getNumThreads() > 0) {
                 omp_set_dynamic(0);
                 omp_set_num_threads(_parms->getNumThreads());
                 std::cout << " * User defines number of threads\n";
         }
-        std::cout << " * IOPlacer is using " << omp_get_max_threads() << " threads.\n";
+        std::cout << " * IOPlacer is using " << omp_get_max_threads()
+                  << " threads.\n";
 
         initNetlistAndCore();
 
@@ -654,6 +652,13 @@ void IOPlacementKernel::run() {
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);
                 updatePinArea(_assignment[i]);
+        }
+
+        if (_assignment.size() != (unsigned)_netlist.numIOPins()) {
+                std::cout << "ERROR: assigned " << _assignment.size()
+                          << " pins out of " << _netlist.numIOPins()
+                          << " I/O pins\n";
+                exit(1);
         }
 
         if (_reportHPWL) {
