@@ -10,7 +10,7 @@ binary=$1
 wget -q http://www.ispd.cc/contests/18/ispd18_test2.tgz 
 tar -xvzf ispd18_test2.tgz > log.txt
 
-$binary -c < ioPlacer.tcl >> log.txt
+$binary -c 1 < ioPlacer.tcl >> log.txt
 
 hpwl=$(grep "Final HPWL" log.txt |  awk '{print $3}')
 golden_hpwl=$(grep "Final HPWL" golden.txt |  awk '{print $3}')

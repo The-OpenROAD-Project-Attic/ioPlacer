@@ -10,7 +10,7 @@ binary=$1
 wget -q http://www.ispd.cc/contests/18/ispd18_test1.tgz 
 tar -xvzf ispd18_test1.tgz > log.txt
 
-$binary -c < ioPlacer.tcl >> log.txt
+$binary -c 1 < ioPlacer.tcl >> log.txt
 
 grep "> Design without pins. IOPlacer will exit..." log.txt >> grep_log.txt
 
