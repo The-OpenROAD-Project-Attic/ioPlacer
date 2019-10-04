@@ -1,1 +1,1 @@
-docker run -v $(pwd):/ioplacer ioplacer bash -c "echo Tests are not ready yet!"
+docker run -v $(pwd):/ioplacer ioplacer bash -c "./ioplacer/jenkins/unit-test.sh"

@@ -15,6 +15,7 @@ if [ "$#" -ne 1 ]; then
 fi
 
 binary=$(readlink -f $1)
+failed=0
 
 echo " > ioPlacer binary: $binary"
 if [ ! -e $binary ] ; 
@@ -47,8 +48,14 @@ do
 		echo "     - Test return YELLOW (passed)"
 	else
 		echo "     - Test returned RED (failed)"
+		failed=1
 	fi
 done
 
 echo ""
 echo "ioPlacer tests finished!"
+
+if [ $failed -gt 0 ]
+then
+	exit 1
+fi
