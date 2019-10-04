@@ -67,12 +67,10 @@ void IOPlacementKernel::initNetlistAndCore() {
                 std::exit(1);
         }
 
-        std::string metal = _parser->getMetalWrittenStyle();
+        std::vector<std::string> metals = _parser->getLayerNames();
 
-        _horizontalMetalLayer =
-            metal + std::to_string(_parms->getHorizontalMetalLayer());
-        _verticalMetalLayer =
-            metal + std::to_string(_parms->getVerticalMetalLayer());
+        _horizontalMetalLayer = metals[_parms->getHorizontalMetalLayer() - 1];
+        _verticalMetalLayer = metals[_parms->getVerticalMetalLayer() - 1];
 
         if (_parms->getBlockagesFile().size() != 0) {
                 _blockagesFile = _parms->getBlockagesFile();

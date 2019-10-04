@@ -111,7 +111,7 @@ class Parser {
         void getBlockages(std::string,
                           std::vector<std::pair<Coordinate, Coordinate>>&);
         bool isDesignPlaced();
-        std::string getMetalWrittenStyle();
+        std::vector<std::string> getLayerNames();
         bool verifyRequiredData();
 };
 

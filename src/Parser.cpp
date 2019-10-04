@@ -162,7 +162,7 @@ void Parser::initNetlist() {
 
         if (_netlist.numIOPins() < 1 ) {
                 std::cout << " > Design without pins. IOPlacer will exit...\n";
-                std::exit(0);
+                std::exit(-1);
         }
 }
 
@@ -292,20 +292,15 @@ bool Parser::isDesignPlaced() {
         return true;
 }
 
-std::string Parser::getMetalWrittenStyle() {
-        std::string metal;
-        int hLayer = _parms.getHorizontalMetalLayer();
-        std::string horizontalLayer = std::to_string(hLayer);
-        for (TrackDscp track : _defDscp._clsTracks) {
-                metal = track._layers[0];
-                if (metal.back() == horizontalLayer.back() &&
-                   (metal[0] == 'm' || metal[0] == 'M')) {
-                        break;
+std::vector<std::string> Parser::getLayerNames() {
+        std::vector<std::string> layers;
+        for (LefLayerDscp layer : _lefDscp._clsLefLayerDscps) {
+                if (layer._clsType == "ROUTING") {
+                        std::cout << layer._clsName << "\n";
+                        layers.push_back(layer._clsName);
                 }
         }
-
-        metal.pop_back();
-        return metal;
+        return layers;
 }
 
 bool Parser::verifyRequiredData() {
