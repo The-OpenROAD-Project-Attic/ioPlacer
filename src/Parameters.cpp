@@ -46,7 +46,7 @@ Parameters::Parameters(int argc, char** argv) {
         po::options_description dscp("Usage");
         // clang-format off
         dscp.add_options()
-                ("interactive,c"        ,  "Enables interactive mode")
+                ("interactive,c"        , po::value<std::string>()     ,  "Enables interactive mode")
                 ("input-lef,l"          , po::value<std::string>()     , "Input LEF file (mandatory)")
                 ("input-def,d"          , po::value<std::string>()     , "Input DEF file (mandatory)")
                 ("output,o"             , po::value<std::string>()     , "Output DEF file (mandatory)")
@@ -134,7 +134,7 @@ Parameters::Parameters(int argc, char** argv) {
                         _interactiveMode = vm.count("interactive");
                 }
                 if (vm.count("num-threads")) {
-                        _interactiveMode = vm.count("num-threads");
+                        _numThreads = vm.count("num-threads");
                 }
                 if (vm.count("rand-seed")) {
                         _randSeed = vm["rand-seed"].as<int>();
