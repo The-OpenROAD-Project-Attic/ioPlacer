@@ -56,7 +56,8 @@ void IOPlacementKernel::initNetlistAndCore() {
                 std::exit(1);
         }
 
-        _parser->initData();
+        _dbWrapper.populateIOPlacer();
+        //_parser->initData();
 
         std::cout << " > Verifying required data\n";
         if (!_parser->verifyRequiredData()) {
@@ -116,7 +117,10 @@ void IOPlacementKernel::initParms() {
 }
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms)
-    : _parms(&parms), _parser(new Parser(*_parms, _netlist, _core)) {}
+    : _parms(&parms), _parser(new Parser(*_parms, _netlist, _core)),
+      _dbWrapper(_netlist, _core, parms) {
+}
+
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
@@ -495,28 +499,28 @@ inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
 
         if (x == lowerXBound) {
                 if (y == upperYBound) {
-                        pin.setOrientation(Orientation::SOUTH);
+                        pin.setOrientation(Orientation::ORIENT_SOUTH);
                         return;
                 } else {
-                        pin.setOrientation(Orientation::EAST);
+                        pin.setOrientation(Orientation::ORIENT_EAST);
                         return;
                 }
         }
         if (x == upperXBound) {
                 if (y == lowerYBound) {
-                        pin.setOrientation(Orientation::NORTH);
+                        pin.setOrientation(Orientation::ORIENT_NORTH);
                         return;
                 } else {
-                        pin.setOrientation(Orientation::WEST);
+                        pin.setOrientation(Orientation::ORIENT_WEST);
                         return;
                 }
         }
         if (y == lowerYBound) {
-                pin.setOrientation(Orientation::NORTH);
+                pin.setOrientation(Orientation::ORIENT_NORTH);
                 return;
         }
         if (y == upperYBound) {
-                pin.setOrientation(Orientation::SOUTH);
+                pin.setOrientation(Orientation::ORIENT_SOUTH);
                 return;
         }
 }
@@ -529,22 +533,29 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
         DBU upperXBound = _core.getUpperBound().getX();
         DBU upperYBound = _core.getUpperBound().getY();
 
-        if (x == lowerXBound || x == upperXBound) {
+        if (pin.getOrientation() == Orientation::ORIENT_NORTH || 
+            pin.getOrientation() == Orientation::ORIENT_SOUTH) {
                 DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0));
                 DBU height =
                     _core.getMinAreaX() != 0.0
                         ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
                         : 2 * halfWidth;
-                pin.setLowerBound(-1 * halfWidth, 0);
-                pin.setUpperBound(halfWidth, height);
                 if (_parms->getVerticalLength() != -1) {
                         height = _parms->getVerticalLength() *
                                  _core.getDatabaseUnit();
-                        pin.setUpperBound(halfWidth, height);
+                }
+        
+                if (pin.getOrientation() == Orientation::ORIENT_NORTH) {
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setUpperBound(pin.getX() + halfWidth, pin.getY() + height);
+                } else {
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setUpperBound(pin.getX() + halfWidth, pin.getY() - height);
                 }
         }
 
-        if (y == lowerYBound || y == upperYBound) {
+        if (pin.getOrientation() == Orientation::ORIENT_WEST || 
+            pin.getOrientation() == Orientation::ORIENT_EAST) {
                 DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0));
                 DBU height = 0;
                 if (_core.getMinAreaY() != 0.0) {
@@ -552,12 +563,17 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 } else {
                         height = 2.0 * halfWidth;
                 }
-                pin.setLowerBound(-1 * halfWidth, 0);
-                pin.setUpperBound(halfWidth, height);
                 if (_parms->getHorizontalLength() != -1) {
                         height = _parms->getHorizontalLength() *
                                  _core.getDatabaseUnit();
-                        pin.setUpperBound(halfWidth, height);
+                }
+                
+                if (pin.getOrientation() == Orientation::ORIENT_EAST) {
+                        pin.setLowerBound(pin.getX(), pin.getY() - halfWidth);
+                        pin.setUpperBound(pin.getX() + height, pin.getY() + halfWidth);
+                } else {
+                        pin.setLowerBound(pin.getX() - height, pin.getY() - halfWidth);
+                        pin.setUpperBound(pin.getX(), pin.getY() + halfWidth);
                 }
         }
 }
@@ -669,13 +685,11 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL after  ioPlacer: " << totalHPWL << "\n";
                 std::cout << "***HPWL delta  ioPlacer: " << deltaHPWL << "\n";
         }
+
+        _dbWrapper.commitIOPlacementToDB(_assignment);
         std::cout << " > IO placement done.\n";
 }
 
-void IOPlacementKernel::getResults() {
-        WriterIOPins writer(_netlistIOPins, _assignment, _horizontalMetalLayer,
-                            _verticalMetalLayer, _parms->getInputDefFile(),
-                            _parms->getOutputDefFile());
-
-        writer.run();
+void IOPlacementKernel::writeDEF() {
+       _dbWrapper.writeDEF(); 
 }

@@ -132,11 +132,11 @@ void Parser::readConnections() {
 void Parser::initNetlist() {
         for (unsigned i = 0; i < _ioPins.size(); ++i) {
                 ioPin& io = _ioPins[i];
-                Direction dir = IN;
+                Direction dir = DIR_IN;
                 if (io.direction == "OUTPUT") {
-                        dir = OUT;
+                        dir = DIR_OUT;
                 } else if (io.direction == "INOUT") {
-                        dir = INOUT;
+                        dir = DIR_INOUT;
                 }
 
                 Coordinate lowerBound(_ioPins[i].bounds.min_corner().x(),
@@ -150,12 +150,16 @@ void Parser::initNetlist() {
 
                 IOPin ioPin(io.name, pos, dir, lowerBound, upperBound, netName,
                         io.locationType);
+                std::cout << "Pin: " << io.name << " pos: " << pos.getX() << " " << pos.getY() <<
+                             " net: " << netName << " iotype: " << io.locationType << "\n";
+
                 std::vector<InstancePin> instPins;
                 for (unsigned j = 0; j < io.connections.size(); ++j) {
                         cellPin& cellPin = io.connections[j];
                         instPins.push_back(InstancePin(
                             cellPin.name, Coordinate(cellPin.position.x(),
                                                      cellPin.position.y())));
+                        std::cout << "\t Inst name: " << cellPin.name << " cellPinPos " << cellPin.position.x() << " " << cellPin.position.y() << "\n";
                 }
                 _netlist.addIONet(ioPin, instPins);
         }
@@ -232,6 +236,18 @@ void Parser::initCore() {
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
+
+        std::cout << "lowerBound: " << lowerBound.getX() << " " << lowerBound.getY() << "\n";
+        std::cout << "upperBound: " << upperBound.getX() << " " << upperBound.getY() << "\n";
+        std::cout << "minSpacingX: " << minSpacingX << "\n";
+        std::cout << "minSpacingY: " << minSpacingY << "\n";
+        std::cout << "initTrackX: " << initTrackX << "\n";
+        std::cout << "initTrackY: " << initTrackY << "\n";
+        std::cout << "minAreaX: " << minAreaX << "\n";
+        std::cout << "minAreaY: " << minAreaY << "\n";
+        std::cout << "minWidthX: " << minWidthX << "\n";
+        std::cout << "minWidthY: " << minWidthY << "\n";
+        std::cout << "databaseUnit: " << databaseUnit << "\n";
 }
 
 void Parser::initMapIOtoNet() {

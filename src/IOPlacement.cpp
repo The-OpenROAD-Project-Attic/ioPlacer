@@ -111,11 +111,11 @@ void IOPlacement::addBlockage(point initialPos, point finalPos) {
 void IOPlacement::initNetlist() {
         for (unsigned i = 0; i < _ioPins.size(); ++i) {
                 ioPin& io = _ioPins[i];
-                Direction dir = IN;
+                Direction dir = DIR_IN;
                 if (io.direction == "OUTPUT") {
-                        dir = OUT;
+                        dir = DIR_OUT;
                 } else if (io.direction == "INOUT") {
-                        dir = INOUT;
+                        dir = DIR_INOUT;
                 }
 
                 Coordinate lowerBound(_ioPins[i].bounds.min_corner().x(),
@@ -143,9 +143,9 @@ void IOPlacement::initNetlist() {
 }
 
 char IOPlacement::getOrientationString(int orient) {
-        if (orient == SOUTH) return 'S';
-        if (orient == NORTH) return 'N';
-        if (orient == EAST) return 'E';
+        if (orient == ORIENT_SOUTH) return 'S';
+        if (orient == ORIENT_NORTH) return 'N';
+        if (orient == ORIENT_EAST) return 'E';
         return 'W';
 }
 

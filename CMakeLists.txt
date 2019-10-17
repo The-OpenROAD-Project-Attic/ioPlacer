@@ -42,6 +42,8 @@ set(BIN_NAME "ioPlacer")
 message(STATUS "ioPlacer")
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(OPENDB_HOME "${PROJECT_SOURCE_DIR}/third_party/OpenDB")
+
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
         message( "INFO: DEBUG BUILD" )
@@ -65,13 +67,16 @@ add_subdirectory(third_party/lef)
 add_subdirectory(third_party/def)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+#set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+set(CMAKE_CXX_FLAGS "-fopenmp")
 set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
 # Finds tcl
 include(FindTCL.cmake)
+
+find_package(ZLIB REQUIRED)
 
 # Loads swig and generates the tcl wrapper file
 find_package(SWIG REQUIRED)
@@ -107,9 +112,38 @@ target_include_directories(${BIN_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
         )
 
+include_directories(${ZLIB_INCLUDE_DIRS})
+target_link_libraries(${BIN_NAME} ${ZLIB_LIBRARIES})
+
+include_directories(
+          ${OPENDB_HOME}/zrouter/src/include
+          ${OPENDB_HOME}/zrouter/src/lefin
+          ${OPENDB_HOME}/zrouter/src/defin
+          ${OPENDB_HOME}/zrouter/src/defout
+          )
+
 target_link_libraries(${BIN_NAME}
         def
         lef
+        rt
         ${Boost_LIBRARIES}
         ${TCL_LIB}
+        ${OPENDB_HOME}/zrouter/src/main/libzroutemain.a
+        ${OPENDB_HOME}/zrouter/src/lefin/liblefin.a
+        ${OPENDB_HOME}/zrouter/src/db/WireConn/libdb_conn.a
+        ${OPENDB_HOME}/zrouter/src/db/db_tcl/libdb_tcl.a
+        ${OPENDB_HOME}/zrouter/src/db/libdb.a
+        ${OPENDB_HOME}/zrouter/src/ModuleTemplate/libTEMPLATE.a
+        ${OPENDB_HOME}/zrouter/src/ModuleTemplate/TMP_tcl/libTMP_tcl.a
+        ${OPENDB_HOME}/zrouter/src/defout/libdefout.a
+        ${OPENDB_HOME}/zrouter/src/sylib/libsylib.a
+        ${OPENDB_HOME}/zrouter/src/tm/libtm.a
+        ${OPENDB_HOME}/zrouter/src/lefout/liblefout.a
+        ${OPENDB_HOME}/zrouter/src/sver/libsver.a
+        ${OPENDB_HOME}/zrouter/src/zutil/libzutil.a
+        ${OPENDB_HOME}/zrouter/src/cdslef56/lef/liblef.a
+        ${OPENDB_HOME}/zrouter/src/defin/libdefin.a
+        ${OPENDB_HOME}/zrouter/src/zlib/libzlib.a
+        ${OPENDB_HOME}/zrouter/src/SHAPES/PDN_tcl/libPDN_tcl.a
+        ${OPENDB_HOME}/zrouter/src/SHAPES/libSHAPES.a
         )

@@ -45,6 +45,7 @@
 #include "Parameters.h"
 #include "Slots.h"
 #include "Parser.h"
+#include "DBWrapper.h"
 
 enum RandomMode { None, Full, Even, Group };
 
@@ -69,6 +70,7 @@ class IOPlacementKernel {
         std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
 
        private:
+        DBWrapper _dbWrapper;
         Parameters* _parms;
         Netlist _netlistIOPins;
         slotVector_t _slots;
@@ -96,10 +98,10 @@ class IOPlacementKernel {
         IOPlacementKernel(Parameters&);
         IOPlacementKernel() = default;
         void run();
-        void getResults();
+        void writeDEF();
         void printConfig();
-        void parseLef(const std::string& file) { _parser->parseLef(file); }
-        void parseDef(const std::string& file) { _parser->parseDef(file); }
+        void parseLef(const std::string& file) { _parser->parseLef(file); _dbWrapper.parseLEF(file); }
+        void parseDef(const std::string& file) { _parser->parseDef(file); _dbWrapper.parseDEF(file); }
         DBU returnIONetsHPWL();
 };
 

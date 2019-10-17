@@ -46,7 +46,7 @@ Parameters::Parameters(int argc, char** argv) {
         po::options_description dscp("Usage");
         // clang-format off
         dscp.add_options()
-                ("interactive,c"        , po::value<int>()             ,  "Enables interactive mode")
+                ("interactive,c"        , po::value<bool>()             ,  "Enables interactive mode")
                 ("input-lef,l"          , po::value<std::string>()     , "Input LEF file (mandatory)")
                 ("input-def,d"          , po::value<std::string>()     , "Input DEF file (mandatory)")
                 ("output,o"             , po::value<std::string>()     , "Output DEF file (mandatory)")

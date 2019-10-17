@@ -35,58 +35,45 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <iostream>
-#include <chrono>
-#include <ctime>
-#include <tcl.h>
 
+#ifndef DBWRAPPER_h
+#define DBWRAPPER_h
+
+#include <string>
+#include "Netlist.h"
 #include "Parameters.h"
-#include "IOPlacementKernel.h"
+#include "Core.h"
 
-extern "C" {
-        extern int Ioplacer_Init(Tcl_Interp *interp);
+// Forward declaration protects IOPlacer code from any
+// header file from the DB. IOPlacer code keeps independent.
+namespace ads{
+class dbDatabase;
+class dbChip;
+class dbTechLayer;
 }
 
-int tclAppInit(Tcl_Interp *interp) {
-        std::cout << " > Running ioPlacer in interactive mode.\n";
+class DBWrapper {
+public:
+        DBWrapper() = default;
+        DBWrapper(Netlist& netlist, Core& core, Parameters& parms);
 
-        Tcl_Init(interp);
-        Ioplacer_Init(interp);
+        void parseLEF(const std::string &filename);
+        void parseDEF(const std::string &filename);
+        
+        void populateIOPlacer();
+        void commitIOPlacementToDB(std::vector<IOPin>& assignment);
+        void writeDEF();
+private:
+        void initCore();
+        void initNetlist();
+        void initTracks();
 
-        return TCL_OK;
-}
+        ads::dbDatabase *_db;
+        ads::dbChip     *_chip;
+        Netlist         *_netlist = nullptr;
+        Core            *_core = nullptr;
+        Parameters      *_parms = nullptr;
+        bool            _verbose = true;
+};
 
-Parameters* parmsToIOPlacer = nullptr;
-IOPlacementKernel* ioPlacerKernel = nullptr;
-
-int main(int argc, char** argv) {
-        std::cout << " ######################################\n";
-        std::cout << " #      OpenROAD IO placement tool    #\n";
-        std::cout << " #                                    #\n";
-        std::cout << " # Authors:                           #\n";
-        std::cout << " #    Vitor Bandeira (UFRGS)          #\n";
-        std::cout << " #    Mateus Fogaca (UFRGS)           #\n";
-        std::cout << " #    Eder Matheus Monteiro (UFRGS)   #\n";
-        std::cout << " #    Isadora Oliveira (UFRGS)        #\n";
-        std::cout << " #                                    #\n";
-        std::cout << " #  Advisor:                          #\n";
-        std::cout << " #    Ricardo Reis (UFRGS)            #\n";
-        std::cout << " ######################################\n";
-        std::cout << "\n";
-
-        std::time_t date = std::chrono::system_clock::to_time_t(
-            std::chrono::system_clock::now());
-        std::cout << " > Current time: " << std::ctime(&date);
-
-        parmsToIOPlacer = new Parameters(argc, argv);
-        ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
-
-        if (parmsToIOPlacer->isInteractiveMode()) {
-                Tcl_Main(argc, argv, tclAppInit);
-        } else {
-                ioPlacerKernel->run();
-                ioPlacerKernel->writeDEF();
-        }
-
-        return 0;
-}
+#endif

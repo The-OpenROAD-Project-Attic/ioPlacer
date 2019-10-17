@@ -172,7 +172,7 @@ int compute_io_nets_hpwl(){
 
 void export_def(const char* file){
         parmsToIOPlacer->setOutputDefFile(file);
-        ioPlacerKernel->getResults();
+        ioPlacerKernel->writeDEF();
 }
 
 void set_num_threads(int numThreads){;
