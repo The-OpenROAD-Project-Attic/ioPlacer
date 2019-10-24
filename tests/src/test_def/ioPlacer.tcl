@@ -1,5 +1,5 @@
-import_lef ispd18_test2.input.lef
-import_def ispd18_test2.input.def
+import_lef input.lef
+import_def input.def
 
 set_hor_metal_layer 2
 set_ver_metal_layer 3

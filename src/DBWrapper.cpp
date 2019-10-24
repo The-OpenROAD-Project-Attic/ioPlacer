@@ -126,6 +126,12 @@ void DBWrapper::initNetlist() {
         }
 
         ads::dbSet<ads::dbBTerm> bterms = block->getBTerms();
+
+        if(bterms.size() == 0) {
+                std::cout << "[ERROR] Design without pins. Exiting...\n";
+                std::exit(1);
+        }
+
         ads::dbSet<ads::dbBTerm>::iterator btIter;
         
         for(btIter = bterms.begin(); btIter != bterms.end(); ++btIter) {
