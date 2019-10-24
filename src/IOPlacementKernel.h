@@ -100,8 +100,8 @@ class IOPlacementKernel {
         void run();
         void writeDEF();
         void printConfig();
-        void parseLef(const std::string& file) { _parser->parseLef(file); _dbWrapper.parseLEF(file); }
-        void parseDef(const std::string& file) { _parser->parseDef(file); _dbWrapper.parseDEF(file); }
+        void parseLef(const std::string& file) { _dbWrapper.parseLEF(file); }
+        void parseDef(const std::string& file) { _dbWrapper.parseDEF(file); }
         DBU returnIONetsHPWL();
 };
 

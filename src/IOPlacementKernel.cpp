@@ -45,43 +45,17 @@
 
 void IOPlacementKernel::initNetlistAndCore() {
         if (!_parms->isInteractiveMode()) {
-                _parser->parseLef(_parms->getInputLefFile());
-                _parser->parseDef(_parms->getInputDefFile());
-        }
-
-        if (!_parser->hasDb()) {
-                std::cout << " > Error! There is no DB in ioPlacer.\n";
-                std::cout << "   Have you imported lef and def using\n";
-                std::cout << "   import_lef and import_def commands?\n";
-                std::exit(1);
+                _dbWrapper.parseLEF(_parms->getInputLefFile()); 
+                _dbWrapper.parseDEF(_parms->getInputDefFile()); 
         }
 
         _dbWrapper.populateIOPlacer();
-        //_parser->initData();
-
-        std::cout << " > Verifying required data\n";
-        if (!_parser->verifyRequiredData()) {
-                std::cout << "*********************************************\n";
-                std::cout << "Required data is not provided by current DEF!\n";
-                std::cout << " Check if DEF have tracks and components\n";
-                std::cout << "*********************************************\n";
-                std::exit(1);
-        }
-
-        std::vector<std::string> metals = _parser->getLayerNames();
-
-        _horizontalMetalLayer = metals[_parms->getHorizontalMetalLayer() - 1];
-        _verticalMetalLayer = metals[_parms->getVerticalMetalLayer() - 1];
 
         if (_parms->getBlockagesFile().size() != 0) {
                 _blockagesFile = _parms->getBlockagesFile();
                 _parser->getBlockages(_blockagesFile, _blockagesArea);
         }
-
-        if (!_parser->isDesignPlaced()) {
-                _cellsPlaced = false;
-        }
-
+        
         delete _parser;  // parser is not necessary anymore
 }
 

@@ -236,18 +236,6 @@ void Parser::initCore() {
         _core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
-
-        std::cout << "lowerBound: " << lowerBound.getX() << " " << lowerBound.getY() << "\n";
-        std::cout << "upperBound: " << upperBound.getX() << " " << upperBound.getY() << "\n";
-        std::cout << "minSpacingX: " << minSpacingX << "\n";
-        std::cout << "minSpacingY: " << minSpacingY << "\n";
-        std::cout << "initTrackX: " << initTrackX << "\n";
-        std::cout << "initTrackY: " << initTrackY << "\n";
-        std::cout << "minAreaX: " << minAreaX << "\n";
-        std::cout << "minAreaY: " << minAreaY << "\n";
-        std::cout << "minWidthX: " << minWidthX << "\n";
-        std::cout << "minWidthY: " << minWidthY << "\n";
-        std::cout << "databaseUnit: " << databaseUnit << "\n";
 }
 
 void Parser::initMapIOtoNet() {

@@ -73,7 +73,7 @@ private:
         Netlist         *_netlist = nullptr;
         Core            *_core = nullptr;
         Parameters      *_parms = nullptr;
-        bool            _verbose = true;
+        bool            _verbose = false;
 };
 
 #endif
