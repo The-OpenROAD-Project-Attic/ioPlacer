@@ -43,6 +43,9 @@ message(STATUS "ioPlacer")
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
 set(OPENDB_HOME "${PROJECT_SOURCE_DIR}/third_party/OpenDB")
+set(BUILD_PYTHON 0)
+set(BUILD_TCL 0)
+add_subdirectory(${OPENDB_HOME})
 
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
@@ -112,15 +115,7 @@ target_include_directories(${BIN_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
         )
 
-include_directories(${ZLIB_INCLUDE_DIRS})
-target_link_libraries(${BIN_NAME} ${ZLIB_LIBRARIES})
-
-include_directories(
-          ${OPENDB_HOME}/zrouter/src/include
-          ${OPENDB_HOME}/zrouter/src/lefin
-          ${OPENDB_HOME}/zrouter/src/defin
-          ${OPENDB_HOME}/zrouter/src/defout
-          )
+include_directories(${opendb_home}/include/opendb) 
 
 target_link_libraries(${BIN_NAME}
         def
@@ -128,22 +123,8 @@ target_link_libraries(${BIN_NAME}
         rt
         ${Boost_LIBRARIES}
         ${TCL_LIB}
-        ${OPENDB_HOME}/zrouter/src/main/libzroutemain.a
-        ${OPENDB_HOME}/zrouter/src/lefin/liblefin.a
-        ${OPENDB_HOME}/zrouter/src/db/WireConn/libdb_conn.a
-        ${OPENDB_HOME}/zrouter/src/db/db_tcl/libdb_tcl.a
-        ${OPENDB_HOME}/zrouter/src/db/libdb.a
-        ${OPENDB_HOME}/zrouter/src/ModuleTemplate/libTEMPLATE.a
-        ${OPENDB_HOME}/zrouter/src/ModuleTemplate/TMP_tcl/libTMP_tcl.a
-        ${OPENDB_HOME}/zrouter/src/defout/libdefout.a
-        ${OPENDB_HOME}/zrouter/src/sylib/libsylib.a
-        ${OPENDB_HOME}/zrouter/src/tm/libtm.a
-        ${OPENDB_HOME}/zrouter/src/lefout/liblefout.a
-        ${OPENDB_HOME}/zrouter/src/sver/libsver.a
-        ${OPENDB_HOME}/zrouter/src/zutil/libzutil.a
-        ${OPENDB_HOME}/zrouter/src/cdslef56/lef/liblef.a
-        ${OPENDB_HOME}/zrouter/src/defin/libdefin.a
-        ${OPENDB_HOME}/zrouter/src/zlib/libzlib.a
-        ${OPENDB_HOME}/zrouter/src/SHAPES/PDN_tcl/libPDN_tcl.a
-        ${OPENDB_HOME}/zrouter/src/SHAPES/libSHAPES.a
+        opendb
+        lefin
         )
+                      
+                      

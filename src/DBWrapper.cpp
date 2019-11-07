@@ -12,20 +12,20 @@
 
 DBWrapper::DBWrapper(Netlist& netlist, Core& core, Parameters& parms) : 
                 _netlist(&netlist), _core(&core), _parms(&parms) {
-        _db = ads::dbDatabase::create();
+        _db = odb::dbDatabase::create();
 }
 
 void DBWrapper::parseLEF(const std::string &filename) {
-        ads::lefin lefReader(_db, false);
+        odb::lefin lefReader(_db, false);
         lefReader.createTechAndLib("testlib", filename.c_str());
 }
 
 void DBWrapper::parseDEF(const std::string &filename) {
-        ads::defin defReader(_db);
+        odb::defin defReader(_db);
 
-        std::vector<ads::dbLib *> searchLibs;
-        ads::dbSet<ads::dbLib> libs = _db->getLibs();
-        ads::dbSet<ads::dbLib>::iterator itr;
+        std::vector<odb::dbLib *> searchLibs;
+        odb::dbSet<odb::dbLib> libs = _db->getLibs();
+        odb::dbSet<odb::dbLib>::iterator itr;
         for(itr = libs.begin(); itr != libs.end(); ++itr) {
                 searchLibs.push_back(*itr);
         }
@@ -40,21 +40,21 @@ void DBWrapper::populateIOPlacer() {
 
 
 void DBWrapper::initCore() {
-        ads::dbTech* tech = _db->getTech();
+        odb::dbTech* tech = _db->getTech();
         if (!tech) {
-                std::cout << "[ERROR] ads::dbTech not initialized! Exiting...\n";
+                std::cout << "[ERROR] odb::dbTech not initialized! Exiting...\n";
                 std::exit(1);
         }
 
         int databaseUnit = tech->getLefUnits(); 
 
-        ads::dbBlock* block = _chip->getBlock();
+        odb::dbBlock* block = _chip->getBlock();
         if (!block) {
-                std::cout << "[ERROR] ads::dbBlock not found! Exiting...\n";
+                std::cout << "[ERROR] odb::dbBlock not found! Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbBox* coreBBox = block->getBBox();
+        odb::dbBox* coreBBox = block->getBBox();
 
         Coordinate lowerBound(coreBBox->xMin(), coreBBox->yMin());
         Coordinate upperBound(coreBBox->xMax(), coreBBox->yMax());
@@ -62,20 +62,20 @@ void DBWrapper::initCore() {
         int horLayerIdx = _parms->getHorizontalMetalLayer();
         int verLayerIdx = _parms->getVerticalMetalLayer();
 
-        ads::dbTechLayer* horLayer = tech->findRoutingLayer(horLayerIdx);
+        odb::dbTechLayer* horLayer = tech->findRoutingLayer(horLayerIdx);
         if (!horLayer) {
                 std::cout << "[ERROR] Layer" << horLayerIdx << " not found! Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbTechLayer* verLayer = tech->findRoutingLayer(verLayerIdx);
+        odb::dbTechLayer* verLayer = tech->findRoutingLayer(verLayerIdx);
         if (!horLayer) {
                 std::cout << "[ERROR] Layer" << verLayerIdx << " not found! Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbTrackGrid* horTrackGrid = block->findTrackGrid( horLayer );        
-        ads::dbTrackGrid* verTrackGrid = block->findTrackGrid( verLayer );
+        odb::dbTrackGrid* horTrackGrid = block->findTrackGrid( horLayer );        
+        odb::dbTrackGrid* verTrackGrid = block->findTrackGrid( verLayer );
         if (!horTrackGrid || !verTrackGrid) {
                 std::cout << "[ERROR] No track grid! Exiting...\n";
                 std::exit(1);
@@ -119,24 +119,24 @@ void DBWrapper::initCore() {
 }
 
 void DBWrapper::initNetlist() {
-        ads::dbBlock* block = _chip->getBlock();
+        odb::dbBlock* block = _chip->getBlock();
         if (!block) {
-                std::cout << "[ERROR] ads::dbBlock not found! Exiting...\n";
+                std::cout << "[ERROR] odb::dbBlock not found! Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbSet<ads::dbBTerm> bterms = block->getBTerms();
+        odb::dbSet<odb::dbBTerm> bterms = block->getBTerms();
 
         if(bterms.size() == 0) {
                 std::cout << "[ERROR] Design without pins. Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbSet<ads::dbBTerm>::iterator btIter;
+        odb::dbSet<odb::dbBTerm>::iterator btIter;
         
         for(btIter = bterms.begin(); btIter != bterms.end(); ++btIter) {
-                ads::dbBTerm* curBTerm = *btIter;
-                ads::dbNet* net =  curBTerm->getNet();
+                odb::dbBTerm* curBTerm = *btIter;
+                odb::dbNet* net =  curBTerm->getNet();
                 if (!net) {
                         std::cout << "[WARNING] Pin " << curBTerm->getConstName()
                                   << " without net!\n";
@@ -144,10 +144,10 @@ void DBWrapper::initNetlist() {
 
                 Direction dir = DIR_INOUT;
                 switch( curBTerm->getIoType() ) {
-                        case ads::dbIoType::INPUT:
+                        case odb::dbIoType::INPUT:
                                 dir = DIR_IN;
                                 break;
-                        case ads::dbIoType::OUTPUT:
+                        case odb::dbIoType::OUTPUT:
                                 dir = DIR_OUT;
                                 break;
                 }
@@ -163,11 +163,11 @@ void DBWrapper::initNetlist() {
                              "FIXED" );
 
                 std::vector<InstancePin> instPins;
-                ads::dbSet<ads::dbITerm> iterms = net->getITerms();
-                ads::dbSet<ads::dbITerm>::iterator iIter;
+                odb::dbSet<odb::dbITerm> iterms = net->getITerms();
+                odb::dbSet<odb::dbITerm>::iterator iIter;
                 for(iIter = iterms.begin(); iIter != iterms.end(); ++iIter) {
-                        ads::dbITerm* curITerm = *iIter;
-                        ads::dbInst* inst = curITerm->getInst();
+                        odb::dbITerm* curITerm = *iIter;
+                        odb::dbInst* inst = curITerm->getInst();
                         int instX = 0, instY = 0;
                         inst->getLocation(instX, instY);
                         
@@ -180,28 +180,28 @@ void DBWrapper::initNetlist() {
 }
 
 void DBWrapper::commitIOPlacementToDB(std::vector<IOPin>& assignment) {
-        ads::dbBlock* block = _chip->getBlock();
+        odb::dbBlock* block = _chip->getBlock();
         if (!block) {
-                std::cout << "[ERROR] ads::dbBlock not found! Exiting...\n";
+                std::cout << "[ERROR] odb::dbBlock not found! Exiting...\n";
                 std::exit(1);
         }
        
-        ads::dbTech* tech = _db->getTech();
+        odb::dbTech* tech = _db->getTech();
         if (!tech) {
-                std::cout << "[ERROR] ads::dbTech not initialized! Exiting...\n";
+                std::cout << "[ERROR] odb::dbTech not initialized! Exiting...\n";
                 std::exit(1);
         }
  
         int horLayerIdx = _parms->getHorizontalMetalLayer();
         int verLayerIdx = _parms->getVerticalMetalLayer();
 
-        ads::dbTechLayer* horLayer = tech->findRoutingLayer(horLayerIdx);
+        odb::dbTechLayer* horLayer = tech->findRoutingLayer(horLayerIdx);
         if (!horLayer) {
                 std::cout << "[ERROR] Layer" << horLayerIdx << " not found! Exiting...\n";
                 std::exit(1);
         }
 
-        ads::dbTechLayer* verLayer = tech->findRoutingLayer(verLayerIdx);
+        odb::dbTechLayer* verLayer = tech->findRoutingLayer(verLayerIdx);
         if (!horLayer) {
                 std::cout << "[ERROR] Layer" << verLayerIdx << " not found! Exiting...\n";
                 std::exit(1);
@@ -209,23 +209,23 @@ void DBWrapper::commitIOPlacementToDB(std::vector<IOPin>& assignment) {
 
 
         for (IOPin& pin: assignment) {
-                ads::dbBTerm* bterm = block->findBTerm(pin.getName().c_str());
-                ads::dbSet<ads::dbBPin> bpins = bterm->getBPins();
-                ads::dbSet<ads::dbBPin>::iterator bpinIter;
-                std::vector<ads::dbBPin*> allBPins;
+                odb::dbBTerm* bterm = block->findBTerm(pin.getName().c_str());
+                odb::dbSet<odb::dbBPin> bpins = bterm->getBPins();
+                odb::dbSet<odb::dbBPin>::iterator bpinIter;
+                std::vector<odb::dbBPin*> allBPins;
                 for(bpinIter = bpins.begin(); bpinIter != bpins.end(); ++bpinIter) {
-                        ads::dbBPin* curBPin = *bpinIter;
+                        odb::dbBPin* curBPin = *bpinIter;
                         allBPins.push_back(curBPin);
                 } 
                                
-                for(ads::dbBPin* bpin: allBPins) {
-                        ads::dbBPin::destroy(bpin);
+                for(odb::dbBPin* bpin: allBPins) {
+                        odb::dbBPin::destroy(bpin);
                 } 
                        
                 Coordinate lowerBound = pin.getLowerBound();
                 Coordinate upperBound = pin.getUpperBound();
 
-                ads::dbBPin* bpin = ads::dbBPin::create(bterm);
+                odb::dbBPin* bpin = odb::dbBPin::create(bterm);
                 
                 int size = upperBound.getX() - lowerBound.getX();
 
@@ -233,25 +233,25 @@ void DBWrapper::commitIOPlacementToDB(std::vector<IOPin>& assignment) {
                 int yMin = lowerBound.getY();
                 int xMax = upperBound.getX();
                 int yMax = upperBound.getY();
-                ads::dbTechLayer* layer = verLayer;
+                odb::dbTechLayer* layer = verLayer;
                 if (pin.getOrientation() == Orientation::ORIENT_EAST ||
                     pin.getOrientation() == Orientation::ORIENT_WEST) {
                         layer = horLayer;
                 }
                      
                 //std::cout << pin.getX() << "\n";
-                ads::dbBox::create(bpin, layer, xMin, yMin, xMax, yMax);
-                bpin->setPlacementStatus(ads::dbPlacementStatus::PLACED);
+                odb::dbBox::create(bpin, layer, xMin, yMin, xMax, yMax);
+                bpin->setPlacementStatus(odb::dbPlacementStatus::PLACED);
         };
 }
 
 void DBWrapper::writeDEF() {
-        ads::dbBlock* block = _chip->getBlock();
+        odb::dbBlock* block = _chip->getBlock();
         
-        ads::defout writer;
+        odb::defout writer;
         
         std::string defFileName = _parms->getOutputDefFile();
         
-        writer.setVersion( ads::defout::DEF_5_6 );
+        writer.setVersion( odb::defout::DEF_5_6 );
         writer.writeBlock( block, defFileName.c_str() );
 }

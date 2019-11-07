@@ -4,3 +4,6 @@
 [submodule "third_party/def"]
 	path = third_party/def
 	url = https://github.com/The-OpenROAD-Project/def
+[submodule "third_party/OpenDB"]
+	path = third_party/OpenDB
+	url = https://github.com/The-OpenROAD-Project/OpenDB

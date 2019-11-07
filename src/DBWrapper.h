@@ -46,7 +46,7 @@
 
 // Forward declaration protects IOPlacer code from any
 // header file from the DB. IOPlacer code keeps independent.
-namespace ads{
+namespace odb{
 class dbDatabase;
 class dbChip;
 class dbTechLayer;
@@ -68,8 +68,8 @@ private:
         void initNetlist();
         void initTracks();
 
-        ads::dbDatabase *_db;
-        ads::dbChip     *_chip;
+        odb::dbDatabase *_db;
+        odb::dbChip     *_chip;
         Netlist         *_netlist = nullptr;
         Core            *_core = nullptr;
         Parameters      *_parms = nullptr;
