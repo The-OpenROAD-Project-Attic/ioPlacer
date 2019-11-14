@@ -15,7 +15,7 @@ pins_end=$(grep -n  "PINS" result.def | cut -f1 -d: | sed -n 2p)
 
 head -n ${pins_end} result.def | tail -n $((pins_end-pins_start+1)) > new.def
 
-if cmp -s "result.def" "golden.def";
+if cmp -s "new.def" "golden.def";
 then
 	exit 0
 else
