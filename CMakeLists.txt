@@ -66,9 +66,6 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-add_subdirectory(third_party/lef)
-add_subdirectory(third_party/def)
-
 set(CMAKE_CXX_STANDARD 11)
 #set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
 set(CMAKE_CXX_FLAGS "-fopenmp")
@@ -111,15 +108,11 @@ target_include_directories(${BIN_NAME} PUBLIC
         ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
         )
 
 include_directories(${opendb_home}/include/opendb) 
 
 target_link_libraries(${BIN_NAME}
-        def
-        lef
         rt
         ${Boost_LIBRARIES}
         ${TCL_LIB}

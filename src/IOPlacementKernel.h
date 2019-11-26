@@ -44,7 +44,6 @@
 #include "Netlist.h"
 #include "Parameters.h"
 #include "Slots.h"
-#include "Parser.h"
 #include "DBWrapper.h"
 
 enum RandomMode { None, Full, Even, Group };
@@ -75,7 +74,6 @@ class IOPlacementKernel {
         Netlist _netlistIOPins;
         slotVector_t _slots;
         sectionVector_t _sections;
-        Parser* _parser = nullptr;
         std::vector<IOPin> _zeroSinkIOs;
         RandomMode _randomMode = RandomMode::Full;
         bool _cellsPlaced = true;

@@ -53,10 +53,7 @@ void IOPlacementKernel::initNetlistAndCore() {
 
         if (_parms->getBlockagesFile().size() != 0) {
                 _blockagesFile = _parms->getBlockagesFile();
-                _parser->getBlockages(_blockagesFile, _blockagesArea);
         }
-        
-        delete _parser;  // parser is not necessary anymore
 }
 
 void IOPlacementKernel::initParms() {
@@ -91,8 +88,7 @@ void IOPlacementKernel::initParms() {
 }
 
 IOPlacementKernel::IOPlacementKernel(Parameters& parms)
-    : _parms(&parms), _parser(new Parser(*_parms, _netlist, _core)),
-      _dbWrapper(_netlist, _core, parms) {
+    : _parms(&parms), _dbWrapper(_netlist, _core, parms) {
 }
 
 #endif  // STANDALONE_MODE
