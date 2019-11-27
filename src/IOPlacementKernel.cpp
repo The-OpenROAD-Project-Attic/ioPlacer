@@ -41,13 +41,11 @@
 #include "IOPlacementKernel.h"
 #include "WriterIOPins.h"
 
-#ifdef STANDALONE_MODE
-
 void IOPlacementKernel::initNetlistAndCore() {
-        if (!_parms->isInteractiveMode()) {
-                _dbWrapper.parseLEF(_parms->getInputLefFile()); 
-                _dbWrapper.parseDEF(_parms->getInputDefFile()); 
-        }
+        //if (!_parms->isInteractiveMode()) {
+        //        _dbWrapper.parseLEF(_parms->getInputLefFile()); 
+        //        _dbWrapper.parseDEF(_parms->getInputDefFile()); 
+        //}
 
         _dbWrapper.populateIOPlacer();
 
@@ -90,8 +88,6 @@ void IOPlacementKernel::initParms() {
 IOPlacementKernel::IOPlacementKernel(Parameters& parms)
     : _parms(&parms), _dbWrapper(_netlist, _core, parms) {
 }
-
-#endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
         const double seed = _parms->getRandSeed();
@@ -567,12 +563,12 @@ void IOPlacementKernel::run() {
         std::cout << " > Running IO placement\n";
 
         if (_parms->getNumThreads() > 0) {
-                omp_set_dynamic(0);
-                omp_set_num_threads(_parms->getNumThreads());
+                //omp_set_dynamic(0);
+                //omp_set_num_threads(_parms->getNumThreads());
                 std::cout << " * User defines number of threads\n";
         }
-        std::cout << " * IOPlacer is using " << omp_get_max_threads()
-                  << " threads.\n";
+        //std::cout << " * IOPlacer is using " << omp_get_max_threads()
+        //           << " threads.\n";
 
         initNetlistAndCore();
 

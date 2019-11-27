@@ -40,8 +40,8 @@
 #include "Parameters.h"
 #include "IOPlacementKernel.h"
 
-extern Parameters* parmsToIOPlacer;
-extern IOPlacementKernel* ioPlacerKernel;
+Parameters* parmsToIOPlacer = new Parameters();
+IOPlacementKernel* ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
 
 void import_lef(const char* file){
         std::cout << " > Importing LEF file \"" << file << "\"\n";

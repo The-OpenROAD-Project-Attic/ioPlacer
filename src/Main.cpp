@@ -56,8 +56,8 @@ int tclAppInit(Tcl_Interp *interp) {
         return TCL_OK;
 }
 
-Parameters* parmsToIOPlacer = nullptr;
-IOPlacementKernel* ioPlacerKernel = nullptr;
+extern Parameters* parmsToIOPlacer;
+extern IOPlacementKernel* ioPlacerKernel;
 
 int main(int argc, char** argv) {
         std::cout << " ######################################\n";

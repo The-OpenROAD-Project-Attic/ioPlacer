@@ -67,11 +67,11 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
-#set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
-set(CMAKE_CXX_FLAGS "-fopenmp")
 set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+
+find_package(OpenMP REQUIRED)
 
 # Finds tcl
 include(FindTCL.cmake)
@@ -90,17 +90,7 @@ add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/Tc
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
 
-if(DEFINED ENV{TYPE_CALL})
-        message("-- Will generate lib")
-        list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/Main.cpp)
-        list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/DEFParser.cpp)
-        add_definitions(-DLIBRARY_MODE)
-        add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES})
-else()
-        message("-- Will generate binary")
-        add_definitions(-DSTANDALONE_MODE)
-        add_executable(${BIN_NAME} ${SRC_FILES})
-endif()
+add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES})
 
 add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
@@ -113,11 +103,11 @@ target_include_directories(${BIN_NAME} PUBLIC
 include_directories(${opendb_home}/include/opendb) 
 
 target_link_libraries(${BIN_NAME}
-        rt
         ${Boost_LIBRARIES}
         ${TCL_LIB}
         opendb
         lefin
-        )
+	OpenMP::OpenMP_CXX
+	)
                       
                       
