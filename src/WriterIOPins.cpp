@@ -72,7 +72,7 @@ bool WriterIOPins::writeFile() {
         defFile.open(_inFileName);
 
         if (!defFile.is_open()) {
-                std::cout << "DEF file could not been open\n";
+                std::cout << "DEF file \"" << _inFileName << "\" could not been open\n";
                 std::exit(-1);
         }
 
@@ -106,21 +106,21 @@ bool WriterIOPins::writeFile() {
                                 Coordinate lowerBound = ioPin.getLowerBound();
                                 Coordinate upperBound = ioPin.getUpperBound();
 
-                                std::string dir = (direction == Direction::IN)
+                                std::string dir = (direction == Direction::DIR_IN)
                                                       ? "INPUT"
                                                       : "OUTPUT";
                                 std::string orient;
                                 switch (orientation) {
-                                        case Orientation::EAST:
+                                        case Orientation::ORIENT_EAST:
                                                 orient = "E";
                                                 break;
-                                        case Orientation::WEST:
+                                        case Orientation::ORIENT_WEST:
                                                 orient = "W";
                                                 break;
-                                        case Orientation::NORTH:
+                                        case Orientation::ORIENT_NORTH:
                                                 orient = "N";
                                                 break;
-                                        case Orientation::SOUTH:
+                                        case Orientation::ORIENT_SOUTH:
                                                 orient = "S";
                                                 break;
                                 }
@@ -132,8 +132,8 @@ bool WriterIOPins::writeFile() {
                                         locationType = "FIXED";
                                 }
 
-                                if (orientation == Orientation::EAST ||
-                                    orientation == Orientation::WEST) {
+                                if (orientation == Orientation::ORIENT_EAST ||
+                                    orientation == Orientation::ORIENT_WEST) {
                                         layer = _horizontalMetalLayer;
                                 } else {
                                         layer = _verticalMetalLayer;

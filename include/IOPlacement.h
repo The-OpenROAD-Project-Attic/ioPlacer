@@ -89,7 +89,7 @@ class IOPlacement {
 
         // run IOPlacement, returns a vector with all a pin name, its new
         // position and its orientation
-        std::vector<Pin_t> run(bool returnHPWL = false);
+        std::vector<Pin_t> run(bool reportHPWL = false);
 
        private:
         struct cellPin {

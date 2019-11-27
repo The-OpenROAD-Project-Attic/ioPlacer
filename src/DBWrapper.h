@@ -35,77 +35,45 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __PARSER_H_
-#define __PARSER_H_
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
+#ifndef DBWRAPPER_h
+#define DBWRAPPER_h
+
 #include <string>
-#include <cstdlib>
-#include <map>
-#include <boost/geometry/geometries/box.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-
-#include "Core.h"
 #include "Netlist.h"
 #include "Parameters.h"
-#include "Coordinate.h"
-#include "DEFDescriptor.h"
-#include "DEFParser.h"
-#include "LEFDescriptor.h"
-#include "LEFParser.h"
+#include "Core.h"
 
-class Parser {
-        typedef boost::geometry::model::d2::point_xy<DBU> point;
-        typedef boost::geometry::model::box<point> box;
+// Forward declaration protects IOPlacer code from any
+// header file from the DB. IOPlacer code keeps independent.
+namespace odb{
+class dbDatabase;
+class dbChip;
+class dbTechLayer;
+}
 
-       private:
-        struct cellPin {
-                std::string name;
-                point position;
-        };
+class DBWrapper {
+public:
+        DBWrapper() = default;
+        DBWrapper(Netlist& netlist, Core& core, Parameters& parms);
 
-        struct ioPin {
-                std::string name;
-                point position;
-                std::string netName;
-                box bounds;
-                std::string direction;
-                std::vector<cellPin> connections;
-                std::string locationType;
-        };
-
-        std::map<std::string, NetDscp> mapIOPinToNet;
-        std::map<std::string, point> mapInstToPosition;
-
-        Parameters& _parms;
-        Netlist& _netlist;
-        Core& _core;
-        box _dieArea;
-        std::vector<ioPin> _ioPins;
-        LEFParser _lefParser;
-        DEFParser _defParser;
-        LefDscp _lefDscp;
-        DefDscp _defDscp;
-
-        point getInstPosition(std::string);
-        void readDieArea();
-        void readConnections();
-        void initNetlist();
+        void parseLEF(const std::string &filename);
+        void parseDEF(const std::string &filename);
+        
+        void populateIOPlacer();
+        void commitIOPlacementToDB(std::vector<IOPin>& assignment);
+        void writeDEF();
+private:
         void initCore();
-        void initMapIOtoNet();
-        void initMapInstToPosition();
+        void initNetlist();
+        void initTracks();
 
-       public:
-        Parser(Parameters&, Netlist&, Core&);
-        void run();
-        void getBlockages(std::string,
-                          std::vector<std::pair<Coordinate, Coordinate>>&);
-        bool isDesignPlaced();
-        std::string getMetalWrittenStyle();
-        bool verifyRequiredData();
+        odb::dbDatabase *_db;
+        odb::dbChip     *_chip;
+        Netlist         *_netlist = nullptr;
+        Core            *_core = nullptr;
+        Parameters      *_parms = nullptr;
+        bool            _verbose = false;
 };
 
-#endif /* __PARSER_H_ */
+#endif

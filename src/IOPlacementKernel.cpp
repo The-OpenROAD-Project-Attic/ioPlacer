@@ -36,77 +36,65 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <random>
+#include <omp.h>
 
 #include "IOPlacementKernel.h"
 #include "WriterIOPins.h"
 
 #ifdef STANDALONE_MODE
-#include "Parser.h"
 
 void IOPlacementKernel::initNetlistAndCore() {
-        Parser parser(*_parms, _netlist, _core);
-        parser.run();
-
-        std::cout << "Verifying required data\n";
-        if (!parser.verifyRequiredData()) {
-                std::cout << "*********************************************\n";
-                std::cout << "Required data is not provided by current DEF!\n";
-                std::cout << " Check if DEF have tracks and components\n";
-                std::cout << "*********************************************\n";
-                std::exit(0);
+        if (!_parms->isInteractiveMode()) {
+                _dbWrapper.parseLEF(_parms->getInputLefFile()); 
+                _dbWrapper.parseDEF(_parms->getInputDefFile()); 
         }
 
-        std::string metal = parser.getMetalWrittenStyle();
+        _dbWrapper.populateIOPlacer();
 
-        _horizontalMetalLayer =
-            metal + std::to_string(_parms->getHorizontalMetalLayer());
-        _verticalMetalLayer =
-            metal + std::to_string(_parms->getVerticalMetalLayer());
-
-        if (_parms->returnBlockagesFile().size() != 0) {
-                _blockagesFile = _parms->returnBlockagesFile();
-                parser.getBlockages(_blockagesFile, _blockagesArea);
-        }
-
-        if (!parser.isDesignPlaced()) {
-                _cellsPlaced = false;
+        if (_parms->getBlockagesFile().size() != 0) {
+                _blockagesFile = _parms->getBlockagesFile();
         }
 }
 
-IOPlacementKernel::IOPlacementKernel(Parameters& parms) : _parms(&parms) {
-        initNetlistAndCore();
-        if (_parms->returnHPWL()) {
-                _returnHPWL = true;
+void IOPlacementKernel::initParms() {
+        if (_parms->getReportHPWL()) {
+                _reportHPWL = true;
         }
-        if (_parms->returnForceSpread()) {
+        if (_parms->getForceSpread()) {
                 _forcePinSpread = true;
         } else {
                 _forcePinSpread = false;
         }
-        if (_parms->returnNslots() > -1) {
-                _slotsPerSection = _parms->returnNslots();
+        if (_parms->getNumSlots() > -1) {
+                _slotsPerSection = _parms->getNumSlots();
         }
-        if (_parms->returnSlotsFactor() > -1) {
-                _slotsIncreaseFactor = _parms->returnSlotsFactor();
+
+        if (_parms->getSlotsFactor() > -1) {
+                _slotsIncreaseFactor = _parms->getSlotsFactor();
         }
-        if (_parms->returnUsage() > -1) {
-                _usagePerSection = _parms->returnUsage();
+        if (_parms->getUsage() > -1) {
+                _usagePerSection = _parms->getUsage();
         }
-        if (_parms->returnUsageFactor() > -1) {
-                _usageIncreaseFactor = _parms->returnUsageFactor();
+        if (_parms->getUsageFactor() > -1) {
+                _usageIncreaseFactor = _parms->getUsageFactor();
         }
-        if (_parms->returnRandomMode() > -1) {
-                _randomMode = (RandomMode)_parms->returnRandomMode();
+        if (_parms->getRandomMode() > -1) {
+                _randomMode = (RandomMode)_parms->getRandomMode();
         }
         if (_forcePinSpread && (_randomMode > 0)) {
                 std::cout << "WARNING: force pin spread option has no effect"
                           << " when using random pin placement\n";
         }
 }
+
+IOPlacementKernel::IOPlacementKernel(Parameters& parms)
+    : _parms(&parms), _dbWrapper(_netlist, _core, parms) {
+}
+
 #endif  // STANDALONE_MODE
 
 void IOPlacementKernel::randomPlacement(const RandomMode mode) {
-        const double seed = time(NULL);
+        const double seed = _parms->getRandSeed();
 
         unsigned numIOs = _netlist.numIOPins();
         unsigned numSlots = _slots.size();
@@ -233,7 +221,7 @@ void IOPlacementKernel::defineSlots() {
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
-        
+
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
         totalNumSlots += (ubY - lbY) * 2 / minDstPinsY;
@@ -385,7 +373,7 @@ bool IOPlacementKernel::assignPinsSections() {
                 std::vector<InstancePin> instPinsVector;
 #pragma omp parallel for
                 for (unsigned i = 0; i < sections.size(); i++) {
-                        dst[i] = net.computeDstIOtoPins(idx, sections[i].pos);
+                        dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
                 }
                 net.forEachSinkOfIO(idx, [&](InstancePin& instPin) {
                         instPinsVector.push_back(instPin);
@@ -407,18 +395,24 @@ bool IOPlacementKernel::assignPinsSections() {
         });
         // if forEachIOPin ends or returns/breaks goes here
         if (totalPinsAssigned == net.numIOPins()) {
+                std::cout << " > Successfully assigned I/O pins\n";
                 return true;
         } else {
+                std::cout << " > Unsuccessfully assigned I/O pins\n";
                 return false;
         }
 }
 
 void IOPlacementKernel::printConfig() {
-        std::cout << "Slots Per Section     " << _slotsPerSection << "\n";
-        std::cout << "Slots Increase Factor " << _slotsIncreaseFactor << "\n";
-        std::cout << "Usage Per Section     " << _usagePerSection << "\n";
-        std::cout << "Usage Increase Factor " << _usageIncreaseFactor << "\n";
-        std::cout << "Force Pin Spread      " << _forcePinSpread << "\n\n";
+        std::cout << " * Num of slots          " << _slots.size() << "\n";
+        std::cout << " * Num of I/O            " << _netlist.numIOPins() << "\n";
+        std::cout << " * Num of I/O w/sink     " << _netlistIOPins.numIOPins() << "\n";
+        std::cout << " * Num of I/O w/o sink   " << _zeroSinkIOs.size() << "\n";
+        std::cout << " * Slots Per Section     " << _slotsPerSection << "\n";
+        std::cout << " * Slots Increase Factor " << _slotsIncreaseFactor << "\n";
+        std::cout << " * Usage Per Section     " << _usagePerSection << "\n";
+        std::cout << " * Usage Increase Factor " << _usageIncreaseFactor << "\n";
+        std::cout << " * Force Pin Spread      " << _forcePinSpread << "\n\n";
 }
 
 void IOPlacementKernel::setupSections() {
@@ -475,28 +469,28 @@ inline void IOPlacementKernel::updateOrientation(IOPin& pin) {
 
         if (x == lowerXBound) {
                 if (y == upperYBound) {
-                        pin.setOrientation(Orientation::SOUTH);
+                        pin.setOrientation(Orientation::ORIENT_SOUTH);
                         return;
                 } else {
-                        pin.setOrientation(Orientation::EAST);
+                        pin.setOrientation(Orientation::ORIENT_EAST);
                         return;
                 }
         }
         if (x == upperXBound) {
                 if (y == lowerYBound) {
-                        pin.setOrientation(Orientation::NORTH);
+                        pin.setOrientation(Orientation::ORIENT_NORTH);
                         return;
                 } else {
-                        pin.setOrientation(Orientation::WEST);
+                        pin.setOrientation(Orientation::ORIENT_WEST);
                         return;
                 }
         }
         if (y == lowerYBound) {
-                pin.setOrientation(Orientation::NORTH);
+                pin.setOrientation(Orientation::ORIENT_NORTH);
                 return;
         }
         if (y == upperYBound) {
-                pin.setOrientation(Orientation::SOUTH);
+                pin.setOrientation(Orientation::ORIENT_SOUTH);
                 return;
         }
 }
@@ -509,22 +503,29 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
         DBU upperXBound = _core.getUpperBound().getX();
         DBU upperYBound = _core.getUpperBound().getY();
 
-        if (x == lowerXBound || x == upperXBound) {
+        if (pin.getOrientation() == Orientation::ORIENT_NORTH || 
+            pin.getOrientation() == Orientation::ORIENT_SOUTH) {
                 DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0));
                 DBU height =
                     _core.getMinAreaX() != 0.0
                         ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
                         : 2 * halfWidth;
-                pin.setLowerBound(-1 * halfWidth, 0);
-                pin.setUpperBound(halfWidth, height);
-                if (_parms->returnVerticalLength() != -1) {
-                        height = _parms->returnVerticalLength() *
+                if (_parms->getVerticalLength() != -1) {
+                        height = _parms->getVerticalLength() *
                                  _core.getDatabaseUnit();
-                        pin.setUpperBound(halfWidth, height);
+                }
+        
+                if (pin.getOrientation() == Orientation::ORIENT_NORTH) {
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setUpperBound(pin.getX() + halfWidth, pin.getY() + height);
+                } else {
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setUpperBound(pin.getX() + halfWidth, pin.getY() - height);
                 }
         }
 
-        if (y == lowerYBound || y == upperYBound) {
+        if (pin.getOrientation() == Orientation::ORIENT_WEST || 
+            pin.getOrientation() == Orientation::ORIENT_EAST) {
                 DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0));
                 DBU height = 0;
                 if (_core.getMinAreaY() != 0.0) {
@@ -532,12 +533,17 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 } else {
                         height = 2.0 * halfWidth;
                 }
-                pin.setLowerBound(-1 * halfWidth, 0);
-                pin.setUpperBound(halfWidth, height);
-                if (_parms->returnHorizontalLength() != -1) {
-                        height = _parms->returnHorizontalLength() *
+                if (_parms->getHorizontalLength() != -1) {
+                        height = _parms->getHorizontalLength() *
                                  _core.getDatabaseUnit();
-                        pin.setUpperBound(halfWidth, height);
+                }
+                
+                if (pin.getOrientation() == Orientation::ORIENT_EAST) {
+                        pin.setLowerBound(pin.getX(), pin.getY() - halfWidth);
+                        pin.setUpperBound(pin.getX() + height, pin.getY() + halfWidth);
+                } else {
+                        pin.setLowerBound(pin.getX() - height, pin.getY() - halfWidth);
+                        pin.setUpperBound(pin.getX(), pin.getY() + halfWidth);
                 }
         }
 }
@@ -553,7 +559,23 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
         return hpwl;
 }
 
+DBU IOPlacementKernel::returnIONetsHPWL() { return returnIONetsHPWL(_netlist); }
+
 void IOPlacementKernel::run() {
+        initParms();
+
+        std::cout << " > Running IO placement\n";
+
+        if (_parms->getNumThreads() > 0) {
+                omp_set_dynamic(0);
+                omp_set_num_threads(_parms->getNumThreads());
+                std::cout << " * User defines number of threads\n";
+        }
+        std::cout << " * IOPlacer is using " << omp_get_max_threads()
+                  << " threads.\n";
+
+        initNetlistAndCore();
+
         std::vector<HungarianMatching> hgVec;
         DBU initHPWL = 0;
         DBU totalHPWL = 0;
@@ -561,6 +583,8 @@ void IOPlacementKernel::run() {
 
         initIOLists();
         defineSlots();
+
+        printConfig();
 
         if (int(_slots.size()) < _netlist.numIOPins()) {
                 std::cout << "ERROR: number of pins (";
@@ -571,7 +595,7 @@ void IOPlacementKernel::run() {
                 exit(1);
         }
 
-        if (_returnHPWL) {
+        if (_reportHPWL) {
                 initHPWL = returnIONetsHPWL(_netlist);
         }
 
@@ -614,7 +638,14 @@ void IOPlacementKernel::run() {
                 updatePinArea(_assignment[i]);
         }
 
-        if (_returnHPWL) {
+        if (_assignment.size() != (unsigned)_netlist.numIOPins()) {
+                std::cout << "ERROR: assigned " << _assignment.size()
+                          << " pins out of " << _netlist.numIOPins()
+                          << " I/O pins\n";
+                exit(1);
+        }
+
+        if (_reportHPWL) {
 #pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         totalHPWL += returnIONetsHPWL(_sections[idx].net);
@@ -624,12 +655,11 @@ void IOPlacementKernel::run() {
                 std::cout << "***HPWL after  ioPlacer: " << totalHPWL << "\n";
                 std::cout << "***HPWL delta  ioPlacer: " << deltaHPWL << "\n";
         }
+
+        _dbWrapper.commitIOPlacementToDB(_assignment);
+        std::cout << " > IO placement done.\n";
 }
 
-void IOPlacementKernel::getResults() {
-        WriterIOPins writer(_netlistIOPins, _assignment, _horizontalMetalLayer,
-                            _verticalMetalLayer, _parms->getInputDefFile(),
-                            _parms->getOutputDefFile());
-
-        writer.run();
+void IOPlacementKernel::writeDEF() {
+       _dbWrapper.writeDEF(); 
 }

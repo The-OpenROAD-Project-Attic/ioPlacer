@@ -101,3 +101,6 @@ Temporary Items
 *.exe
 *.out
 *.app
+
+# Downloaded files from unit tests
+tests/src/*

@@ -1,4 +1,3 @@
-////////////////////////////////////////////////////////////////////////////////
 // Authors: Vitor Bandeira, Mateus Fogaça, Eder Matheus Monteiro e Isadora
 // Oliveira
 //          (Advisor: Ricardo Reis)
@@ -35,26 +34,44 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef DEFPARSER_H
-#define DEFPARSER_H
+%module ioplacer
+%{
+#include "TclInterface.h"
+%}
 
-#include <string>
-using std::string;
-#include <iostream>
-using std::cout;
-#include <vector>
-using std::vector;
-
-#include "DEFDescriptor.h"
-#include <cmath>
-
-class DEFParser {
-       public:
-        DEFParser();
-        void parseDEF(const std::string &filename, DefDscp &defDscp);
-        virtual ~DEFParser();
-
-        static std::string unescape(const std::string &str);
-};
-
-#endif /* DEFPARSER_H */
+void import_lef(const char* file);
+void import_def(const char* file);
+extern void  set_hor_metal_layer(int layer);
+extern int   get_hor_metal_layer();
+extern void  set_ver_metal_layer(int layer);
+extern int   get_ver_metal_layer();
+extern void  set_num_slots(int numSlots);
+extern int   get_num_slots();
+extern void  set_random_mode(int mode);
+extern int   get_random_mode();
+extern void  set_slots_factor(float factor);
+extern float get_slots_factor();
+extern void  set_force_spread(bool force);
+extern bool  get_force_spread();
+extern void  set_usage(float usage);
+extern float get_usage();
+extern void  set_usage_factor(float factor);
+extern float get_usage_factor();
+extern void  set_blockages_file(const char* file);
+extern const char* get_blockages_file();
+extern void  set_hor_length(float length);
+extern float get_hor_length();
+extern void  set_ver_length(float length);
+extern float get_ver_length();
+extern void  set_report_hpwl(bool report);
+extern bool  get_report_hpwl();
+extern void  set_interactive_mode(bool enable);
+extern bool  is_interactive_mode();
+extern void print_all_parms();
+extern void run_io_placement();
+extern int compute_io_nets_hpwl();
+extern void export_def(const char*);
+extern void  set_num_threads(int numThreads);
+extern int   get_num_threads();
+extern void   set_rand_seed(double seed);
+extern double get_rand_seed();

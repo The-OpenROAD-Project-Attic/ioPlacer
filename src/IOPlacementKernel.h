@@ -44,6 +44,7 @@
 #include "Netlist.h"
 #include "Parameters.h"
 #include "Slots.h"
+#include "DBWrapper.h"
 
 enum RandomMode { None, Full, Even, Group };
 
@@ -55,7 +56,7 @@ class IOPlacementKernel {
         std::string _horizontalMetalLayer;
         std::string _verticalMetalLayer;
         std::vector<IOPin> _assignment;
-        bool _returnHPWL = false;
+        bool _reportHPWL = false;
 
         unsigned _slotsPerSection = 200;
         float _slotsIncreaseFactor = 0.01f;
@@ -68,6 +69,7 @@ class IOPlacementKernel {
         std::vector<std::pair<Coordinate, Coordinate>> _blockagesArea;
 
        private:
+        DBWrapper _dbWrapper;
         Parameters* _parms;
         Netlist _netlistIOPins;
         slotVector_t _slots;
@@ -78,6 +80,7 @@ class IOPlacementKernel {
 
         void initNetlistAndCore();
         void initIOLists();
+        void initParms();
         void randomPlacement(const RandomMode);
         void defineSlots();
         void createSections();
@@ -93,8 +96,11 @@ class IOPlacementKernel {
         IOPlacementKernel(Parameters&);
         IOPlacementKernel() = default;
         void run();
-        void getResults();
+        void writeDEF();
         void printConfig();
+        void parseLef(const std::string& file) { _dbWrapper.parseLEF(file); }
+        void parseDef(const std::string& file) { _dbWrapper.parseDEF(file); }
+        DBU returnIONetsHPWL();
 };
 
 #endif /* __IOPLACEMENTKERNEL_H_ */

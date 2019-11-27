@@ -38,9 +38,26 @@
 #include <iostream>
 #include <chrono>
 #include <ctime>
+#include <tcl.h>
 
 #include "Parameters.h"
 #include "IOPlacementKernel.h"
+
+extern "C" {
+        extern int Ioplacer_Init(Tcl_Interp *interp);
+}
+
+int tclAppInit(Tcl_Interp *interp) {
+        std::cout << " > Running ioPlacer in interactive mode.\n";
+
+        Tcl_Init(interp);
+        Ioplacer_Init(interp);
+
+        return TCL_OK;
+}
+
+Parameters* parmsToIOPlacer = nullptr;
+IOPlacementKernel* ioPlacerKernel = nullptr;
 
 int main(int argc, char** argv) {
         std::cout << " ######################################\n";
@@ -48,7 +65,7 @@ int main(int argc, char** argv) {
         std::cout << " #                                    #\n";
         std::cout << " # Authors:                           #\n";
         std::cout << " #    Vitor Bandeira (UFRGS)          #\n";
-        std::cout << " #    Mateus Fogaça (UFRGS)           #\n";
+        std::cout << " #    Mateus Fogaca (UFRGS)           #\n";
         std::cout << " #    Eder Matheus Monteiro (UFRGS)   #\n";
         std::cout << " #    Isadora Oliveira (UFRGS)        #\n";
         std::cout << " #                                    #\n";
@@ -59,12 +76,17 @@ int main(int argc, char** argv) {
 
         std::time_t date = std::chrono::system_clock::to_time_t(
             std::chrono::system_clock::now());
-        std::cout << "Current time: " << std::ctime(&date);
+        std::cout << " > Current time: " << std::ctime(&date);
 
-        Parameters parms(argc, argv);
-        IOPlacementKernel kernel(parms);
-        kernel.run();
-        kernel.getResults();
+        parmsToIOPlacer = new Parameters(argc, argv);
+        ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
+
+        if (parmsToIOPlacer->isInteractiveMode()) {
+                Tcl_Main(argc, argv, tclAppInit);
+        } else {
+                ioPlacerKernel->run();
+                ioPlacerKernel->writeDEF();
+        }
 
         return 0;
 }

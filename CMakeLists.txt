@@ -42,6 +42,11 @@ set(BIN_NAME "ioPlacer")
 message(STATUS "ioPlacer")
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(OPENDB_HOME "${PROJECT_SOURCE_DIR}/third_party/OpenDB")
+set(BUILD_PYTHON 0)
+set(BUILD_TCL 0)
+add_subdirectory(${OPENDB_HOME})
+
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
         message( "INFO: DEBUG BUILD" )
@@ -61,16 +66,29 @@ endif()
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-add_subdirectory(third_party/lef)
-add_subdirectory(third_party/def)
-
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+#set(CMAKE_CXX_FLAGS "-Wall -Werror -O3 -fopenmp")
+set(CMAKE_CXX_FLAGS "-fopenmp")
 set(Boost_USE_STATIC_LIBS ON)
 
 find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
 
+# Finds tcl
+include(FindTCL.cmake)
+
+find_package(ZLIB REQUIRED)
+
+# Loads swig and generates the tcl wrapper file
+find_package(SWIG REQUIRED)
+add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp
+        COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMENT "Generating swig wrapper"
+)
+add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
+
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
 
 if(DEFINED ENV{TYPE_CALL})
         message("-- Will generate lib")
@@ -84,16 +102,22 @@ else()
         add_executable(${BIN_NAME} ${SRC_FILES})
 endif()
 
+add_dependencies(${BIN_NAME} tclInterfaceWrapper)
+
 target_include_directories(${BIN_NAME} PUBLIC
         ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/def
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party/lef
         )
 
+include_directories(${opendb_home}/include/opendb) 
+
 target_link_libraries(${BIN_NAME}
-        def
-        lef
+        rt
         ${Boost_LIBRARIES}
+        ${TCL_LIB}
+        opendb
+        lefin
         )
+                      
+                      
