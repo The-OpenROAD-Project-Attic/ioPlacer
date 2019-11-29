@@ -47,6 +47,8 @@
 #include "Coordinate.h"
 #include "Box.h"
 
+namespace ioPlacer {
+
 enum Orientation { ORIENT_NORTH, ORIENT_SOUTH, ORIENT_EAST, ORIENT_WEST };
 enum Direction { DIR_IN, DIR_OUT, DIR_INOUT };
 
@@ -125,4 +127,5 @@ class Netlist {
         Box getBB(unsigned, Coordinate);
 };
 
+}
 #endif /* __NETLIST_H_ */

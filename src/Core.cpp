@@ -37,6 +37,8 @@
 
 #include "Core.h"
 
+namespace ioPlacer {
+
 DBU Core::getPerimeter() {
         DBU lowerX = _lowerBound.getX();
         DBU lowerY = _lowerBound.getY();
@@ -47,4 +49,6 @@ DBU Core::getPerimeter() {
         DBU y = upperY - lowerY;
 
         return (x + y) * 2;
+}
+
 }

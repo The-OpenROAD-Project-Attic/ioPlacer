@@ -35,31 +35,31 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __BOX_H_
-#define __BOX_H_
-
-#include "Coordinate.h"
+#include "MakeIoplacer.h"
+#include "openroad/OpenRoad.hh"
+#include "Parameters.h"
+#include "IOPlacementKernel.h"
+#include "db.h"
 
 namespace ioPlacer {
-
-class Box {
-       private:
-        Coordinate _lowerBound;
-        Coordinate _upperBound;
-
-       public:
-        Box() : _lowerBound(Coordinate(0, 0)), _upperBound(Coordinate(0, 0)){};
-
-        Box(const Coordinate& lowerBound, const Coordinate& upperBound)
-            : _lowerBound(lowerBound), _upperBound(upperBound) {}
-
-        Coordinate getLowerBound() const { return _lowerBound; }
-        Coordinate getUpperBound() const { return _upperBound; }
-
-        DBU getHalfPerimeter();
-        Coordinate getMiddle();
-};
-
+extern IOPlacementKernel* ioPlacerKernel;
+extern Parameters*        parmsToIOPlacer; 
 }
 
-#endif /* __BOX_H_ */
+namespace ord {
+
+void *makeIoplacer() {
+        return ioPlacer::ioPlacerKernel;
+}
+
+void initIoplacer(OpenRoad * openroad) {
+        unsigned dbId = openroad->getDb()->getId();
+        ioPlacer::parmsToIOPlacer->setDbId(dbId);
+}
+
+void deleteIoplacer(void *ioplacer) {
+        delete ioPlacer::ioPlacerKernel;
+        delete ioPlacer::parmsToIOPlacer;
+}
+
+}

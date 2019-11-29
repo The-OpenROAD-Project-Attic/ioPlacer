@@ -40,6 +40,8 @@
 #include "Parameters.h"
 #include "IOPlacementKernel.h"
 
+namespace ioPlacer {
+
 Parameters* parmsToIOPlacer = new Parameters();
 IOPlacementKernel* ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
 
@@ -189,4 +191,6 @@ void   set_rand_seed(double seed){
 
 double get_rand_seed(){
         return parmsToIOPlacer->getRandSeed();
+}
+
 }

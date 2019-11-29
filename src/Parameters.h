@@ -42,6 +42,8 @@
 
 #include "Coordinate.h"
 
+namespace ioPlacer {
+
 class Parameters {
        private:
         int _horizontalMetalLayer = 1;
@@ -63,6 +65,7 @@ class Parameters {
         bool  _interactiveMode = false;
         int _numThreads = -1;
         double _randSeed = 42.0;
+        unsigned _dbId;        
 
        public:
         Parameters() = default;
@@ -104,7 +107,11 @@ class Parameters {
         void setRandSeed(double seed) { _randSeed = seed; }
         double getRandSeed() const { return _randSeed; }
 
+        void setDbId(unsigned idx) { _dbId = idx; }
+        unsigned getDbId() const { return _dbId; }
+
         void printAll() const;
 };
 
+}
 #endif /* __PARAMETERS_H_ */

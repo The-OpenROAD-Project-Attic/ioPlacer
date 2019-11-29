@@ -38,6 +38,8 @@
 #ifndef _TCL_INTERFACE_
 #define _TCL_INTERFACE_
 
+namespace ioPlacer {
+
 // LEF/DEF interface
 void import_lef(const char* file);
 void import_def(const char* file);
@@ -82,5 +84,6 @@ void run_io_placement();
 // Reports
 int  compute_io_nets_hpwl();
 
+}
 #endif
 

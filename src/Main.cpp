@@ -56,8 +56,10 @@ int tclAppInit(Tcl_Interp *interp) {
         return TCL_OK;
 }
 
+namespace ioPlacer {
 extern Parameters* parmsToIOPlacer;
 extern IOPlacementKernel* ioPlacerKernel;
+}
 
 int main(int argc, char** argv) {
         std::cout << " ######################################\n";
@@ -78,14 +80,14 @@ int main(int argc, char** argv) {
             std::chrono::system_clock::now());
         std::cout << " > Current time: " << std::ctime(&date);
 
-        parmsToIOPlacer = new Parameters(argc, argv);
-        ioPlacerKernel = new IOPlacementKernel(*parmsToIOPlacer);
+        ioPlacer::parmsToIOPlacer = new ioPlacer::Parameters(argc, argv);
+        ioPlacer::ioPlacerKernel = new ioPlacer::IOPlacementKernel(*ioPlacer::parmsToIOPlacer);
 
-        if (parmsToIOPlacer->isInteractiveMode()) {
+        if (ioPlacer::parmsToIOPlacer->isInteractiveMode()) {
                 Tcl_Main(argc, argv, tclAppInit);
         } else {
-                ioPlacerKernel->run();
-                ioPlacerKernel->writeDEF();
+                ioPlacer::ioPlacerKernel->run();
+                ioPlacer::ioPlacerKernel->writeDEF();
         }
 
         return 0;

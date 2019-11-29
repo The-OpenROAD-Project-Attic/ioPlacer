@@ -37,6 +37,8 @@
 
 #include "HungarianMatching.h"
 
+namespace ioPlacer { 
+
 HungarianMatching::HungarianMatching(Section_t& section, slotVector_t& slots)
     : _netlist(section.net), _slots(slots) {
         _numIOPins = _netlist.numIOPins();
@@ -101,4 +103,6 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigment) {
                 }
                 col++;
         });
+}
+
 }

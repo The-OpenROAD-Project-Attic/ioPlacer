@@ -52,6 +52,8 @@ class dbChip;
 class dbTechLayer;
 }
 
+namespace ioPlacer {
+
 class DBWrapper {
 public:
         DBWrapper() = default;
@@ -75,5 +77,7 @@ private:
         Parameters      *_parms = nullptr;
         bool            _verbose = false;
 };
+
+}
 
 #endif

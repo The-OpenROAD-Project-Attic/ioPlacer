@@ -37,6 +37,8 @@
 
 #include "Netlist.h"
 
+namespace ioPlacer {
+
 Netlist::Netlist() { _netPointer.push_back(0); }
 
 void Netlist::addIONet(const IOPin& ioPin,
@@ -148,4 +150,6 @@ DBU Netlist::computeDstIOtoPins(unsigned idx, Coordinate slotPos) {
         }
 
         return totalDistance;
+}
+
 }

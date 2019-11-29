@@ -39,6 +39,8 @@
 #include "TclInterface.h"
 %}
 
+namespace ioPlacer {
+
 void import_lef(const char* file);
 void import_def(const char* file);
 extern void  set_hor_metal_layer(int layer);
@@ -75,3 +77,5 @@ extern void  set_num_threads(int numThreads);
 extern int   get_num_threads();
 extern void   set_rand_seed(double seed);
 extern double get_rand_seed();
+
+}

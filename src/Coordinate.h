@@ -40,6 +40,8 @@
 
 typedef long long int DBU;
 
+namespace ioPlacer {
+
 class Coordinate {
         DBU _x, _y;
 
@@ -55,5 +57,7 @@ class Coordinate {
         DBU getY() const { return _y; }
         DBU dst(Coordinate);
 };
+
+}
 
 #endif /* __COORDINATE_H_ */

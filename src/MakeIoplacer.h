@@ -35,30 +35,19 @@
 // POSSIBILITY OF SUCH DAMAGE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef __WRITERIOPINS_H_
-#define __WRITERIOPINS_H_
+#ifndef MAKE_IOPLACER
+#define MAKE_IOPLACER
 
-#include "IOPlacementKernel.h"
-#include "Parameters.h"
-#include "Coordinate.h"
-#include "Netlist.h"
+namespace ord {
 
-class WriterIOPins {
-       private:
-        Netlist& _netlist;
-        std::vector<IOPin>& _assignment;
-        std::string _inFileName;
-        std::string _outFileName;
-        std::string _horizontalMetalLayer;
-        std::string _verticalMetalLayer;
+class OpenRoad;
 
-        bool writeFile();
+void *makeIoplacer();
 
-       public:
-        WriterIOPins(Netlist&, std::vector<IOPin>&, std::string, std::string,
-                     std::string, std::string);
-        virtual ~WriterIOPins() = default;
-        void run();
-};
+void initIoplacer(OpenRoad * openroad);
 
-#endif /* __WRITERIOPINS_H_ */
+void deleteIoplacer(void *ioplacer);
+
+}
+
+#endif

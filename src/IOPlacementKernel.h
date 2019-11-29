@@ -46,6 +46,8 @@
 #include "Slots.h"
 #include "DBWrapper.h"
 
+namespace ioPlacer {
+
 enum RandomMode { None, Full, Even, Group };
 
 class IOPlacementKernel {
@@ -103,4 +105,5 @@ class IOPlacementKernel {
         DBU returnIONetsHPWL();
 };
 
+}
 #endif /* __IOPLACEMENTKERNEL_H_ */

@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <cassert> 
 
 #include "db.h"
 #include "lefin.h"
@@ -9,6 +10,8 @@
 #include "defout.h"
 #include "dbShape.h"
 #include "Coordinate.h"
+
+namespace ioPlacer {
 
 DBWrapper::DBWrapper(Netlist& netlist, Core& core, Parameters& parms) : 
                 _netlist(&netlist), _core(&core), _parms(&parms) {
@@ -34,6 +37,8 @@ void DBWrapper::parseDEF(const std::string &filename) {
 }
 
 void DBWrapper::populateIOPlacer() {
+	_db = odb::dbDatabase::getDatabase(_parms->getDbId());
+	_chip = _db->getChip();
         initNetlist();
         initCore();
 }
@@ -55,7 +60,7 @@ void DBWrapper::initCore() {
         }
 
         odb::dbBox* coreBBox = block->getBBox();
-
+	
         Coordinate lowerBound(coreBBox->xMin(), coreBBox->yMin());
         Coordinate upperBound(coreBBox->xMax(), coreBBox->yMax());
         
@@ -254,4 +259,6 @@ void DBWrapper::writeDEF() {
         
         writer.setVersion( odb::defout::DEF_5_6 );
         writer.writeBlock( block, defFileName.c_str() );
+}
+
 }

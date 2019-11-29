@@ -37,6 +37,8 @@
 
 #include "Box.h"
 
+namespace ioPlacer {
+
 Coordinate Box::getMiddle() {
         DBU lowerX = _lowerBound.getX();
         DBU lowerY = _lowerBound.getY();
@@ -56,4 +58,6 @@ DBU Box::getHalfPerimeter() {
         DBU y = upperY - lowerY;
 
         return (x + y);
+}
+
 }

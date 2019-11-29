@@ -47,6 +47,8 @@
 #include "Netlist.h"
 #include <numeric>
 
+namespace ioPlacer {
+
 struct _Slot_t {
         bool blocked;
         bool used;
@@ -79,4 +81,5 @@ std::vector<size_t> sort_indexes(const std::vector<T>& v) {
         return idx;
 }
 
+}
 #endif /* __SLOTS_H */

@@ -42,6 +42,7 @@ set(BIN_NAME "ioPlacer")
 message(STATUS "ioPlacer")
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
+set(OPENROAD_HOME "${PROJECT_SOURCE_DIR}/../..")
 set(OPENDB_HOME "${PROJECT_SOURCE_DIR}/third_party/OpenDB")
 set(BUILD_PYTHON 0)
 set(BUILD_TCL 0)
@@ -81,7 +82,7 @@ find_package(ZLIB REQUIRED)
 # Loads swig and generates the tcl wrapper file
 find_package(SWIG REQUIRED)
 add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp
-        COMMAND ${SWIG_EXECUTABLE} -tcl8 -c++ -o ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
+        COMMAND ${SWIG_EXECUTABLE} -namespace -prefix ioPlacer -tcl8 -c++ -o ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating swig wrapper"
 )
@@ -98,6 +99,7 @@ target_include_directories(${BIN_NAME} PUBLIC
         ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+        ${OPENROAD_HOME}/include
         )
 
 include_directories(${opendb_home}/include/opendb) 

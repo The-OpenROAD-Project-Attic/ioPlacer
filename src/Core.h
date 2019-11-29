@@ -40,6 +40,8 @@
 
 #include "Coordinate.h"
 
+namespace ioPlacer {
+
 class Core {
        private:
         Coordinate _lowerBound;
@@ -92,5 +94,7 @@ class Core {
 
         DBU getPerimeter();
 };
+
+}
 
 #endif /* __CORE_H_ */

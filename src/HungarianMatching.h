@@ -45,6 +45,8 @@
 #include "IOPlacementKernel.h"
 #include "Slots.h"
 
+namespace ioPlacer {
+
 class HungarianMatching {
        private:
         Matrix<DBU> _hungarianMatrix;
@@ -66,4 +68,5 @@ class HungarianMatching {
         void getFinalAssignment(std::vector<IOPin>&);
 };
 
+}
 #endif /* __HUNGARIANMATCHING_H_ */

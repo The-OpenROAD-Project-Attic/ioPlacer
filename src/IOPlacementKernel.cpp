@@ -39,7 +39,8 @@
 #include <omp.h>
 
 #include "IOPlacementKernel.h"
-#include "WriterIOPins.h"
+
+namespace ioPlacer {
 
 void IOPlacementKernel::initNetlistAndCore() {
         //if (!_parms->isInteractiveMode()) {
@@ -658,4 +659,6 @@ void IOPlacementKernel::run() {
 
 void IOPlacementKernel::writeDEF() {
        _dbWrapper.writeDEF(); 
+}
+
 }
