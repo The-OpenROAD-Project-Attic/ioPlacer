@@ -37,12 +37,19 @@
 
 
 sta::define_cmd_args "run_io_placement" {[-hor_layer h_layer] \ 
-                                         [-ver_layer v_layer]}
+                                         [-ver_layer v_layer] \
+                                         [-random]            \
+}
 
 proc run_io_placement { args } {
         sta::parse_key_args "run_io_placement" args \
-        keys {-hor_layer -ver_layer} flags {}
-        
+        keys {-hor_layer -ver_layer} flags {-random}
+
+        if { [info exists flags(-random)] } {
+                ioPlacer::set_rand_seed 42
+                ioPlacer::set_random_mode 2
+        }
+
         set hor_layer 3
         if [info exists keys(-hor_layer)] {
                 set hor_layer $keys(-hor_layer)
