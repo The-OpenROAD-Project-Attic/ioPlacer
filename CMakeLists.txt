@@ -82,14 +82,23 @@ add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp
 )
 add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
 
+set(IOPLACER_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/IoplacerTclInitVar.cc)
+add_custom_command(OUTPUT ${IOPLACER_TCL_INIT}
+        COMMAND ${OPENSTA_HOME}/etc/TclEncode.tcl ${IOPLACER_TCL_INIT} ioplacer_tcl_inits ${IOPLACER_HOME}/src/ioPlacer.tcl
+        WORKING_DIRECTORY ${IOPLACER_HOME}/src
+        DEPENDS ${IOPLACER_HOME}/src/ioPlacer.tcl ${OPENSTA_HOME}/etc/TclEncode.tcl
+)
+
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
 
-add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES})
+
+add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_TCL_INIT})
 
 add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
 target_include_directories(${BIN_NAME} PUBLIC
+        ${OPENSTA_HOME}/app
         ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party

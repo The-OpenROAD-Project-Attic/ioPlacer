@@ -40,6 +40,16 @@
 #include "Parameters.h"
 #include "IOPlacementKernel.h"
 #include "db.h"
+#include "StaMain.hh"
+
+namespace sta {
+        //Tcl files encoded into strings.
+        extern const char *ioplacer_tcl_inits[];
+}
+
+extern "C" {
+        extern int Ioplacer_Init(Tcl_Interp *interp);
+}
 
 namespace ioPlacer {
 extern IOPlacementKernel* ioPlacerKernel;
@@ -53,6 +63,11 @@ void *makeIoplacer() {
 }
 
 void initIoplacer(OpenRoad * openroad) {
+        Tcl_Interp *tcl_interp = openroad->tclInterp();
+        // Define swig TCL commands.
+        Ioplacer_Init(tcl_interp);
+        sta::evalTclInit(tcl_interp, sta::ioplacer_tcl_inits);
+
         unsigned dbId = openroad->getDb()->getId();
         ioPlacer::parmsToIOPlacer->setDbId(dbId);
 }
