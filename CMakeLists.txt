@@ -42,12 +42,6 @@ set(BIN_NAME "ioPlacer")
 message(STATUS "ioPlacer")
 message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(OPENROAD_HOME "${PROJECT_SOURCE_DIR}/../..")
-set(OPENDB_HOME "${PROJECT_SOURCE_DIR}/third_party/OpenDB")
-set(BUILD_PYTHON 0)
-set(BUILD_TCL 0)
-add_subdirectory(${OPENDB_HOME})
-
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
         message( "INFO: DEBUG BUILD" )
