@@ -69,7 +69,6 @@ class Parameters {
 
        public:
         Parameters() = default;
-        Parameters(int, char**);
         
         void setInputDefFile(const std::string& file) { _inputDefFile = file; }
         std::string getInputDefFile() const { return _inputDefFile; }

@@ -64,7 +64,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(CMAKE_CXX_STANDARD 11)
 set(Boost_USE_STATIC_LIBS ON)
 
-find_package(Boost COMPONENTS system filesystem program_options REQUIRED)
+find_package(Boost REQUIRED)
 
 find_package(OpenMP REQUIRED)
 
