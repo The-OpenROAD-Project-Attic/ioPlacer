@@ -1,14 +1,9 @@
-import_lef input.lef
-import_def input.def
+read_lef input.lef
+read_def input.def
 
-set_hor_metal_layer 2
-set_ver_metal_layer 3
+run_io_placement -hor_layer 2 -ver_layer 3
 
-set_num_threads 5
-
-run_io_placement
-
-export_def "result.def"
+write_def "result.def"
 
 exit
 

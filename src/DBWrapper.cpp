@@ -50,7 +50,7 @@ void DBWrapper::initCore() {
                 std::cout << "[ERROR] odb::dbTech not initialized! Exiting...\n";
                 std::exit(1);
         }
-
+        
         int databaseUnit = tech->getLefUnits(); 
 
         odb::dbBlock* block = _chip->getBlock();
@@ -59,10 +59,11 @@ void DBWrapper::initCore() {
                 std::exit(1);
         }
 
-        odb::dbBox* coreBBox = block->getBBox();
+        odb::adsRect rect;
+        block->getDieArea(rect);
 	
-        Coordinate lowerBound(coreBBox->xMin(), coreBBox->yMin());
-        Coordinate upperBound(coreBBox->xMax(), coreBBox->yMax());
+        Coordinate lowerBound(rect.xMin(), rect.yMin());
+        Coordinate upperBound(rect.xMax(), rect.yMax());
         
         int horLayerIdx = _parms->getHorizontalMetalLayer();
         int verLayerIdx = _parms->getVerticalMetalLayer();
@@ -107,7 +108,6 @@ void DBWrapper::initCore() {
         *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
                       initTrackX, initTrackY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
-
         if(_verbose) {
                 std::cout << "lowerBound: " << lowerBound.getX() << " " << lowerBound.getY() << "\n";
                 std::cout << "upperBound: " << upperBound.getX() << " " << upperBound.getY() << "\n";
@@ -243,8 +243,7 @@ void DBWrapper::commitIOPlacementToDB(std::vector<IOPin>& assignment) {
                     pin.getOrientation() == Orientation::ORIENT_WEST) {
                         layer = horLayer;
                 }
-                     
-                //std::cout << pin.getX() << "\n";
+                
                 odb::dbBox::create(bpin, layer, xMin, yMin, xMax, yMax);
                 bpin->setPlacementStatus(odb::dbPlacementStatus::PLACED);
         };
