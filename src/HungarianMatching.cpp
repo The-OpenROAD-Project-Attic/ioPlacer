@@ -56,7 +56,6 @@ void HungarianMatching::run() {
 void HungarianMatching::createMatrix() {
         _hungarianMatrix = Matrix<DBU>(_nonBlockedSlots, _numIOPins);
         unsigned slotIndex = 0;
-#pragma omp parallel for
         for (unsigned i = _beginSlot; i < _endSlot; ++i) {
                 unsigned pinIndex = 0;
                 Coordinate newPos = _slots[i].pos;

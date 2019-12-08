@@ -63,8 +63,6 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
 
-find_package(OpenMP REQUIRED)
-
 # Finds tcl
 include(FindTCL.cmake)
 
@@ -107,7 +105,6 @@ target_link_libraries(${BIN_NAME}
         ${TCL_LIB}
         opendb
         lefin
-	OpenMP::OpenMP_CXX
 	)
                       
                       

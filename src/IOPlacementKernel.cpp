@@ -36,7 +36,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <random>
-#include <omp.h>
 
 #include "IOPlacementKernel.h"
 
@@ -368,7 +367,6 @@ bool IOPlacementKernel::assignPinsSections() {
                 bool pinAssigned = false;
                 std::vector<DBU> dst(sections.size());
                 std::vector<InstancePin> instPinsVector;
-#pragma omp parallel for
                 for (unsigned i = 0; i < sections.size(); i++) {
                         dst[i] = net.computeIONetHPWL(idx, sections[i].pos);
                 }
@@ -609,7 +607,6 @@ void IOPlacementKernel::run() {
                         }
                 }
 
-#pragma omp parallel for
                 for (unsigned idx = 0; idx < hgVec.size(); idx++) {
                         hgVec[idx].run();
                 }
@@ -629,7 +626,6 @@ void IOPlacementKernel::run() {
                         i++;
                 }
         }
-#pragma omp parallel for
         for (unsigned i = 0; i < _assignment.size(); ++i) {
                 updateOrientation(_assignment[i]);
                 updatePinArea(_assignment[i]);
@@ -643,7 +639,6 @@ void IOPlacementKernel::run() {
         }
 
         if (_reportHPWL) {
-#pragma omp parallel for reduction(+ : totalHPWL)
                 for (unsigned idx = 0; idx < _sections.size(); idx++) {
                         totalHPWL += returnIONetsHPWL(_sections[idx].net);
                 }

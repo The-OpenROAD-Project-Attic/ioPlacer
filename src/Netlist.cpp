@@ -142,7 +142,6 @@ DBU Netlist::computeDstIOtoPins(unsigned idx, Coordinate slotPos) {
 
         DBU totalDistance = 0;
 
-#pragma omp parallel for reduction(+ : totalDistance)
         for (unsigned idx = netStart; idx < netEnd; ++idx) {
                 Coordinate pinPos = _instPins[idx].getPos();
                 totalDistance += abs(pinPos.getX() - slotPos.getX()) +
