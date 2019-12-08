@@ -62,9 +62,6 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
-set(Boost_USE_STATIC_LIBS ON)
-
-find_package(Boost REQUIRED)
 
 find_package(OpenMP REQUIRED)
 
@@ -99,7 +96,6 @@ add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
 target_include_directories(${BIN_NAME} PUBLIC
         ${OPENSTA_HOME}/app
-        ${Boost_INCLUDE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${OPENROAD_HOME}/include
@@ -108,7 +104,6 @@ target_include_directories(${BIN_NAME} PUBLIC
 include_directories(${opendb_home}/include/opendb) 
 
 target_link_libraries(${BIN_NAME}
-        ${Boost_LIBRARIES}
         ${TCL_LIB}
         opendb
         lefin
