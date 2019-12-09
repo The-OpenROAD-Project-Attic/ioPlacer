@@ -40,7 +40,6 @@
 
 #include "Core.h"
 #include "HungarianMatching.h"
-#include "IOPlacement.h"
 #include "Netlist.h"
 #include "Parameters.h"
 #include "Slots.h"
@@ -52,7 +51,6 @@ enum RandomMode { None, Full, Even, Group };
 
 class IOPlacementKernel {
        protected:
-        friend class ioPlacer::IOPlacement;
         Netlist _netlist;
         Core _core;
         std::string _horizontalMetalLayer;
