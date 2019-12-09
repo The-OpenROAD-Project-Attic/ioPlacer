@@ -95,7 +95,6 @@ add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
 target_include_directories(${BIN_NAME} PUBLIC
         ${OPENSTA_HOME}/app
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${OPENROAD_HOME}/include
