@@ -70,12 +70,13 @@ find_package(ZLIB REQUIRED)
 
 # Loads swig and generates the tcl wrapper file
 find_package(SWIG REQUIRED)
-add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp
-        COMMAND ${SWIG_EXECUTABLE} -namespace -prefix ioPlacer -tcl8 -c++ -o ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
+add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp
+        COMMAND ${SWIG_EXECUTABLE} -namespace -prefix ioPlacer -tcl8 -c++ -o ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         COMMENT "Generating swig wrapper"
 )
-add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
+add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
+
 
 set(IOPLACER_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/IoplacerTclInitVar.cc)
 add_custom_command(OUTPUT ${IOPLACER_TCL_INIT}
@@ -85,7 +86,7 @@ add_custom_command(OUTPUT ${IOPLACER_TCL_INIT}
 )
 
 file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
-set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterfaceWrap.cpp)
+set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
 
 
 add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_TCL_INIT})
@@ -95,6 +96,7 @@ add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 target_include_directories(${BIN_NAME} PUBLIC
         ${OPENSTA_HOME}/app
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${OPENROAD_HOME}/include
         )
