@@ -155,6 +155,8 @@ void DBWrapper::initNetlist() {
                         case odb::dbIoType::OUTPUT:
                                 dir = DIR_OUT;
                                 break;
+                        default:
+                                dir = DIR_INOUT;
                 }
 
                 int xPos = 0;

@@ -36,35 +36,35 @@
 # ////////////////////////////////////////////////////////////////////////////////
 
 
-sta::define_cmd_args "run_io_placement" {[-hor_layer h_layer] \ 
-                                         [-ver_layer v_layer] \
-                                         [-random]            \
+sta::define_cmd_args "io_placer" {[-hor_layer h_layer] \ 
+                                     [-ver_layer v_layer] \
+                                     [-random]            \
 }
 
-proc run_io_placement { args } {
-        sta::parse_key_args "run_io_placement" args \
-        keys {-hor_layer -ver_layer} flags {-random}
+proc io_placer { args } {
+  sta::parse_key_args "io_placer" args \
+  keys {-hor_layer -ver_layer} flags {-random}
 
-        if { [info exists flags(-random)] } {
-                ioPlacer::set_rand_seed 42
-                ioPlacer::set_random_mode 2
-        }
+  if { [info exists flags(-random)] } {
+    ioPlacer::set_rand_seed 42
+    ioPlacer::set_random_mode 2
+  }
 
-        set hor_layer 3
-        if [info exists keys(-hor_layer)] {
-                set hor_layer $keys(-hor_layer)
-                ioPlacer::set_hor_metal_layer $hor_layer
-        } else {
-                puts "Warning: use -hor_layer to set the horizontal layer."
-        }       
- 
-        set ver_layer 2
-        if [info exists keys(-ver_layer)] {
-                set ver_layer $keys(-ver_layer)
-                ioPlacer::set_ver_metal_layer $ver_layer
-        } else {
-                puts "Warning: use -ver_layer to set the vertical layer."
-        }       
+  set hor_layer 3
+  if [info exists keys(-hor_layer)] {
+    set hor_layer $keys(-hor_layer)
+    ioPlacer::set_hor_metal_layer $hor_layer
+  } else {
+    puts "Warning: use -hor_layer to set the horizontal layer."
+  }       
+  
+  set ver_layer 2
+  if [info exists keys(-ver_layer)] {
+    set ver_layer $keys(-ver_layer)
+    ioPlacer::set_ver_metal_layer $ver_layer
+  } else {
+    puts "Warning: use -ver_layer to set the vertical layer."
+  }       
 
-        ioPlacer::run_io_placement
+  ioPlacer::run_io_placement
 }
