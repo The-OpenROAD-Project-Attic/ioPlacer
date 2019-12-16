@@ -39,8 +39,6 @@ cmake_minimum_required(VERSION 3.1)
 
 project(ioPlacement)
 set(BIN_NAME "ioPlacer")
-message(STATUS "ioPlacer")
-message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
