@@ -44,7 +44,6 @@ message(STATUS ${CMAKE_CURRENT_SOURCE_DIR})
 
 # Print info on build
 if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
-        message( "INFO: DEBUG BUILD" )
         # for debug type builds, turn on verbose makefiles
         set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -53,9 +52,6 @@ if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
 
         # Tell C/C++ that we're doing a debug build
         add_definitions(-DDEBUG)
-endif()
-if( CMAKE_BUILD_TYPE MATCHES "[Rr][Ee][Ll][Ee][Aa][Ss][Ee]" )
-        message( "INFO: RELEASE BUILD" )
 endif()
 
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
