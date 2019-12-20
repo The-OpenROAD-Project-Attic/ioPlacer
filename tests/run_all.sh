@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 test_script=./run.sh
-test_root=$(pwd)
 
 echo ""
 echo "***********************"
@@ -9,12 +8,13 @@ echo "* ioPlacer unit tests *"
 echo "***********************"
 echo ""
 
-if [ "$#" -ne 1 ]; then
-    echo "Usage: ./run_all.sh <path_to_bin>"
+if [ "$#" -ne 2 ]; then
+    echo "Usage: ./run_all.sh <path_to_bin> <testdir>"
 	exit 1
 fi
 
 binary=$(readlink -f $1)
+testdir=$(readlink -f $2)
 failed=0
 
 echo " > ioPlacer binary: $binary"
@@ -24,7 +24,7 @@ then
 	exit 1
 fi
 
-for unit_test_path in src/* ; 
+for unit_test_path in ${testdir}/src/* ; 
 do
 	test_name=$(basename $unit_test_path)
 	echo " > Now running test $test_name..."
