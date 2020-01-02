@@ -100,9 +100,9 @@ void DBWrapper::initCore() {
         verTrackGrid->getGridPatternX(0, initTrackX, numTracks, minSpacingX);
         horTrackGrid->getGridPatternY(0, initTrackY, numTracks, minSpacingY);
 
-        minAreaX =  verLayer->getArea();
+        minAreaX =  verLayer->getArea() * databaseUnit * databaseUnit;
         minWidthX = verLayer->getWidth();
-        minAreaY =  horLayer->getArea();
+        minAreaY =  horLayer->getArea() * databaseUnit * databaseUnit;
         minWidthY = horLayer->getWidth();
 
         *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
