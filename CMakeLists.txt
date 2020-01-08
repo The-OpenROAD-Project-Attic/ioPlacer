@@ -92,6 +92,8 @@ target_include_directories(${BIN_NAME} PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${OPENROAD_HOME}/include
+	SYSTEM
+	${TCL_INCLUDE_PATH}
         )
 
 include_directories(${opendb_home}/include/opendb) 
