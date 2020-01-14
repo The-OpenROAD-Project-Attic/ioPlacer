@@ -6,7 +6,7 @@ fi
 
 binary=$1
 
-$binary -c 1 < ioPlacer.tcl > log.txt 2>&1
+$binary -no_init < ioPlacer.tcl > log.txt 2>&1
 
 grep "Design without pins. Exiting..." log.txt >> grep_log.txt
 
