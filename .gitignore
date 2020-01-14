@@ -103,4 +103,4 @@ Temporary Items
 *.app
 
 # Downloaded files from unit tests
-tests/src/*
+test/src/*
