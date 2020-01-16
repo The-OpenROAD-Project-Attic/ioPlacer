@@ -136,6 +136,14 @@ float get_hor_length(){
         return parmsToIOPlacer->getHorizontalLength();
 }
 
+void  set_ver_length_extend(float length){
+        parmsToIOPlacer->setVerticalLengthExtend(length);
+}
+
+void  set_hor_length_extend(float length){
+        parmsToIOPlacer->setHorizontalLengthExtend(length);
+}
+
 void  set_ver_length(float length){
         parmsToIOPlacer->setHorizontalLength(length);
 }
