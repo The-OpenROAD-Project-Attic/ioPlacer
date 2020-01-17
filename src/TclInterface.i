@@ -63,6 +63,8 @@ extern void  set_blockages_file(const char* file);
 extern const char* get_blockages_file();
 extern void  set_hor_length_extend(float length);
 extern void  set_hor_length(float length);
+extern void  set_hor_thick_multiplier(float length);
+extern void  set_ver_thick_multiplier(float length);
 extern float get_hor_length();
 extern void  set_ver_length_extend(float length);
 extern void  set_ver_length(float length);

@@ -79,6 +79,8 @@ void   set_num_threads(int numThreads);
 int    get_num_threads();
 void   set_rand_seed(double seed);
 double get_rand_seed();
+void  set_hor_thick_multiplier(float length);
+void  set_ver_thick_multiplier(float length);
 
 // flow
 void run_io_placement();

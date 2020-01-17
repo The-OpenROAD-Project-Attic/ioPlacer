@@ -201,4 +201,12 @@ double get_rand_seed(){
         return parmsToIOPlacer->getRandSeed();
 }
 
+void  set_hor_thick_multiplier(float length) {
+        parmsToIOPlacer->setHorizontalThicknessMultiplier(length);
+}
+
+void  set_ver_thick_multiplier(float length) {
+        parmsToIOPlacer->setVerticalThicknessMultiplier(length);
+}
+
 }
