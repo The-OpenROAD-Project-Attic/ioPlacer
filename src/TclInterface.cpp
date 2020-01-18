@@ -209,4 +209,19 @@ void  set_ver_thick_multiplier(float length) {
         parmsToIOPlacer->setVerticalThicknessMultiplier(length);
 }
 
+float  get_ver_thick_multiplier() {
+        return parmsToIOPlacer->getVerticalThicknessMultiplier();
+}
+
+float  get_hor_thick_multiplier() {
+        return parmsToIOPlacer->getHorizontalThicknessMultiplier();
+}
+
+float  get_hor_length_extend() {
+        return parmsToIOPlacer->getHorizontalLengthExtend();
+}
+
+float  get_ver_length_extend() {
+        return parmsToIOPlacer->getVerticalLengthExtend();
+}
 }
