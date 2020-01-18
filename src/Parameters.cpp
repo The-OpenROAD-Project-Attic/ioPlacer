@@ -66,6 +66,10 @@ void Parameters::printAll() const {
         std::cout << "Random mode: " << _randomMode << "\n";
         std::cout << "Horizontal pin length: " << _horizontalLength << "\n";
         std::cout << "Vertical pin length: " << _verticalLength << "\n";
+        std::cout << "Horizontal pin length extend: " << _horizontalLengthExtend << "\n";
+        std::cout << "Vertical pin length extend: " << _verticalLengthExtend << "\n";
+        std::cout << "Horizontal pin thickness multiplier: " << _horizontalThicknessMultiplier << "\n";
+        std::cout << "Vertical pin thickness multiplier: " << _verticalThicknessMultiplier << "\n";
         std::cout << "Interactive mode: " << _interactiveMode << "\n";
         std::cout << "Num threads: " << _numThreads << "\n";
         std::cout << "Rand seed: " << _randSeed << "\n";
