@@ -137,11 +137,11 @@ float get_hor_length(){
 }
 
 void  set_ver_length(float length){
-        parmsToIOPlacer->setHorizontalLength(length);
+        parmsToIOPlacer->setVerticalLength(length);
 }
 
 float get_ver_length(){
-        return parmsToIOPlacer->getHorizontalLength();
+        return parmsToIOPlacer->getVerticalLength();
 }
 
 void  set_interactive_mode(bool enable){
