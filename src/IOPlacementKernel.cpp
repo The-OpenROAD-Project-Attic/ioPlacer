@@ -500,8 +500,8 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
 
         if (pin.getOrientation() == Orientation::ORIENT_NORTH || 
             pin.getOrientation() == Orientation::ORIENT_SOUTH) {
-                float thickness_multiplier = _parms->getVerticalThicknessMultiplier();
-                DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0)) * thickness_multiplier;
+                float thicknessMultiplier = _parms->getVerticalThicknessMultiplier();
+                DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0)) * thicknessMultiplier;
                 DBU height =
                     _core.getMinAreaX() != 0.0
                         ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
@@ -528,8 +528,8 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
 
         if (pin.getOrientation() == Orientation::ORIENT_WEST || 
             pin.getOrientation() == Orientation::ORIENT_EAST) {
-                float thickness_multiplier = _parms->getHorizontalThicknessMultiplier();
-                DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0)) * thickness_multiplier;
+                float thicknessMultiplier = _parms->getHorizontalThicknessMultiplier();
+                DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0)) * thicknessMultiplier;
                 DBU height = 0;
                 DBU ext = 0;
                 if (_parms->getHorizontalLengthExtend() != -1) {
