@@ -500,29 +500,42 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
 
         if (pin.getOrientation() == Orientation::ORIENT_NORTH || 
             pin.getOrientation() == Orientation::ORIENT_SOUTH) {
-                DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0));
+                float thickness_multiplier = _parms->getVerticalThicknessMultiplier();
+                DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0)) * thickness_multiplier;
                 DBU height =
                     _core.getMinAreaX() != 0.0
                         ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
                         : 2 * halfWidth;
+                DBU ext = 0;
                 if (_parms->getVerticalLength() != -1) {
                         height = _parms->getVerticalLength() *
                                  _core.getDatabaseUnit();
                 }
+
+                if (_parms->getVerticalLengthExtend() != -1) {
+                        ext = _parms->getVerticalLengthExtend() *
+                                 _core.getDatabaseUnit();
+                }
         
                 if (pin.getOrientation() == Orientation::ORIENT_NORTH) {
-                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY() - ext);
                         pin.setUpperBound(pin.getX() + halfWidth, pin.getY() + height);
                 } else {
-                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY());
+                        pin.setLowerBound(pin.getX() - halfWidth, pin.getY() + ext);
                         pin.setUpperBound(pin.getX() + halfWidth, pin.getY() - height);
                 }
         }
 
         if (pin.getOrientation() == Orientation::ORIENT_WEST || 
             pin.getOrientation() == Orientation::ORIENT_EAST) {
-                DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0));
+                float thickness_multiplier = _parms->getHorizontalThicknessMultiplier();
+                DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0)) * thickness_multiplier;
                 DBU height = 0;
+                DBU ext = 0;
+                if (_parms->getHorizontalLengthExtend() != -1) {
+                        ext = _parms->getHorizontalLengthExtend() *
+                                 _core.getDatabaseUnit();
+                }
                 if (_core.getMinAreaY() != 0.0) {
                         height = ceil(_core.getMinAreaY() / (2.0 * halfWidth));
                 } else {
@@ -534,11 +547,11 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 }
                 
                 if (pin.getOrientation() == Orientation::ORIENT_EAST) {
-                        pin.setLowerBound(pin.getX(), pin.getY() - halfWidth);
+                        pin.setLowerBound(pin.getX() - ext, pin.getY() - halfWidth);
                         pin.setUpperBound(pin.getX() + height, pin.getY() + halfWidth);
                 } else {
                         pin.setLowerBound(pin.getX() - height, pin.getY() - halfWidth);
-                        pin.setUpperBound(pin.getX(), pin.getY() + halfWidth);
+                        pin.setUpperBound(pin.getX() + ext, pin.getY() + halfWidth);
                 }
         }
 }

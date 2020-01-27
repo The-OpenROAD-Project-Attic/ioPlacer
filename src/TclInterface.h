@@ -64,8 +64,10 @@ void   set_usage_factor(float factor);
 float  get_usage_factor();
 void   set_blockages_file(const char* file);
 const  char* get_blockages_file();
+void   set_hor_length_extend(float length);
 void   set_hor_length(float length);
 float  get_hor_length();
+void   set_ver_length_extend(float length);
 void   set_ver_length(float length);
 float  get_ver_length();
 void   set_report_hpwl(bool report);
@@ -77,6 +79,12 @@ void   set_num_threads(int numThreads);
 int    get_num_threads();
 void   set_rand_seed(double seed);
 double get_rand_seed();
+void   set_hor_thick_multiplier(float length);
+void   set_ver_thick_multiplier(float length);
+float  get_ver_thick_multiplier();
+float  get_hor_thick_multiplier();
+float  get_hor_length_extend();
+float  get_ver_length_extend();
 
 // flow
 void run_io_placement();

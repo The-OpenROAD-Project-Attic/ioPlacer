@@ -136,6 +136,14 @@ float get_hor_length(){
         return parmsToIOPlacer->getHorizontalLength();
 }
 
+void  set_ver_length_extend(float length){
+        parmsToIOPlacer->setVerticalLengthExtend(length);
+}
+
+void  set_hor_length_extend(float length){
+        parmsToIOPlacer->setHorizontalLengthExtend(length);
+}
+
 void  set_ver_length(float length){
         parmsToIOPlacer->setVerticalLength(length);
 }
@@ -193,4 +201,27 @@ double get_rand_seed(){
         return parmsToIOPlacer->getRandSeed();
 }
 
+void  set_hor_thick_multiplier(float length) {
+        parmsToIOPlacer->setHorizontalThicknessMultiplier(length);
+}
+
+void  set_ver_thick_multiplier(float length) {
+        parmsToIOPlacer->setVerticalThicknessMultiplier(length);
+}
+
+float  get_ver_thick_multiplier() {
+        return parmsToIOPlacer->getVerticalThicknessMultiplier();
+}
+
+float  get_hor_thick_multiplier() {
+        return parmsToIOPlacer->getHorizontalThicknessMultiplier();
+}
+
+float  get_hor_length_extend() {
+        return parmsToIOPlacer->getHorizontalLengthExtend();
+}
+
+float  get_ver_length_extend() {
+        return parmsToIOPlacer->getVerticalLengthExtend();
+}
 }

@@ -60,6 +60,10 @@ class Parameters {
         float _usage = -1;
         float _usageFactor = -1;
         std::string _blockagesFile;
+        float _horizontalThicknessMultiplier = 1;
+        float _verticalThicknessMultiplier = 1;
+        float _horizontalLengthExtend = -1;
+        float _verticalLengthExtend = -1;
         float _horizontalLength = -1;
         float _verticalLength = -1;
         bool  _interactiveMode = false;
@@ -95,6 +99,10 @@ class Parameters {
         bool getForceSpread() const { return _forceSpread; }
         void setBlockagesFile(const std::string& file) { _blockagesFile = file; }
         std::string getBlockagesFile() const { return _blockagesFile; }
+        void setHorizontalLengthExtend(float length) { _horizontalLengthExtend = length; }
+        float getHorizontalLengthExtend() const { return _horizontalLengthExtend; }
+        void setVerticalLengthExtend(float length) { _verticalLengthExtend = length; }
+        float getVerticalLengthExtend() const { return _verticalLengthExtend; }
         void setHorizontalLength(float length) { _horizontalLength = length; }
         float getHorizontalLength() const { return _horizontalLength; }
         void setVerticalLength(float length) { _verticalLength = length; }
@@ -105,6 +113,10 @@ class Parameters {
         int  getNumThreads() const { return _numThreads; }
         void setRandSeed(double seed) { _randSeed = seed; }
         double getRandSeed() const { return _randSeed; }
+        void setHorizontalThicknessMultiplier(float length) { _horizontalThicknessMultiplier = length; }
+        float getHorizontalThicknessMultiplier() const { return _horizontalThicknessMultiplier; }
+        void setVerticalThicknessMultiplier(float length) { _verticalThicknessMultiplier = length; }
+        float getVerticalThicknessMultiplier() const { return _verticalThicknessMultiplier; }
 
         void setDbId(unsigned idx) { _dbId = idx; }
         unsigned getDbId() const { return _dbId; }
