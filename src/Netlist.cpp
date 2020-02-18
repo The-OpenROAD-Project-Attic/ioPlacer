@@ -144,8 +144,8 @@ DBU Netlist::computeDstIOtoPins(unsigned idx, Coordinate slotPos) {
 
         for (unsigned idx = netStart; idx < netEnd; ++idx) {
                 Coordinate pinPos = _instPins[idx].getPos();
-                totalDistance += abs(pinPos.getX() - slotPos.getX()) +
-                                 abs(pinPos.getY() - slotPos.getY());
+                totalDistance += std::abs(pinPos.getX() - slotPos.getX()) +
+                                 std::abs(pinPos.getY() - slotPos.getY());
         }
 
         return totalDistance;
