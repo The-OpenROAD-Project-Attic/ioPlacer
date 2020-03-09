@@ -112,16 +112,26 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                 Section_t s = {Coordinate(0, 0)};
                 _sections.push_back(s);
         }
-
-        switch (mode) {
+        
+	// MF @ 2020/03/09: Set the seed for std::random_shuffle
+	srand(seed);
+	//---
+	
+	switch (mode) {
                 case RandomMode::Full:
                         std::cout << "RandomMode Full\n";
-                        for (size_t i = 0; i < vSlots.size(); ++i) {
+                        
+			for (size_t i = 0; i < vSlots.size(); ++i) {
                                 vSlots[i] = i;
                         }
-                        std::shuffle(vSlots.begin(), vSlots.end(),
-                                     std::default_random_engine(seed));
-                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+
+			// MF @ 2020/03/09: std::shuffle produces different results
+			// between gccs 4.8.x and 8.5.x
+			// std::random_shuffle is deterministic across versions
+                        std::random_shuffle(vSlots.begin(), vSlots.end());
+                        // ---
+		
+			_netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vSlots[0];
                                 ioPin.setPos(_slots.at(b).pos);
                                 _assignment.push_back(ioPin);
@@ -131,10 +141,18 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         break;
                 case RandomMode::Even:
                         std::cout << "RandomMode Even\n";
-                        for (size_t i = 0; i < vIOs.size(); ++i) vIOs[i] = i;
-                        std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(seed));
-                        _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
+			
+			for (size_t i = 0; i < vIOs.size(); ++i) {
+				vIOs[i] = i;
+			}
+						
+			// MF @ 2020/03/09: std::shuffle produces different results
+			// between gccs 4.8.x and 8.5.x
+			// std::random_shuffle is deterministic across versions
+			std::random_shuffle(vIOs.begin(), vIOs.end());
+                        // ---
+			
+			_netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(floor(b * shift)).pos);
                                 _assignment.push_back(ioPin);
@@ -156,8 +174,13 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         for (size_t i = mid4; i < mid4 + lastSlots; i++) {
                                 vIOs[idx++] = i;
                         }
-                        std::shuffle(vIOs.begin(), vIOs.end(),
-                                     std::default_random_engine(seed));
+			
+			// MF @ 2020/03/09: std::shuffle produces different results
+			// between gccs 4.8.x and 8.5.x
+			// std::random_shuffle is deterministic across versions
+                        std::random_shuffle(vIOs.begin(), vIOs.end());
+			// ---
+
                         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(b).pos);

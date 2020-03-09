@@ -37,18 +37,24 @@
 
 
 sta::define_cmd_args "io_placer" {[-hor_layer h_layer] \ 
-                                     [-ver_layer v_layer] \
-                                     [-random]            \
-}
+                                  [-ver_layer v_layer] \
+                                  [-random_seed seed]  \
+                       	          [-random]            \
+                                 }
 
 proc io_placer { args } {
   sta::parse_key_args "io_placer" args \
-  keys {-hor_layer -ver_layer} flags {-random}
+  keys {-hor_layer -ver_layer -random_seed} flags {-random}
 
   if { [info exists flags(-random)] } {
-    ioPlacer::set_rand_seed 42
     ioPlacer::set_random_mode 2
   }
+
+  set seed 42
+  if [info exists keys(-random_seed)] {
+    set seed $keys(-random_seed)
+  }
+  ioPlacer::set_rand_seed $seed
 
   set hor_layer 3
   if [info exists keys(-hor_layer)] {
