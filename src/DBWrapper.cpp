@@ -59,7 +59,7 @@ void DBWrapper::initCore() {
                 std::exit(1);
         }
 
-        odb::adsRect rect;
+        odb::Rect rect;
         block->getDieArea(rect);
 	
         Coordinate lowerBound(rect.xMin(), rect.yMin());
