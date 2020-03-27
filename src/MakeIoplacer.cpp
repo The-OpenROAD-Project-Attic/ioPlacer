@@ -58,7 +58,7 @@ extern Parameters*        parmsToIOPlacer;
 
 namespace ord {
 
-void *makeIoplacer() {
+ioPlacer::IOPlacementKernel* makeIoplacer() {
   return ioPlacer::ioPlacerKernel;
 }
 

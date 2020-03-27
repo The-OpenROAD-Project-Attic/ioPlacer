@@ -38,11 +38,15 @@
 #ifndef MAKE_IOPLACER
 #define MAKE_IOPLACER
 
+namespace ioPlacer {
+        class IOPlacementKernel;
+}
+
 namespace ord {
 
 class OpenRoad;
 
-void *makeIoplacer();
+ioPlacer::IOPlacementKernel* makeIoplacer();
 
 void initIoplacer(OpenRoad * openroad);
 
