@@ -82,7 +82,9 @@ void DBWrapper::initCore() {
 
         odb::dbTrackGrid* horTrackGrid = block->findTrackGrid( horLayer );        
         odb::dbTrackGrid* verTrackGrid = block->findTrackGrid( verLayer );
-        if (!horTrackGrid || !verTrackGrid) {
+        if (!horTrackGrid || !verTrackGrid ||
+            horTrackGrid->getNumGridPatternsY() == 0 || 
+            verTrackGrid->getNumGridPatternsX() == 0) {
                 std::cout << "[ERROR] No track grid! Exiting...\n";
                 std::exit(1);
         }
