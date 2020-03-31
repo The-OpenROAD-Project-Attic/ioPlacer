@@ -8,7 +8,7 @@ binary=$1
 
 $binary -no_init < ioPlacer.tcl > log.txt 2>&1
  
-grep -q "No track grid! Exiting..." log.txt
+grep -q "missing track structure" log.txt
 
 if [ $? -eq 0 ]; then
     exit 0

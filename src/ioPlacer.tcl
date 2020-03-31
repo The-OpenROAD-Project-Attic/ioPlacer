@@ -71,6 +71,11 @@ proc io_placer { args } {
   } else {
     puts "Warning: use -ver_layer to set the vertical layer."
   }       
-
-  ioPlacer::run_io_placement
+ 
+  if { [ord::db_layer_has_hor_tracks $hor_layer] && \
+       [ord::db_layer_has_ver_tracks $ver_layer] } {
+    ioPlacer::run_io_placement 
+  } else {
+    ord::error "missing track structure"
+  }
 }
