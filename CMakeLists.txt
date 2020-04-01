@@ -57,9 +57,6 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(CMAKE_CXX_STANDARD 11)
 
-# Finds tcl
-include(FindTCL.cmake)
-
 find_package(ZLIB REQUIRED)
 
 # Loads swig and generates the tcl wrapper file
