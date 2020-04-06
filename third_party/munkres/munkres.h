@@ -49,8 +49,8 @@ class Munkres {
                 const size_t rows = m.rows(), columns = m.columns(),
                              size = std::max(rows, columns);
 
-#ifdef DEBUG
-// std::cout << "Munkres input: " << m << std::endl;
+#ifdef DEBUG_MATRIX
+ std::cout << "Munkres input: " << m << std::endl;
 #endif
 
                 // Copy input matrix
@@ -125,8 +125,8 @@ class Munkres {
                         }
                 }
 
-#ifdef DEBUG
-// std::cout << "Munkres output: " << matrix << std::endl;
+#ifdef DEBUG_MATRIX
+ std::cout << "Munkres output: " << matrix << std::endl;
 #endif
                 // Remove the excess rows or columns that we added to fit the
                 // input to a square matrix.
@@ -279,14 +279,14 @@ class Munkres {
                                 }
 
                 if (covercount >= matrix.minsize()) {
-#ifdef DEBUG
+#ifdef DEBUG_MATRIX
                         std::cout << "Final cover count: " << covercount
                                   << std::endl;
 #endif
                         return 0;
                 }
 
-#ifdef DEBUG
+#ifdef DEBUG_MATRIX
                 std::cout << "Munkres matrix has " << covercount << " of "
                           << matrix.minsize()
                           << " Columns covered:" << std::endl;
