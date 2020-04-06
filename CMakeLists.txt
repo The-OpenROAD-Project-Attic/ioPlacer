@@ -85,7 +85,7 @@ add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_TCL_INIT})
 add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
 target_include_directories(${BIN_NAME} PUBLIC
-        ${OPENSTA_HOME}/app
+        ${OPENSTA_HOME}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}/third_party
         ${OPENROAD_HOME}/include

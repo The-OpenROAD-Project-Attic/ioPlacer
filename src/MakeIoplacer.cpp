@@ -40,7 +40,7 @@
 #include "Parameters.h"
 #include "IOPlacementKernel.h"
 #include "db.h"
-#include "StaMain.hh"
+#include "sta/StaMain.hh"
 
 namespace sta {
   //Tcl files encoded into strings.
