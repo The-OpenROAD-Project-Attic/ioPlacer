@@ -50,6 +50,8 @@ class Core {
         unsigned _minDstPinsY;
         unsigned _initTracksX;
         unsigned _initTracksY;
+        unsigned _numTracksX;
+        unsigned _numTracksY;
         unsigned _minAreaX;
         unsigned _minAreaY;
         unsigned _minWidthX;
@@ -65,6 +67,7 @@ class Core {
         Core(const Coordinate& lowerBound, const Coordinate& upperBound,
              const DBU& minDstPinsX, const DBU& minDstPinsY,
              const DBU& initTracksX, const DBU& initTracksY,
+             const DBU& numTracksX, const DBU& numTracksY,
              const DBU& minAreaX, const DBU& minAreaY,
              const DBU& minWidthX, const DBU& minWidthY,
              const DBU& databaseUnit)
@@ -74,6 +77,8 @@ class Core {
               _minDstPinsY(minDstPinsY),
               _initTracksX(initTracksX),
               _initTracksY(initTracksY),
+              _numTracksX(numTracksX),
+              _numTracksY(numTracksY),
               _minAreaX(minAreaX),
               _minAreaY(minAreaY),
               _minWidthX(minWidthX),
@@ -86,6 +91,8 @@ class Core {
         unsigned getMinDstPinsY() const { return _minDstPinsY; }
         unsigned getInitTracksX() const { return _initTracksX; }
         unsigned getInitTracksY() const { return _initTracksY; }
+        unsigned getNumTracksX() const { return _numTracksX; }
+        unsigned getNumTracksY() const { return _numTracksY; }
         unsigned getMinAreaX() const { return _minAreaX; }
         unsigned getMinAreaY() const { return _minAreaY; }
         unsigned getMinWidthX() const { return _minWidthX; }

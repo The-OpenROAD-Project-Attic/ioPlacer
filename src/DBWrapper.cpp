@@ -98,9 +98,10 @@ void DBWrapper::initCore() {
         int minWidthX = 0;
         int minWidthY = 0;
         
-        int numTracks = -1;
-        verTrackGrid->getGridPatternX(0, initTrackX, numTracks, minSpacingX);
-        horTrackGrid->getGridPatternY(0, initTrackY, numTracks, minSpacingY);
+        int numTracksX = 0;
+        int numTracksY = 0;
+        verTrackGrid->getGridPatternX(0, initTrackX, numTracksX, minSpacingX);
+        horTrackGrid->getGridPatternY(0, initTrackY, numTracksY, minSpacingY);
 
         minAreaX =  verLayer->getArea() * databaseUnit * databaseUnit;
         minWidthX = verLayer->getWidth();
@@ -108,7 +109,7 @@ void DBWrapper::initCore() {
         minWidthY = horLayer->getWidth();
 
         *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
-                      initTrackX, initTrackY, minAreaX, minAreaY,
+                      initTrackX, initTrackY, numTracksX, numTracksY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
         if(_verbose) {
                 std::cout << "lowerBound: " << lowerBound.getX() << " " << lowerBound.getY() << "\n";
@@ -117,6 +118,8 @@ void DBWrapper::initCore() {
                 std::cout << "minSpacingY: " << minSpacingY << "\n";
                 std::cout << "initTrackX: " << initTrackX << "\n";
                 std::cout << "initTrackY: " << initTrackY << "\n";
+                std::cout << "numTracksX: " << numTracksX << "\n";
+                std::cout << "numTracksY: " << numTracksY << "\n";
                 std::cout << "minAreaX: " << minAreaX << "\n";
                 std::cout << "minAreaY: " << minAreaY << "\n";
                 std::cout << "minWidthX: " << minWidthX << "\n";

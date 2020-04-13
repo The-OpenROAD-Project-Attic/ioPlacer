@@ -240,6 +240,8 @@ void IOPlacementKernel::defineSlots() {
         unsigned minDstPinsY = _core.getMinDstPinsY();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
+        unsigned numTracksX = _core.getNumTracksX();
+        unsigned numTracksY = _core.getNumTracksY();
 
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
@@ -267,7 +269,7 @@ void IOPlacementKernel::defineSlots() {
         DBU currX = initTracksX;
         DBU currY = lb.getY();
 
-        while (currX < ub.getX()) {
+        for (int i = 0; i < numTracksX; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge1.push_back(pos);
                 currX += minDstPinsX;
@@ -276,7 +278,7 @@ void IOPlacementKernel::defineSlots() {
         std::vector<Coordinate> slotsEdge2;
         currY = initTracksY;
         currX = ub.getX();
-        while (currY < ub.getY()) {
+        for (int i = 0; i < numTracksY; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge2.push_back(pos);
                 currY += minDstPinsY;
@@ -285,7 +287,7 @@ void IOPlacementKernel::defineSlots() {
         std::vector<Coordinate> slotsEdge3;
         currX = initTracksX;
         currY = ub.getY();
-        while (currX < ub.getX()) {
+        for (int i = 0; i < numTracksX; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge3.push_back(pos);
                 currX += minDstPinsX;
@@ -295,7 +297,7 @@ void IOPlacementKernel::defineSlots() {
         std::vector<Coordinate> slotsEdge4;
         currY = initTracksY;
         currX = lb.getX();
-        while (currY < ub.getY()) {
+        for (int i = 0; i < numTracksY; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge4.push_back(pos);
                 currY += minDstPinsY;
