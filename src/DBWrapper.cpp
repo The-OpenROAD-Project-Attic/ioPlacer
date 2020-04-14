@@ -108,7 +108,7 @@ void DBWrapper::initCore() {
         minAreaY =  horLayer->getArea() * databaseUnit * databaseUnit;
         minWidthY = horLayer->getWidth();
 
-        *_core = Core(lowerBound, upperBound, minSpacingX * 2, minSpacingY * 2,
+        *_core = Core(lowerBound, upperBound, minSpacingX, minSpacingY,
                       initTrackX, initTrackY, numTracksX, numTracksY, minAreaX, minAreaY,
                       minWidthX, minWidthY, databaseUnit);
         if(_verbose) {
