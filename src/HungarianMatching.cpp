@@ -50,11 +50,11 @@ HungarianMatching::HungarianMatching(Section_t& section, slotVector_t& slots)
 
 void HungarianMatching::run() {
         createMatrix();
-        _hungarianSolver.solve(_hungarianMatrix);
+        _hungarianSolver.Solve(_hungarianMatrix, _assignment);
 }
 
 void HungarianMatching::createMatrix() {
-        _hungarianMatrix = Matrix<DBU>(_nonBlockedSlots, _numIOPins);
+	_hungarianMatrix.resize(_nonBlockedSlots);
         unsigned slotIndex = 0;
         for (unsigned i = _beginSlot; i < _endSlot; ++i) {
                 unsigned pinIndex = 0;
@@ -62,9 +62,10 @@ void HungarianMatching::createMatrix() {
                 if (_slots[i].blocked) {
                         continue;
                 }
+		_hungarianMatrix[slotIndex].resize(_numIOPins);
                 _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                         DBU hpwl = _netlist.computeIONetHPWL(idx, newPos);
-                        _hungarianMatrix(slotIndex, pinIndex) = hpwl;
+                        _hungarianMatrix[slotIndex][pinIndex] = hpwl;
                         pinIndex++;
                 });
                 slotIndex++;
@@ -76,7 +77,7 @@ inline bool samePos(Coordinate& a, Coordinate& b) {
 }
 
 void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigment) {
-        size_t rows = _hungarianMatrix.rows();
+        size_t rows = _nonBlockedSlots;
         size_t col = 0;
         unsigned slotIndex = 0;
         _netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
@@ -85,7 +86,7 @@ void HungarianMatching::getFinalAssignment(std::vector<IOPin>& assigment) {
                         while (_slots[slotIndex].blocked &&
                                slotIndex < _slots.size())
                                 slotIndex++;
-                        if (_hungarianMatrix(row, col) != 0) {
+                        if (_assignment[row] != col) {
                                 slotIndex++;
                                 continue;
                         }

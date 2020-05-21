@@ -38,7 +38,13 @@
 #ifndef __HUNGARIANMATCHING_H_
 #define __HUNGARIANMATCHING_H_
 
-#include "munkres/munkres.h"
+#include "src/Hungarian.h"
+#include <list>
+#include <utility>
+#include <iostream>
+#include <cmath>
+#include <limits>
+#include <algorithm>
 
 #include "Coordinate.h"
 #include "Netlist.h"
@@ -49,8 +55,9 @@ namespace ioPlacer {
 
 class HungarianMatching {
        private:
-        Matrix<DBU> _hungarianMatrix;
-        Munkres<DBU> _hungarianSolver;
+        std::vector<std::vector<DBU>> _hungarianMatrix;
+	std::vector<int> _assignment;
+	HungarianAlgorithm _hungarianSolver;
         Netlist& _netlist;
         slotVector_t& _slots;
         unsigned _beginSlot;

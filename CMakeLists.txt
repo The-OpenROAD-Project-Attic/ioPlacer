@@ -82,12 +82,14 @@ set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
 
 add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_TCL_INIT})
 
+add_subdirectory(${IOPLACER_HOME}/third_party/munkres)
+
 add_dependencies(${BIN_NAME} tclInterfaceWrapper)
 
 target_include_directories(${BIN_NAME} PUBLIC
         ${OPENSTA_HOME}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/third_party
+        ${IOPLACER_HOME}/third_party/munkres
         ${OPENROAD_HOME}/include
 	${TCL_INCLUDE_PATH}
         )
@@ -98,6 +100,7 @@ target_link_libraries(${BIN_NAME}
         ${TCL_LIB}
         opendb
         lefin
+	Munkres
 	)
                       
                       
