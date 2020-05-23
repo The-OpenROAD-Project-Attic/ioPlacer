@@ -551,10 +551,8 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
             pin.getOrientation() == Orientation::ORIENT_SOUTH) {
                 float thicknessMultiplier = _parms->getVerticalThicknessMultiplier();
                 DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0)) * thicknessMultiplier;
-                DBU height =
-                    _core.getMinAreaX() != 0.0
-                        ? DBU(ceil(_core.getMinAreaX() / (2.0 * halfWidth)))
-                        : 2 * halfWidth;
+                DBU height = DBU(std::max(2.0 * halfWidth, ceil(_core.getMinAreaX() / (2.0 * halfWidth))));
+
                 DBU ext = 0;
                 if (_parms->getVerticalLength() != -1) {
                         height = _parms->getVerticalLength() *
@@ -579,16 +577,12 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
             pin.getOrientation() == Orientation::ORIENT_EAST) {
                 float thicknessMultiplier = _parms->getHorizontalThicknessMultiplier();
                 DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0)) * thicknessMultiplier;
-                DBU height = 0;
+                DBU height = DBU(std::max(2.0 * halfWidth, ceil(_core.getMinAreaY() / (2.0 * halfWidth))));
+
                 DBU ext = 0;
                 if (_parms->getHorizontalLengthExtend() != -1) {
                         ext = _parms->getHorizontalLengthExtend() *
                                  _core.getDatabaseUnit();
-                }
-                if (_core.getMinAreaY() != 0.0) {
-                        height = ceil(_core.getMinAreaY() / (2.0 * halfWidth));
-                } else {
-                        height = 2.0 * halfWidth;
                 }
                 if (_parms->getHorizontalLength() != -1) {
                         height = _parms->getHorizontalLength() *
