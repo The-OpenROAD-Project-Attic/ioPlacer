@@ -43,8 +43,8 @@ namespace ioPlacer {
 
 void IOPlacementKernel::initNetlistAndCore() {
         //if (!_parms->isInteractiveMode()) {
-        //        _dbWrapper.parseLEF(_parms->getInputLefFile()); 
-        //        _dbWrapper.parseDEF(_parms->getInputDefFile()); 
+        //        _dbWrapper.parseLEF(_parms->getInputLefFile());
+        //        _dbWrapper.parseDEF(_parms->getInputDefFile());
         //}
 
         _dbWrapper.populateIOPlacer();
@@ -112,15 +112,15 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                 Section_t s = {Coordinate(0, 0)};
                 _sections.push_back(s);
         }
-        
+
 	// MF @ 2020/03/09: Set the seed for std::random_shuffle
 	srand(seed);
 	//---
-	
+
 	switch (mode) {
                 case RandomMode::Full:
                         std::cout << "RandomMode Full\n";
-                        
+
 			for (size_t i = 0; i < vSlots.size(); ++i) {
                                 vSlots[i] = i;
                         }
@@ -130,7 +130,7 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
 			// std::random_shuffle is deterministic across versions
                         std::random_shuffle(vSlots.begin(), vSlots.end());
                         // ---
-		
+
 			_netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vSlots[0];
                                 ioPin.setPos(_slots.at(b).pos);
@@ -141,17 +141,17 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         break;
                 case RandomMode::Even:
                         std::cout << "RandomMode Even\n";
-			
+
 			for (size_t i = 0; i < vIOs.size(); ++i) {
 				vIOs[i] = i;
 			}
-						
+
 			// MF @ 2020/03/09: std::shuffle produces different results
 			// between gccs 4.8.x and 8.5.x
 			// std::random_shuffle is deterministic across versions
 			std::random_shuffle(vIOs.begin(), vIOs.end());
                         // ---
-			
+
 			_netlist.forEachIOPin([&](unsigned idx, IOPin& ioPin) {
                                 unsigned b = vIOs[0];
                                 ioPin.setPos(_slots.at(floor(b * shift)).pos);
@@ -174,7 +174,7 @@ void IOPlacementKernel::randomPlacement(const RandomMode mode) {
                         for (size_t i = mid4; i < mid4 + lastSlots; i++) {
                                 vIOs[idx++] = i;
                         }
-			
+
 			// MF @ 2020/03/09: std::shuffle produces different results
 			// between gccs 4.8.x and 8.5.x
 			// std::random_shuffle is deterministic across versions
@@ -265,29 +265,51 @@ void IOPlacementKernel::defineSlots() {
          *                 ---->                    *
          *******************************************/
 
-        std::vector<Coordinate> slotsEdge1;
-        DBU currX = initTracksX;
-        DBU currY = lb.getY();
 
-        for (int i = 0; i < numTracksX; ++i) {
+
+        int start_idx, end_idx;
+        DBU currX, currY;
+        float thicknessMultiplierV = _parms->getVerticalThicknessMultiplier();
+        float thicknessMultiplierH = _parms->getHorizontalThicknessMultiplier();
+        DBU halfWidthX = DBU(ceil(_core.getMinWidthX() / 2.0)) * thicknessMultiplierV;
+        DBU halfWidthY = DBU(ceil(_core.getMinWidthY() / 2.0)) * thicknessMultiplierH;
+
+        std::vector<Coordinate> slotsEdge1;
+
+        // For wider pins (when set_hor|ver_thick multiplier is used), a valid
+        // slot is one that does not cause a part of the pin to lie outside
+        // the die area (OffGrid violation):
+        // (offset + k_start * pitch) - halfWidth >= lower_bound , where k_start is a non-negative integer => start_idx is k_start
+        // (offset + k_end * pitch) + halfWidth <= upper_bound, where k_end is a non-negative integer => end_idx is k_end
+        //     ^^^^^^^^ position of tracks(slots)
+
+        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX));
+        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX));
+        currX = initTracksX + start_idx * minDstPinsX;
+        currY = lbY;
+        for (int i = start_idx; i <= end_idx; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge1.push_back(pos);
                 currX += minDstPinsX;
         }
 
         std::vector<Coordinate> slotsEdge2;
-        currY = initTracksY;
-        currX = ub.getX();
-        for (int i = 0; i < numTracksY; ++i) {
+        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY));
+        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY));
+        currY = initTracksY + start_idx * minDstPinsY;
+        currX = ubX;
+        for (int i = start_idx; i <= end_idx; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge2.push_back(pos);
                 currY += minDstPinsY;
         }
 
         std::vector<Coordinate> slotsEdge3;
-        currX = initTracksX;
-        currY = ub.getY();
-        for (int i = 0; i < numTracksX; ++i) {
+        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX));
+        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX));
+        currX = initTracksX + start_idx * minDstPinsX;
+        currY = ubY;
+        for (int i = start_idx; i <= end_idx; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge3.push_back(pos);
                 currX += minDstPinsX;
@@ -295,9 +317,11 @@ void IOPlacementKernel::defineSlots() {
         std::reverse(slotsEdge3.begin(), slotsEdge3.end());
 
         std::vector<Coordinate> slotsEdge4;
-        currY = initTracksY;
-        currX = lb.getX();
-        for (int i = 0; i < numTracksY; ++i) {
+        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY));
+        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY));
+        currY = initTracksY + start_idx * minDstPinsY;
+        currX = lbX;
+        for (int i = start_idx; i <= end_idx; ++i) {
                 Coordinate pos(currX, currY);
                 slotsEdge4.push_back(pos);
                 currY += minDstPinsY;
@@ -523,7 +547,7 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
         DBU upperXBound = _core.getUpperBound().getX();
         DBU upperYBound = _core.getUpperBound().getY();
 
-        if (pin.getOrientation() == Orientation::ORIENT_NORTH || 
+        if (pin.getOrientation() == Orientation::ORIENT_NORTH ||
             pin.getOrientation() == Orientation::ORIENT_SOUTH) {
                 float thicknessMultiplier = _parms->getVerticalThicknessMultiplier();
                 DBU halfWidth = DBU(ceil(_core.getMinWidthX() / 2.0)) * thicknessMultiplier;
@@ -541,7 +565,7 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                         ext = _parms->getVerticalLengthExtend() *
                                  _core.getDatabaseUnit();
                 }
-        
+
                 if (pin.getOrientation() == Orientation::ORIENT_NORTH) {
                         pin.setLowerBound(pin.getX() - halfWidth, pin.getY() - ext);
                         pin.setUpperBound(pin.getX() + halfWidth, pin.getY() + height);
@@ -551,7 +575,7 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                 }
         }
 
-        if (pin.getOrientation() == Orientation::ORIENT_WEST || 
+        if (pin.getOrientation() == Orientation::ORIENT_WEST ||
             pin.getOrientation() == Orientation::ORIENT_EAST) {
                 float thicknessMultiplier = _parms->getHorizontalThicknessMultiplier();
                 DBU halfWidth = DBU(ceil(_core.getMinWidthY() / 2.0)) * thicknessMultiplier;
@@ -570,7 +594,7 @@ inline void IOPlacementKernel::updatePinArea(IOPin& pin) {
                         height = _parms->getHorizontalLength() *
                                  _core.getDatabaseUnit();
                 }
-                
+
                 if (pin.getOrientation() == Orientation::ORIENT_EAST) {
                         pin.setLowerBound(pin.getX() - ext, pin.getY() - halfWidth);
                         pin.setUpperBound(pin.getX() + height, pin.getY() + halfWidth);
@@ -691,7 +715,7 @@ void IOPlacementKernel::run() {
 }
 
 void IOPlacementKernel::writeDEF() {
-       _dbWrapper.writeDEF(); 
+       _dbWrapper.writeDEF();
 }
 
 }
