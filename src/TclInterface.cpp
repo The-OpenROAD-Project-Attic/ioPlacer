@@ -128,6 +128,10 @@ const char* get_blockages_file(){
         return parmsToIOPlacer->getBlockagesFile().c_str();
 }
 
+void add_blocked_area(long long int llx, long long int lly, long long int urx, long long int ury) {
+        ioPlacerKernel->addBlockedArea(llx, lly, urx, ury);
+}
+
 void  set_hor_length(float length){
         parmsToIOPlacer->setHorizontalLength(length);
 }

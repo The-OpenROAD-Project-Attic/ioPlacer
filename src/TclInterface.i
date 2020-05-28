@@ -61,6 +61,7 @@ extern void  set_usage_factor(float factor);
 extern float get_usage_factor();
 extern void  set_blockages_file(const char* file);
 extern const char* get_blockages_file();
+extern void add_blocked_area(long long int llx, long long int lly, long long int urx, long long int ury);
 extern float get_ver_length_extend();
 extern float get_hor_length_extend();
 extern void  set_hor_length_extend(float length);

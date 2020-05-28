@@ -101,6 +101,7 @@ class IOPlacementKernel {
         void parseLef(const std::string& file) { _dbWrapper.parseLEF(file); }
         void parseDef(const std::string& file) { _dbWrapper.parseDEF(file); }
         DBU returnIONetsHPWL();
+        void addBlockedArea(long long int llx, long long int lly, long long int urx, long long int ury);
 };
 
 }

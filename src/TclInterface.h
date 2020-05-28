@@ -64,6 +64,7 @@ void   set_usage_factor(float factor);
 float  get_usage_factor();
 void   set_blockages_file(const char* file);
 const  char* get_blockages_file();
+void add_blocked_area(long long int llx, long long int lly, long long int urx, long long int ury);
 void   set_hor_length_extend(float length);
 void   set_hor_length(float length);
 float  get_hor_length();

@@ -612,6 +612,14 @@ DBU IOPlacementKernel::returnIONetsHPWL(Netlist& netlist) {
 
 DBU IOPlacementKernel::returnIONetsHPWL() { return returnIONetsHPWL(_netlist); }
 
+void IOPlacementKernel::addBlockedArea(long long int llx, long long int lly, long long int urx, long long int ury) {
+        Coordinate lowerLeft = Coordinate(llx, lly);
+        Coordinate upperRight = Coordinate(urx, ury);
+        std::pair<Coordinate, Coordinate> blkArea = std::make_pair(lowerLeft, upperRight);
+
+        _blockagesArea.push_back(blkArea);
+}
+
 void IOPlacementKernel::run() {
         initParms();
 
