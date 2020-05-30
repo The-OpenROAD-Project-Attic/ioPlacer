@@ -43,6 +43,23 @@ sta::define_cmd_args "io_placer" {[-hor_layer h_layer] \
                                  }
 
 proc io_placer { args } {
+  set db [::ord::get_db]
+  set block [[$db getChip] getBlock]
+  set blockages {}
+
+  foreach inst [$block getInsts] {
+    if { [$inst isBlock] } {
+      if { ![$inst isPlaced] } {
+        puts "\[ERROR\] Macro [$inst getName] is not placed"
+          continue
+      }
+      lappend blockages $inst
+    }
+  }
+
+  set num_macroblocks [llength $blockages]
+  puts "#Macro blocks found: $num_macroblocks"
+
   sta::parse_key_args "io_placer" args \
   keys {-hor_layer -ver_layer -random_seed} flags {-random}
 
