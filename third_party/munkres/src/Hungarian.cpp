@@ -12,6 +12,7 @@
 #include <stdlib.h>
 #include <cfloat> // for DBL_MAX
 #include <cmath>  // for fabs()
+#include <limits>
 #include "Hungarian.h"
 
 
@@ -367,7 +368,7 @@ void HungarianAlgorithm::step5(int *assignment, long long int *distMatrix, bool 
 	int row, col;
 
 	/* find smallest uncovered element h */
-	h = DBL_MAX;
+	h = std::numeric_limits<long long int>::max();
 	for (row = 0; row<nOfRows; row++)
 		if (!coveredRows[row])
 			for (col = 0; col<nOfColumns; col++)
