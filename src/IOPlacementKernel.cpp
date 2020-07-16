@@ -242,6 +242,9 @@ void IOPlacementKernel::defineSlots() {
         unsigned numTracksX = _core.getNumTracksX();
         unsigned numTracksY = _core.getNumTracksY();
         int offset = _parms->getBoundariesOffset();
+        offset *= _core.getDatabaseUnit();
+
+        int num_tracks_offset = std::ceil(offset / (std::max(minDstPinsX, minDstPinsY)));
 
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;
@@ -283,8 +286,8 @@ void IOPlacementKernel::defineSlots() {
         // (offset + k_end * pitch) + halfWidth <= upper_bound, where k_end is a non-negative integer => end_idx is k_end
         //     ^^^^^^^^ position of tracks(slots)
 
-        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX)) + offset;
-        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX)) - offset;
+        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX)) + num_tracks_offset;
+        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX)) - num_tracks_offset;
         currX = initTracksX + start_idx * minDstPinsX;
         currY = lbY;
         for (int i = start_idx; i <= end_idx; ++i) {
@@ -294,8 +297,8 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge2;
-        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY)) + offset;
-        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY)) - offset;
+        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY)) + num_tracks_offset;
+        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY)) - num_tracks_offset;
         currY = initTracksY + start_idx * minDstPinsY;
         currX = ubX;
         for (int i = start_idx; i <= end_idx; ++i) {
@@ -305,8 +308,8 @@ void IOPlacementKernel::defineSlots() {
         }
 
         std::vector<Coordinate> slotsEdge3;
-        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX)) + offset;
-        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX)) - offset;
+        start_idx = std::max(0.0, ceil( (lbX + halfWidthX - initTracksX) / (double)minDstPinsX)) + num_tracks_offset;
+        end_idx = std::min(double(numTracksX-1), floor( (ubX - halfWidthX - initTracksX) / (double)minDstPinsX)) - num_tracks_offset;
         currX = initTracksX + start_idx * minDstPinsX;
         currY = ubY;
         for (int i = start_idx; i <= end_idx; ++i) {
@@ -317,8 +320,8 @@ void IOPlacementKernel::defineSlots() {
         std::reverse(slotsEdge3.begin(), slotsEdge3.end());
 
         std::vector<Coordinate> slotsEdge4;
-        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY)) + offset;
-        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY)) - offset;
+        start_idx = std::max(0.0, ceil( (lbY + halfWidthY - initTracksY) / (double)minDstPinsY)) + num_tracks_offset;
+        end_idx = std::min(double(numTracksY-1), floor( (ubY - halfWidthY - initTracksY) / (double)minDstPinsY)) - num_tracks_offset;
         currY = initTracksY + start_idx * minDstPinsY;
         currX = lbX;
         for (int i = start_idx; i <= end_idx; ++i) {

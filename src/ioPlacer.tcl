@@ -88,7 +88,7 @@ proc io_placer { args } {
     puts "Warning: use -ver_layer to set the vertical layer."
   }
 
-  set offset 40
+  set offset 5
   if [info exists keys(-boundaries_offset)] {
     set offset $keys(-boundaries_offset)
     ioPlacer::set_boundaries_offset $offset
