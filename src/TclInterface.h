@@ -85,6 +85,7 @@ float  get_ver_thick_multiplier();
 float  get_hor_thick_multiplier();
 float  get_hor_length_extend();
 float  get_ver_length_extend();
+void set_boundaries_offset(int offset);
 
 // flow
 void run_io_placement();

@@ -85,5 +85,6 @@ extern void  set_num_threads(int numThreads);
 extern int   get_num_threads();
 extern void   set_rand_seed(double seed);
 extern double get_rand_seed();
+extern void set_boundaries_offset(int offset);
 
 }

@@ -241,6 +241,7 @@ void IOPlacementKernel::defineSlots() {
         unsigned initTracksY = _core.getInitTracksY();
         unsigned numTracksX = _core.getNumTracksX();
         unsigned numTracksY = _core.getNumTracksY();
+        int offset = _parms->getBoundariesOffset();
 
         DBU totalNumSlots = 0;
         totalNumSlots += (ubX - lbX) * 2 / minDstPinsX;

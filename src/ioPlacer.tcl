@@ -34,10 +34,11 @@
 ###############################################################################
 
 
-sta::define_cmd_args "io_placer" {[-hor_layer h_layer] \ 
-                                  [-ver_layer v_layer] \
-                                  [-random_seed seed]  \
-                       	          [-random]            \
+sta::define_cmd_args "io_placer" {[-hor_layer h_layer]        \ 
+                                  [-ver_layer v_layer]        \
+                                  [-random_seed seed]         \
+                       	          [-random]                   \
+                                  [-boundaries_offset offset] \
                                  }
 
 proc io_placer { args } {
@@ -59,7 +60,7 @@ proc io_placer { args } {
   puts "#Macro blocks found: $num_macroblocks"
 
   sta::parse_key_args "io_placer" args \
-  keys {-hor_layer -ver_layer -random_seed} flags {-random}
+  keys {-hor_layer -ver_layer -random_seed -boundaries_offset} flags {-random}
 
   if { [info exists flags(-random)] } {
     ioPlacer::set_random_mode 2
@@ -85,7 +86,16 @@ proc io_placer { args } {
     ioPlacer::set_ver_metal_layer $ver_layer
   } else {
     puts "Warning: use -ver_layer to set the vertical layer."
-  }       
+  }
+
+  set offset 40
+  if [info exists keys(-boundaries_offset)] {
+    set offset $keys(-boundaries_offset)
+    ioPlacer::set_boundaries_offset $offset
+  } else {
+    puts "Warning: using the default boundaries offset ($offset tracks)"
+    ioPlacer::set_boundaries_offset $offset
+  }
  
   if { [ord::db_layer_has_hor_tracks $hor_layer] && \
        [ord::db_layer_has_ver_tracks $ver_layer] } {

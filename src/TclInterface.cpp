@@ -227,4 +227,8 @@ float  get_hor_length_extend() {
 float  get_ver_length_extend() {
         return parmsToIOPlacer->getVerticalLengthExtend();
 }
+
+void set_boundaries_offset(int offset) {
+        parmsToIOPlacer->setBoundariesOffset(offset);
+}
 }

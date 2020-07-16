@@ -76,7 +76,6 @@ class IOPlacementKernel {
         std::vector<IOPin> _zeroSinkIOs;
         RandomMode _randomMode = RandomMode::Full;
         bool _cellsPlaced = true;
-        const int offset = 10;
 
         void initNetlistAndCore();
         void initIOLists();

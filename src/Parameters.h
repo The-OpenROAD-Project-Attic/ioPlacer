@@ -68,7 +68,8 @@ class Parameters {
         bool  _interactiveMode = false;
         int _numThreads = -1;
         double _randSeed = 42.0;
-        unsigned _dbId;        
+        unsigned _dbId;
+        int _boundariesOffset;    
 
        public:
         Parameters() = default;
@@ -116,6 +117,8 @@ class Parameters {
         float getHorizontalThicknessMultiplier() const { return _horizontalThicknessMultiplier; }
         void setVerticalThicknessMultiplier(float length) { _verticalThicknessMultiplier = length; }
         float getVerticalThicknessMultiplier() const { return _verticalThicknessMultiplier; }
+        void setBoundariesOffset(int offset) { _boundariesOffset = offset; }
+        int getBoundariesOffset() const { return _boundariesOffset; }
 
         void setDbId(unsigned idx) { _dbId = idx; }
         unsigned getDbId() const { return _dbId; }
