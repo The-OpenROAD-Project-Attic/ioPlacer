@@ -93,7 +93,7 @@ proc io_placer { args } {
     set offset $keys(-boundaries_offset)
     ioPlacer::set_boundaries_offset $offset
   } else {
-    puts "Warning: using the default boundaries offset ($offset tracks)"
+    puts "Warning: using the default boundaries offset ($offset microns)"
     ioPlacer::set_boundaries_offset $offset
   }
  
