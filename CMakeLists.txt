@@ -50,6 +50,8 @@ if( CMAKE_BUILD_TYPE MATCHES "[Dd][Ee][Bb][Uu][Gg]" )
         add_definitions(-DDEBUG)
 endif()
 
+add_subdirectory(${IOPLACER_HOME}/third_party/munkres)
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
@@ -59,15 +61,16 @@ find_package(ZLIB REQUIRED)
 
 # Loads swig and generates the tcl wrapper file
 find_package(SWIG REQUIRED)
-add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp
-        COMMAND ${SWIG_EXECUTABLE} -namespace -prefix ioPlacer -tcl8 -c++ -o ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/TclInterface.i   
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        COMMENT "Generating swig wrapper"
-)
-add_custom_target(tclInterfaceWrapper DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
 
-
+set(IOPLACER_WRAP ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
 set(IOPLACER_TCL_INIT ${CMAKE_CURRENT_BINARY_DIR}/IoplacerTclInitVar.cc)
+
+add_custom_command(OUTPUT ${IOPLACER_WRAP}
+        COMMAND ${SWIG_EXECUTABLE} -namespace -prefix ioPlacer -tcl8 -c++ -o ${IOPLACER_WRAP} ${IOPLACER_HOME}/src/TclInterface.i   
+        WORKING_DIRECTORY ${IOPLACER_HOME}/src
+        DEPENDS ${IOPLACER_HOME}/src/ioPlacer.tcl ${OPENSTA_HOME}/etc/TclEncode.tcl
+)
+
 add_custom_command(OUTPUT ${IOPLACER_TCL_INIT}
         COMMAND ${OPENSTA_HOME}/etc/TclEncode.tcl ${IOPLACER_TCL_INIT} ioplacer_tcl_inits ${IOPLACER_HOME}/src/ioPlacer.tcl
         WORKING_DIRECTORY ${IOPLACER_HOME}/src
@@ -78,11 +81,7 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 set(SRC_FILES ${SRC_FILES} ${CMAKE_CURRENT_BINARY_DIR}/TclInterfaceWrap.cpp)
 
 
-add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_TCL_INIT})
-
-add_subdirectory(${IOPLACER_HOME}/third_party/munkres)
-
-add_dependencies(${BIN_NAME} tclInterfaceWrapper)
+add_LIBRARY(${BIN_NAME} STATIC ${SRC_FILES} ${IOPLACER_WRAP} ${IOPLACER_TCL_INIT})
 
 target_include_directories(${BIN_NAME} PUBLIC
         ${OPENSTA_HOME}/include
