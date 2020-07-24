@@ -231,4 +231,9 @@ float  get_ver_length_extend() {
 void set_boundaries_offset(int offset) {
         parmsToIOPlacer->setBoundariesOffset(offset);
 }
+
+void set_min_distance(int minDist) {
+    parmsToIOPlacer->setMinDistance(minDist);
+}
+
 }

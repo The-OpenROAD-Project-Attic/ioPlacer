@@ -39,6 +39,7 @@ sta::define_cmd_args "io_placer" {[-hor_layer h_layer]        \
                                   [-random_seed seed]         \
                        	          [-random]                   \
                                   [-boundaries_offset offset] \
+                                  [-min_distance min_dist]    \
                                  }
 
 proc io_placer { args } {
@@ -60,7 +61,7 @@ proc io_placer { args } {
   puts "#Macro blocks found: $num_macroblocks"
 
   sta::parse_key_args "io_placer" args \
-  keys {-hor_layer -ver_layer -random_seed -boundaries_offset} flags {-random}
+  keys {-hor_layer -ver_layer -random_seed -boundaries_offset -min_distance} flags {-random}
 
   if { [info exists flags(-random)] } {
     ioPlacer::set_random_mode 2
@@ -95,6 +96,15 @@ proc io_placer { args } {
   } else {
     puts "Warning: using the default boundaries offset ($offset microns)"
     ioPlacer::set_boundaries_offset $offset
+  }
+
+  set min_dist 2
+  if [info exists keys(-min_distance)] {
+    set min_dist $keys(-min_distance)
+    ioPlacer::set_min_distance $min_dist
+  } else {
+    puts "Warning: using the default min distance between IO pins ($min_dist tracks)"
+    ioPlacer::set_min_distance $min_dist
   }
  
   if { [ord::db_layer_has_hor_tracks $hor_layer] && \

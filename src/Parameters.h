@@ -69,7 +69,8 @@ class Parameters {
         int _numThreads = -1;
         double _randSeed = 42.0;
         unsigned _dbId;
-        int _boundariesOffset;    
+        int _boundariesOffset;
+        int _minDist;
 
        public:
         Parameters() = default;
@@ -119,6 +120,8 @@ class Parameters {
         float getVerticalThicknessMultiplier() const { return _verticalThicknessMultiplier; }
         void setBoundariesOffset(int offset) { _boundariesOffset = offset; }
         int getBoundariesOffset() const { return _boundariesOffset; }
+        void setMinDistance(int minDist) { _minDist = minDist; }
+        int getMinDistance() const { return _minDist; }
 
         void setDbId(unsigned idx) { _dbId = idx; }
         unsigned getDbId() const { return _dbId; }

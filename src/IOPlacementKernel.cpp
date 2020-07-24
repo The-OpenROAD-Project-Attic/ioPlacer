@@ -235,8 +235,8 @@ void IOPlacementKernel::defineSlots() {
         DBU lbY = lb.getY();
         DBU ubX = ub.getX();
         DBU ubY = ub.getY();
-        unsigned minDstPinsX = _core.getMinDstPinsX();
-        unsigned minDstPinsY = _core.getMinDstPinsY();
+        unsigned minDstPinsX = _core.getMinDstPinsX() * _parms->getMinDistance();
+        unsigned minDstPinsY = _core.getMinDstPinsY() * _parms->getMinDistance();
         unsigned initTracksX = _core.getInitTracksX();
         unsigned initTracksY = _core.getInitTracksY();
         unsigned numTracksX = _core.getNumTracksX();
